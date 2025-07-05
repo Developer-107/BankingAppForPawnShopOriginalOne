@@ -99,8 +99,8 @@ class EditPaidPercentWindow(QWidget):
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
                                 amount = ?
-                            WHERE contract_id = ? AND status = ?
-                        """, (new_amount, contract_id, status))
+                            WHERE contract_id = ? AND status = ? AND date_of_inflow = ?
+                        """, (new_amount, contract_id, status, payment_date))
             conn.commit()
             conn.close()
 
@@ -119,12 +119,12 @@ class EditPaidPercentWindow(QWidget):
             cursor.execute("""
                                 UPDATE inflow_order_both SET
                                     percent_paid_amount = ?
-                                WHERE contract_id = ? AND payment_date = ? AND principal_paid_money = ?
+                                WHERE contract_id = ? AND payment_date = ? AND principle_paid_amount = ?
                                 """, (new_amount, contract_id, payment_date, 0))
             conn.commit()
             conn.close()
 
-            # U need to test this code in this GUI
+
 
 
 

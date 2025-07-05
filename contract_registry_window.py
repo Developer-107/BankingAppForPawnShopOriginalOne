@@ -67,16 +67,17 @@ class ContractRegistry(QWidget):
         self.to_date.setCalendarPopup(True)
         self.to_date.setDate(QDate.currentDate())
 
-        self.contract_date_radio = QRadioButton("გაფორმების თარიღით")
-        self.contract_date_radio.setChecked(True)  # Default
+        self.contract_date_radio = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
         self.closing_date_radio = QRadioButton("დამატების თარიღით")
+        self.closing_date_radio.setChecked(True)  # Default
+
 
         box_layout1.addWidget(self.contract_date_radio, 0, 0, 1, 2)
         box_layout1.addWidget(self.closing_date_radio, 1, 0, 1, 2)
 
-        box_layout1.addWidget(QLabel("დან თარიღი:"), 2, 0)
+        box_layout1.addWidget(QLabel("*დან თარიღი:"), 2, 0)
         box_layout1.addWidget(self.from_date, 2, 1)
-        box_layout1.addWidget(QLabel("მდე თარიღი:"), 3, 0)
+        box_layout1.addWidget(QLabel("*მდე თარიღი:"), 3, 0)
         box_layout1.addWidget(self.to_date, 3, 1)
 
 
@@ -216,16 +217,15 @@ class ContractRegistry(QWidget):
         self.to_date_2.setCalendarPopup(True)
         self.to_date_2.setDate(QDate.currentDate())
 
-        self.date_radio_2 = QRadioButton("თარიღით ძებნა")
-        self.date_radio_2.setChecked(True)
-        self.closing_date_radio_2 = QRadioButton("დამატების თარიღით")
-
+        self.date_radio_2 = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
+        self.closing_date_radio_2 = QRadioButton("ძირის შემოტანის თარიღით")
+        self.closing_date_radio_2.setChecked(True)
 
         box_layout2_1.addWidget(self.date_radio_2, 0, 0, 1, 2)
         box_layout2_1.addWidget(self.closing_date_radio_2, 1, 0, 1, 2)
-        box_layout2_1.addWidget(QLabel("დან თარიღი:"), 2, 0)
+        box_layout2_1.addWidget(QLabel("*დან თარიღი:"), 2, 0)
         box_layout2_1.addWidget(self.from_date_2, 2, 1)
-        box_layout2_1.addWidget(QLabel("მდე თარიღი:"), 3, 0)
+        box_layout2_1.addWidget(QLabel("*მდე თარიღი:"), 3, 0)
         box_layout2_1.addWidget(self.to_date_2, 3, 1)
 
         search_button_2 = QPushButton("ძებნა")
@@ -350,15 +350,15 @@ class ContractRegistry(QWidget):
         self.to_date_3.setCalendarPopup(True)
         self.to_date_3.setDate(QDate.currentDate())
 
-        self.date_radio_3 = QRadioButton("თარიღით ძებნა")
-        self.date_radio_3.setChecked(True)
-        self.closing_date_radio_3 = QRadioButton("დამატების თარიღით")
+        self.date_radio_3 = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
+        self.closing_date_radio_3 = QRadioButton("პროცენტის დარიცხვის თარიღით")
+        self.closing_date_radio_3.setChecked(True)
 
         box_layout3_1.addWidget(self.date_radio_3, 0, 0, 1, 2)
         box_layout3_1.addWidget(self.closing_date_radio_3, 1, 0, 1, 2)
-        box_layout3_1.addWidget(QLabel("დან თარიღი:"), 2, 0)
+        box_layout3_1.addWidget(QLabel("*დან თარიღი:"), 2, 0)
         box_layout3_1.addWidget(self.from_date_3, 2, 1)
-        box_layout3_1.addWidget(QLabel("მდე თარიღი:"), 3, 0)
+        box_layout3_1.addWidget(QLabel("*მდე თარიღი:"), 3, 0)
         box_layout3_1.addWidget(self.to_date_3, 3, 1)
 
         search_button_3 = QPushButton("ძებნა")
@@ -480,15 +480,15 @@ class ContractRegistry(QWidget):
         self.to_date_4.setCalendarPopup(True)
         self.to_date_4.setDate(QDate.currentDate())
 
-        self.date_radio_4 = QRadioButton("თარიღით ძებნა")
-        self.date_radio_4.setChecked(True)
-        self.closing_date_radio_4 = QRadioButton("დამატების თარიღით")
+        self.date_radio_4 = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
+        self.closing_date_radio_4 = QRadioButton("პროცენტის გადახდის თარიღით")
+        self.closing_date_radio_4.setChecked(True)
 
         box_layout4_1.addWidget(self.date_radio_4, 0, 0, 1, 2)
         box_layout4_1.addWidget(self.closing_date_radio_4, 1, 0, 1, 2)
-        box_layout4_1.addWidget(QLabel("დან თარიღი:"), 2, 0)
+        box_layout4_1.addWidget(QLabel("*დან თარიღი:"), 2, 0)
         box_layout4_1.addWidget(self.from_date_4, 2, 1)
-        box_layout4_1.addWidget(QLabel("მდე თარიღი:"), 3, 0)
+        box_layout4_1.addWidget(QLabel("*მდე თარიღი:"), 3, 0)
         box_layout4_1.addWidget(self.to_date_4, 3, 1)
 
         search_button_4 = QPushButton("ძებნა")
@@ -554,7 +554,7 @@ class ContractRegistry(QWidget):
         delete_button_4.setFixedSize(145, 45)
         delete_button_4.setStyleSheet("font-size: 16px;")
         delete_button_4.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        # delete_button_4.clicked.connect(self.delete_selected_row_4)
+        delete_button_4.clicked.connect(self.delete_selected_row_4)
 
         export_button_4 = QToolButton()
         export_button_4.setText(" ექსპორტი ")
@@ -968,13 +968,13 @@ class ContractRegistry(QWidget):
         self.model2.select()  # This reloads the data from DB
 
     def search_by_date(self):
-        from_date_str = self.from_date.date().toString("dd.MM.yyyy")
-        to_date_str = self.to_date.date().toString("dd.MM.yyyy")
+        from_date_str = self.from_date.date().toString("yyyy-MM-dd")
+        to_date_str = self.to_date.date().toString("yyyy-MM-dd HH:mm:ss")
 
         if self.contract_date_radio.isChecked():
-            date_column = "date"
+            date_column = "date_of_C_O"
         elif self.closing_date_radio.isChecked():
-            date_column = "closing_date"
+            date_column = "date_of_addition"
         else:
             QMessageBox.warning(self, "შეცდომა", "აირჩიეთ თარიღის ტიპი.")
             return
@@ -988,7 +988,7 @@ class ContractRegistry(QWidget):
         column = ""
 
         if self.contract_radio.isChecked():
-            column = "id"
+            column = "contract_id"
         elif self.name_radio.isChecked():
             column = "name_surname"
         elif self.id_radio.isChecked():
@@ -998,7 +998,7 @@ class ContractRegistry(QWidget):
         elif self.tel_radio.isChecked():
             column = "tel_number"
         elif self.imei_radio.isChecked():
-            column = "imei"
+            column = "IMEI"
 
         if column:
             filter_str = f"{column} LIKE '%{text}%'"
@@ -1148,13 +1148,13 @@ class ContractRegistry(QWidget):
         self.model3.select()  # Reload data from principal_inflows.db
 
     def search_by_date_2(self):
-        from_date_str = self.from_date_2.date().toString("dd.MM.yyyy HH.mm.ss")
-        to_date_str = self.to_date_2.date().toString("dd.MM.yyyy HH.mm.ss")
+        from_date_str = self.from_date_2.date().toString("yyyy-MM-dd HH:mm:ss")
+        to_date_str = self.to_date_2.date().toString("yyyy-MM-dd HH:mm:ss")
 
         if self.date_radio_2.isChecked():
-            date_column = "date"
+            date_column = "date_C_O"
         elif self.closing_date_radio_2.isChecked():
-            date_column = "closing_date"
+            date_column = "date_of_payment"
         else:
             QMessageBox.warning(self, "შეცდომა", "აირჩიეთ თარიღის ტიპი.")
             return
@@ -1171,13 +1171,13 @@ class ContractRegistry(QWidget):
         elif self.id_radio_2.isChecked():
             column = "id_number"
         elif self.contract_radio_2.isChecked():
-            column = "id"
+            column = "contract_id"
         elif self.model_radio_2.isChecked():
             column = "model"
         elif self.tel_radio_2.isChecked():
             column = "tel_number"
         elif self.imei_radio_2.isChecked():
-            column = "imei"
+            column = "IMEI"
 
         if column:
             filter_str = f"{column} LIKE '%{text}%'"
@@ -1329,11 +1329,11 @@ class ContractRegistry(QWidget):
         self.model3_1.select()
 
     def search_by_date_3(self):
-        from_date_str = self.from_date_3.date().toString("dd.MM.yyyy HH.mm.ss")
-        to_date_str = self.to_date_3.date().toString("dd.MM.yyyy HH.mm.ss")
+        from_date_str = self.from_date_3.date().toString("yyyy-MM-dd HH:mm:ss")
+        to_date_str = self.to_date_3.date().toString("yyyy-MM-dd HH:mm:ss")
 
         if self.date_radio_3.isChecked():
-            date_column = "date"
+            date_column = "date_of_C_O"
         elif self.closing_date_radio_3.isChecked():
             date_column = "date_of_percent_addition"
         else:
@@ -1358,7 +1358,7 @@ class ContractRegistry(QWidget):
         elif self.tel_radio_3.isChecked():
             column = "tel_number"
         elif self.imei_radio_3.isChecked():
-            column = "imei"
+            column = "IMEI"
 
         if column:
             filter_str = f"{column} LIKE '%{text}%'"
@@ -1470,11 +1470,11 @@ class ContractRegistry(QWidget):
         self.model4.select()
 
     def search_by_date_4(self):
-        from_date_str = self.from_date_4.date().toString("dd.MM.yyyy HH.mm.ss")
-        to_date_str = self.to_date_4.date().toString("dd.MM.yyyy HH.mm.ss")
+        from_date_str = self.from_date_4.date().toString("yyyy-MM-dd HH:mm:ss")
+        to_date_str = self.to_date_4.date().toString("yyyy-MM-dd HH:mm:ss")
 
         if self.date_radio_4.isChecked():
-            date_column = "date"
+            date_column = "date_of_C_O"
         elif self.closing_date_radio_4.isChecked():
             date_column = "date_of_percent_addition"
         else:
@@ -1499,7 +1499,7 @@ class ContractRegistry(QWidget):
         elif self.tel_radio_4.isChecked():
             column = "tel_number"
         elif self.imei_radio_4.isChecked():
-            column = "imei"
+            column = "IMEI"
 
         if column:
             filter_str = f"{column} LIKE '%{text}%'"
@@ -1550,7 +1550,7 @@ class ContractRegistry(QWidget):
 
         unique_id_index = model4.fieldIndex("unique_id")
         contract_id_index = model4.fieldIndex("contract_id")
-        percent_index = model4.fieldIndex("paid_amount")
+        paid_percent_index = model4.fieldIndex("paid_amount")
         date_index = model4.fieldIndex("date_of_percent_addition")
         status_index = model4.fieldIndex("status")
 
@@ -1559,8 +1559,8 @@ class ContractRegistry(QWidget):
             return
 
         contract_id = model4.data(model4.index(row_index, contract_id_index))
-        percent_amount = model4.data(model4.index(row_index, percent_index))
-        percent_date = model4.data(model4.index(row_index, date_index))
+        paid_percent_amount = model4.data(model4.index(row_index, paid_percent_index))
+        percent_payment_date = model4.data(model4.index(row_index, date_index))
         status = model4.data(model4.index(row_index, status_index))
 
         reply = QMessageBox.question(
@@ -1571,7 +1571,62 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model4.removeRow(row_index)
 
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cursor = conn.cursor()
 
+            cursor.execute("SELECT paid_percents FROM active_contracts WHERE id = ?", (contract_id,))
+            row = cursor.fetchone()
+            conn.close()
+
+            if row:
+                paid_percents_before = row[0]
+
+            new_percents_amount = paid_percents_before - paid_percent_amount
+
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                                          UPDATE active_contracts SET
+                                            paid_percents = ?
+                                          WHERE id = ?
+                                      """, (
+                new_percents_amount,
+                contract_id,
+            ))
+            conn.commit()
+            conn.close()
+
+            conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+            cur_given = conn.cursor()
+            cur_given.execute("""
+                                   DELETE FROM paid_principle_and_paid_percentage_database
+                                   WHERE contract_id = ? AND status = ? AND date_of_inflow = ?
+                               """,
+                              (contract_id, status, percent_payment_date))
+            conn.commit()
+            conn.close()
+
+            conn = sqlite3.connect("Databases/inflow_order_only_percent_amount.db")
+            cur_given = conn.cursor()
+            cur_given.execute("""
+                                               DELETE FROM inflow_order_only_percent_amount
+                                               WHERE contract_id = ? AND payment_date = ?
+                                           """,
+                              (contract_id, percent_payment_date))
+            conn.commit()
+            conn.close()
+
+            # Deleting from inflow_order_in_both
+            conn = sqlite3.connect("Databases/inflow_order_both.db")
+            cur_given = conn.cursor()
+            cur_given.execute("""
+                                  DELETE FROM inflow_order_both
+                                  WHERE contract_id = ? AND payment_date = ? AND principle_paid_amount = ?
+                              """,
+                              (contract_id, percent_payment_date, 0))
+            conn.commit()
+            conn.close()
 
 
             if model4.submitAll():
