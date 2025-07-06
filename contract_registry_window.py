@@ -612,29 +612,22 @@ class ContractRegistry(QWidget):
 
         self.search_input_5 = QLineEdit()
         self.search_input_5.setPlaceholderText("მოძებნე აქ")
+        self.search_input_5.textChanged.connect(self.apply_text_filter_5)
+
 
         self.contract_radio_5 = QRadioButton("ხელშეკრულების N")
         self.name_radio_5 = QRadioButton("სახელი და გვარი")
-        self.id_radio_5 = QRadioButton("პირადი N")
-        self.model_radio_5 = QRadioButton("მოდელი")
         self.tel_radio_5 = QRadioButton("ტელეფონის ნომერი")
-        self.imei_radio_5 = QRadioButton("IMEI")
 
         search_group_5 = QButtonGroup()
         search_group_5.addButton(self.contract_radio_5)
         search_group_5.addButton(self.name_radio_5)
-        search_group_5.addButton(self.id_radio_5)
-        search_group_5.addButton(self.model_radio_5)
         search_group_5.addButton(self.tel_radio_5)
-        search_group_5.addButton(self.imei_radio_5)
 
         box_layout5_2.addWidget(self.contract_radio_5, 0, 0)
         box_layout5_2.addWidget(self.name_radio_5, 0, 1)
-        box_layout5_2.addWidget(self.id_radio_5, 0, 2)
-        box_layout5_2.addWidget(self.model_radio_5, 1, 2)
-        box_layout5_2.addWidget(self.tel_radio_5, 1, 1)
-        box_layout5_2.addWidget(self.imei_radio_5, 1, 0)
-        box_layout5_2.addWidget(self.search_input_5, 1, 3)
+        box_layout5_2.addWidget(self.tel_radio_5, 0, 2)
+        box_layout5_2.addWidget(self.search_input_5, 1, 0, 1, 3)
 
         box5_2.setLayout(box_layout5_2)
         layout5.addWidget(box5_2, 0, 0, 1, 2)
@@ -685,32 +678,21 @@ class ContractRegistry(QWidget):
 
         self.search_input_6_1 = QLineEdit()
         self.search_input_6_1.setPlaceholderText("მოძებნე აქ")
+        self.search_input_6_1.textChanged.connect(self.apply_text_filter_6_1)
 
         self.contract_radio_6_1 = QRadioButton("ხელშეკრულების N")
         self.name_radio_6_1 = QRadioButton("სახელი და გვარი")
-        self.id_radio_6_1 = QRadioButton("პირადი N")
-        self.model_radio_6_1 = QRadioButton("მოდელი")
-        self.tel_radio_6_1 = QRadioButton("ტელეფონის ნომერი")
-        self.imei_radio_6_1 = QRadioButton("IMEI")
 
         search_group_6_1 = QButtonGroup()
         search_group_6_1.addButton(self.contract_radio_6_1)
         search_group_6_1.addButton(self.name_radio_6_1)
-        search_group_6_1.addButton(self.id_radio_6_1)
-        search_group_6_1.addButton(self.model_radio_6_1)
-        search_group_6_1.addButton(self.tel_radio_6_1)
-        search_group_6_1.addButton(self.imei_radio_6_1)
 
         box_layout6_1_2.addWidget(self.contract_radio_6_1, 0, 0)
         box_layout6_1_2.addWidget(self.name_radio_6_1, 0, 1)
-        box_layout6_1_2.addWidget(self.id_radio_6_1, 0, 2)
-        box_layout6_1_2.addWidget(self.model_radio_6_1, 1, 2)
-        box_layout6_1_2.addWidget(self.tel_radio_6_1, 1, 1)
-        box_layout6_1_2.addWidget(self.imei_radio_6_1, 1, 0)
-        box_layout6_1_2.addWidget(self.search_input_6_1, 1, 3)
+        box_layout6_1_2.addWidget(self.search_input_6_1, 1, 0, 1, 2)
 
         box6_1_2.setLayout(box_layout6_1_2)
-        layout_tab6_1.addWidget(box6_1_2, 0, 0, 1, 2)
+        layout_tab6_1.addWidget(box6_1_2, 0, 0, 1, 1)
 
         # --- Table Setup ---
         self.db6_1 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_only_percent_amount")
@@ -742,32 +724,21 @@ class ContractRegistry(QWidget):
 
         self.search_input_6_2 = QLineEdit()
         self.search_input_6_2.setPlaceholderText("მოძებნე აქ")
+        self.search_input_6_2.textChanged.connect(self.apply_text_filter_6_2)
 
         self.contract_radio_6_2 = QRadioButton("ხელშეკრულების N")
         self.name_radio_6_2 = QRadioButton("სახელი და გვარი")
-        self.id_radio_6_2 = QRadioButton("პირადი N")
-        self.model_radio_6_2 = QRadioButton("მოდელი")
-        self.tel_radio_6_2 = QRadioButton("ტელეფონის ნომერი")
-        self.imei_radio_6_2 = QRadioButton("IMEI")
 
         search_group_6_2 = QButtonGroup()
         search_group_6_2.addButton(self.contract_radio_6_2)
         search_group_6_2.addButton(self.name_radio_6_2)
-        search_group_6_2.addButton(self.id_radio_6_2)
-        search_group_6_2.addButton(self.model_radio_6_2)
-        search_group_6_2.addButton(self.tel_radio_6_2)
-        search_group_6_2.addButton(self.imei_radio_6_2)
 
         box_layout6_2_2.addWidget(self.contract_radio_6_2, 0, 0)
         box_layout6_2_2.addWidget(self.name_radio_6_2, 0, 1)
-        box_layout6_2_2.addWidget(self.id_radio_6_2, 0, 2)
-        box_layout6_2_2.addWidget(self.model_radio_6_2, 1, 2)
-        box_layout6_2_2.addWidget(self.tel_radio_6_2, 1, 1)
-        box_layout6_2_2.addWidget(self.imei_radio_6_2, 1, 0)
-        box_layout6_2_2.addWidget(self.search_input_6_2, 1, 3)
+        box_layout6_2_2.addWidget(self.search_input_6_2, 1, 0, 1, 2)
 
         box6_2_2.setLayout(box_layout6_2_2)
-        layout_tab6_2.addWidget(box6_2_2, 0, 0, 1, 2)
+        layout_tab6_2.addWidget(box6_2_2, 0, 0, 1, 1)
 
         # --- Table Setup ---
         self.db6_2 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_only_principal_amount")
@@ -800,32 +771,22 @@ class ContractRegistry(QWidget):
 
         self.search_input_6_3 = QLineEdit()
         self.search_input_6_3.setPlaceholderText("მოძებნე აქ")
+        self.search_input_6_3.textChanged.connect(self.apply_text_filter_6_3)
+
 
         self.contract_radio_6_3 = QRadioButton("ხელშეკრულების N")
         self.name_radio_6_3 = QRadioButton("სახელი და გვარი")
-        self.id_radio_6_3 = QRadioButton("პირადი N")
-        self.model_radio_6_3 = QRadioButton("მოდელი")
-        self.tel_radio_6_3 = QRadioButton("ტელეფონის ნომერი")
-        self.imei_radio_6_3 = QRadioButton("IMEI")
 
         search_group_6_3 = QButtonGroup()
         search_group_6_3.addButton(self.contract_radio_6_3)
         search_group_6_3.addButton(self.name_radio_6_3)
-        search_group_6_3.addButton(self.id_radio_6_3)
-        search_group_6_3.addButton(self.model_radio_6_3)
-        search_group_6_3.addButton(self.tel_radio_6_3)
-        search_group_6_3.addButton(self.imei_radio_6_3)
 
         box_layout6_3_2.addWidget(self.contract_radio_6_3, 0, 0)
         box_layout6_3_2.addWidget(self.name_radio_6_3, 0, 1)
-        box_layout6_3_2.addWidget(self.id_radio_6_3, 0, 2)
-        box_layout6_3_2.addWidget(self.model_radio_6_3, 1, 2)
-        box_layout6_3_2.addWidget(self.tel_radio_6_3, 1, 1)
-        box_layout6_3_2.addWidget(self.imei_radio_6_3, 1, 0)
-        box_layout6_3_2.addWidget(self.search_input_6_3, 1, 3)
+        box_layout6_3_2.addWidget(self.search_input_6_3, 1, 0, 1, 2)
 
         box6_3_2.setLayout(box_layout6_3_2)
-        layout_tab6_3.addWidget(box6_3_2, 0, 0, 1, 2)
+        layout_tab6_3.addWidget(box6_3_2, 0, 0, 1, 1)
 
         # --- Table Setup ---
         self.db6_3 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_both")
@@ -890,6 +851,7 @@ class ContractRegistry(QWidget):
 
         self.search_input_7 = QLineEdit()
         self.search_input_7.setPlaceholderText("მოძებნე აქ")
+        self.search_input_7.textChanged.connect(self.apply_text_filter_7)
 
         self.contract_radio_7 = QRadioButton("ხელშეკრულების N")
         self.name_radio_7 = QRadioButton("სახელი და გვარი")
@@ -968,7 +930,7 @@ class ContractRegistry(QWidget):
         self.model2.select()  # This reloads the data from DB
 
     def search_by_date(self):
-        from_date_str = self.from_date.date().toString("yyyy-MM-dd")
+        from_date_str = self.from_date.date().toString("yyyy-MM-dd HH:mm:ss")
         to_date_str = self.to_date.date().toString("yyyy-MM-dd HH:mm:ss")
 
         if self.contract_date_radio.isChecked():
@@ -980,7 +942,7 @@ class ContractRegistry(QWidget):
             return
 
         # Assuming your table has a date column named 'date'
-        filter_str = f"{date_column} >= '{from_date_str}' AND date <= '{to_date_str}'"
+        filter_str = f"{date_column} >= '{from_date_str}' AND {date_column} <= '{to_date_str}'"
         self.model2.setFilter(filter_str)
         self.model2.select()
 
@@ -1633,3 +1595,101 @@ class ContractRegistry(QWidget):
                 QMessageBox.information(self, "წარმატება", "ჩანაწერი წაიშალა")
             else:
                 QMessageBox.critical(self, "შეცდომა", "წაშლა ვერ მოხერხდა")
+
+    # --------------------------------------------page5functions-----------------------------------------------------
+
+    def apply_text_filter_5(self, text):
+        column = ""
+
+        if self.name_radio_5.isChecked():
+            column = "name_surname"
+        elif self.contract_radio_5.isChecked():
+            column = "contract_id"
+        elif self.tel_radio_5.isChecked():
+            column = "tel_number"
+
+        if column:
+            filter_str = f"{column} LIKE '%{text}%'"
+            self.model5.setFilter(filter_str)
+        else:
+            self.model5.setFilter("")
+
+        self.model5.select()
+
+    # --------------------------------------------page6functions-----------------------------------------------------
+
+    def apply_text_filter_6_1(self, text):
+        column = ""
+
+        if self.contract_radio_6_1.isChecked():
+            column = "contract_id"
+        elif self.name_radio_6_1.isChecked():
+            column = "name_surname"
+
+        if column:
+            filter_str = f"{column} LIKE '%{text}%'"
+            self.model6_1.setFilter(filter_str)
+        else:
+            self.model6_1.setFilter("")
+
+        self.model6_1.select()
+
+
+    def apply_text_filter_6_2(self, text):
+        column = ""
+
+        if self.contract_radio_6_2.isChecked():
+            column = "contract_id"
+        elif self.name_radio_6_2.isChecked():
+            column = "name_surname"
+
+        if column:
+            filter_str = f"{column} LIKE '%{text}%'"
+            self.model6_2.setFilter(filter_str)
+        else:
+            self.model6_2.setFilter("")
+
+        self.model6_2.select()
+
+
+    def apply_text_filter_6_3(self, text):
+        column = ""
+
+        if self.contract_radio_6_3.isChecked():
+            column = "contract_id"
+        elif self.name_radio_6_3.isChecked():
+            column = "name_surname"
+
+        if column:
+            filter_str = f"{column} LIKE '%{text}%'"
+            self.model6_3.setFilter(filter_str)
+        else:
+            self.model6_3.setFilter("")
+
+        self.model6_3.select()
+
+    # --------------------------------------------page7functions-----------------------------------------------------
+
+    def apply_text_filter_7(self, text):
+        column = ""
+
+        if self.contract_radio_7.isChecked():
+            column = "contract_id"
+        elif self.name_radio_7.isChecked():
+            column = "name_surname"
+        elif self.id_radio_7.isChecked():
+            column = "id_number"
+        elif self.model_radio_7.isChecked():
+            column = "model"
+        elif self.tel_radio_7.isChecked():
+            column = "tel_number"
+        elif self.imei_radio_7.isChecked():
+            column = "IMEI"
+
+        if column:
+            filter_str = f"{column} LIKE '%{text}%'"
+            self.model7.setFilter(filter_str)
+        else:
+            self.model7.setFilter("")
+
+        self.model7.select()

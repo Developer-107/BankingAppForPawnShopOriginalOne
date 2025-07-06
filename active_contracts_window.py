@@ -164,9 +164,9 @@ class ActiveContracts(QWidget):
         self.to_date.setCalendarPopup(True)
         self.to_date.setDate(QDate.currentDate())
         #
-        box_layout3.addWidget(QLabel("დან თარიღი:"))
+        box_layout3.addWidget(QLabel("*დან თარიღი:"))
         box_layout3.addWidget(self.from_date)
-        box_layout3.addWidget(QLabel("მდე თარიღი:"))
+        box_layout3.addWidget(QLabel("*მდე თარიღი:"))
         box_layout3.addWidget(self.to_date)
 
         filter_button = QPushButton("ძებნა")
@@ -553,9 +553,10 @@ class ActiveContracts(QWidget):
         principal_paid = self.model.data(self.model.index(row, self.model.fieldIndex("principal_paid")))
         percent_paid = self.model.data(self.model.index(row, self.model.fieldIndex("paid_percents")))
         given_money = self.model.data(self.model.index(row, self.model.fieldIndex("given_money")))
+        principal_should_be_paid = self.model.data(self.model.index(row, self.model.fieldIndex("principal_should_be_paid")))
 
-
-        self.confirm_window = PaymentConfirmWindow(contract_id, name_surname, principal_paid, percent_paid, given_money)
+        self.confirm_window = PaymentConfirmWindow(contract_id, name_surname, principal_paid, percent_paid,
+                                                   given_money, principal_should_be_paid)
         self.confirm_window.show()
 
 

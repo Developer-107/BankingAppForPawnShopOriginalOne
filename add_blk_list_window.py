@@ -9,7 +9,6 @@ class AddBlkListWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("დამატება")
-        self.initialize_sql_database()
         self.setWindowIcon(QIcon("Icons/blacklist.png"))
         self.resize(400, 100)
 

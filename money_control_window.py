@@ -34,9 +34,9 @@ class MoneyControl(QWidget):
         self.to_date.setCalendarPopup(True)
         self.to_date.setDate(QDate.currentDate())
         #
-        box_layout1.addWidget(QLabel("დან თარიღი:"))
+        box_layout1.addWidget(QLabel("*დან თარიღი:"))
         box_layout1.addWidget(self.from_date)
-        box_layout1.addWidget(QLabel("მდე თარიღი:"))
+        box_layout1.addWidget(QLabel("*მდე თარიღი:"))
         box_layout1.addWidget(self.to_date)
 
         filter_button = QPushButton("ძებნა")
@@ -131,15 +131,19 @@ class MoneyControl(QWidget):
         self.model2.select()
 
     def search_by_date(self):
-        from_date_str = self.from_date.date().toString("dd.MM.yyyy")
-        to_date_str = self.to_date.date().toString("dd.MM.yyyy")
+        from_date_str = self.from_date.date().toString("yyyy-MM-dd HH:mm:ss")
+        to_date_str = self.to_date.date().toString("yyyy-MM-dd HH:mm:ss")
+
+        date_column = "date_of_inflow"
+        date_column1 = "date_of_outflow"
 
         # Assuming your table has a date column named 'date'
-        filter_str = f"date >= '{from_date_str}' AND date <= '{to_date_str}'"
+        filter_str = f"{date_column} >= '{from_date_str}' AND {date_column} <= '{to_date_str}'"
         self.model1.setFilter(filter_str)
         self.model1.select()
 
-        self.model2.setFilter(filter_str)
+        filter_str1 = f"{date_column1} >= '{from_date_str}' AND {date_column1} <= '{to_date_str}'"
+        self.model2.setFilter(filter_str1)
         self.model2.select()
 
     def export_table1_to_excel(self):

@@ -1,10 +1,13 @@
-from PyQt5.QtCore import Qt
+import sqlite3
+
+from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QGridLayout, QMessageBox
 from PyQt5.QtGui import QFont, QPalette, QColor, QIcon
+from pandas.core.dtypes.inference import is_number
 
 
 class PaymentConfirmWindow(QWidget):
-    def __init__(self, contract_id, name_surname, principal_paid, percent_paid, given_money):
+    def __init__(self, contract_id, name_surname, principal_paid, percent_paid, given_money, principal_should_be_paid):
         super().__init__()
         self.setWindowTitle("გადახდის დადასტურება")
         self.setWindowIcon(QIcon("Icons/closed_contracts.png"))
@@ -22,6 +25,7 @@ class PaymentConfirmWindow(QWidget):
         # Labels and data
         layout.addWidget(QLabel(" ხელშეკრულების № "), 1, 0)
         contract_id_box = QLineEdit(str(contract_id))
+        self.contract_id = contract_id
         contract_id_box.setReadOnly(True)
         layout.addWidget(contract_id_box, 2, 0)
 
@@ -41,7 +45,7 @@ class PaymentConfirmWindow(QWidget):
         layout.addWidget(percent_box, 2, 3)
 
         # # Difference calculation
-        self.remaining = float(given_money) - float(principal_paid)
+        self.remaining = principal_should_be_paid
         remaining_label = QLineEdit(str(self.remaining))
         remaining_label.setReadOnly(True)
         remaining_label.setAlignment(Qt.AlignCenter)
@@ -85,5 +89,76 @@ class PaymentConfirmWindow(QWidget):
 
     def confirm_payment(self):
         # You can connect this to your DB update
-        QMessageBox.information(self, "წარმატება", "გადახდა დადასტურებულია")
-        self.close()
+        try:
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cur_given = conn.cursor()
+            cur_given.execute("""
+                                 DELETE FROM active_contracts
+                                 WHERE id = ?
+                              """,
+                              (self.contract_id,))
+            conn.commit()
+            conn.close()
+
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT * FROM active_contracts WHERE id = ?", (self.contract_id,))
+            row = cursor.fetchone()
+            conn.close()
+
+
+            name_surname = str(row[3])
+            id_number = str(row[4])
+            tel_number = str(row[5])
+            item_name = str(row[6])
+            model = str(row[7])
+            imei = str(row[8])
+            percent = str(row[13])
+            day_quantity = str(row[14])
+            given_money = str(row[12])
+            additional_amount = str(row[15])
+            paid_principle = str(row[16])
+            added_percents = str(row[18])
+            paid_percents = str(row[19])
+            status = str(row[20])
+
+
+
+            conn = sqlite3.connect("Databases/closed_contracts.db")  # Make sure this matches your DB
+            cursor = conn.cursor()
+
+            # Insert in closed_contracts database
+            cursor.execute("""
+                            INSERT INTO closed_contracts (
+                                contract_id, name_surname, id_number, tel_number, item_name, model, IMEI, percent,
+                                percent_day_quantity, given_money, additional_money, paid_principle, added_percents,
+                                paid_percents, status, date_of_closing
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                self.contract_id,
+                name_surname,
+                id_number,
+                tel_number,
+                item_name,
+                model,
+                imei,
+                percent,
+                day_quantity,
+                given_money,
+                additional_amount,
+                paid_principle,
+                added_percents,
+                paid_percents,
+                status,
+                QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
+            ))
+
+            conn.commit()
+            conn.close()
+
+            QMessageBox.information(self, "წარმატება", "გადახდა დადასტურებულია")
+            self.close()
+
+        except Exception as e:
+            QMessageBox.critical(self, "შეცდომა", str(e))
