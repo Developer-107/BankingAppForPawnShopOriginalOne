@@ -91,22 +91,11 @@ class PaymentConfirmWindow(QWidget):
         # You can connect this to your DB update
         try:
             conn = sqlite3.connect("Databases/active_contracts.db")
-            cur_given = conn.cursor()
-            cur_given.execute("""
-                                 DELETE FROM active_contracts
-                                 WHERE id = ?
-                              """,
-                              (self.contract_id,))
-            conn.commit()
-            conn.close()
-
-            conn = sqlite3.connect("Databases/active_contracts.db")
             cursor = conn.cursor()
 
             cursor.execute("SELECT * FROM active_contracts WHERE id = ?", (self.contract_id,))
             row = cursor.fetchone()
             conn.close()
-
 
             name_surname = str(row[3])
             id_number = str(row[4])
@@ -123,7 +112,15 @@ class PaymentConfirmWindow(QWidget):
             paid_percents = str(row[19])
             status = str(row[20])
 
-
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cur_given = conn.cursor()
+            cur_given.execute("""
+                                 DELETE FROM active_contracts
+                                 WHERE id = ?
+                              """,
+                              (self.contract_id,))
+            conn.commit()
+            conn.close()
 
             conn = sqlite3.connect("Databases/closed_contracts.db")  # Make sure this matches your DB
             cursor = conn.cursor()
@@ -131,7 +128,7 @@ class PaymentConfirmWindow(QWidget):
             # Insert in closed_contracts database
             cursor.execute("""
                             INSERT INTO closed_contracts (
-                                contract_id, name_surname, id_number, tel_number, item_name, model, IMEI, percent,
+                                id, name_surname, id_number, tel_number, item_name, model, IMEI, percent,
                                 percent_day_quantity, given_money, additional_money, paid_principle, added_percents,
                                 paid_percents, status, date_of_closing
                             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
