@@ -7,34 +7,39 @@ class ContractColorDelegate(QStyledItemDelegate):
         model = index.model()
         row = index.row()
 
-        # Extract needed data from model:
-        # Assuming these columns exist in your model:
-        date_str = model.data(model.index(row, model.fieldIndex("date")))
-        day_quantity = model.data(model.index(row, model.fieldIndex("day_quantity")))
-        percent_should_be_paid = model.data(model.index(row, model.fieldIndex("percent_should_be_payed")))
+        try:
+            rec = model.record(row)
+            date_str = rec.value("date")
+            day_quantity_raw = rec.value("day_quantity")
+            percent_should_be_paid = float(rec.value("percent_should_be_paid") or 0)
+            paid_percents = float(rec.value("paid_percents") or 0)
 
-        # Parse date string to QDate
-        contract_date = QDate.fromString(date_str.split(" ")[0], "dd.MM.yyyy") if date_str else QDate()
+            contract_date = QDate.fromString(str(date_str).split(" ")[0], "yyyy-MM-dd")
+            today = QDate.currentDate()
 
-        today = QDate.currentDate()
-        start_date = min(contract_date, contract_date.addDays(int(day_quantity) - 1)) if contract_date.isValid() else QDate()
+            if contract_date.isValid() and day_quantity_raw:
+                day_quantity = int(day_quantity_raw)
+                if day_quantity <= 0:
+                    bg_color = QColor("white")
+                else:
+                    days_diff = contract_date.daysTo(today)
+                    is_payment_day = (days_diff >= 0 and days_diff % day_quantity == 0)
 
-        # Default color
-        bg_color = QColor("white")
+                    if percent_should_be_paid > 0 and paid_percents < percent_should_be_paid:
+                        if is_payment_day:
+                            bg_color = QColor("yellow")  # due today & unpaid
+                        elif days_diff > 0 and days_diff % day_quantity != 0:
+                            bg_color = QColor("red")     # overdue
+                        else:
+                            bg_color = QColor("white")
+                    else:
+                        bg_color = QColor("white")
+            else:
+                bg_color = QColor("white")
 
-        if contract_date.isValid() and day_quantity and percent_should_be_paid:
-            try:
-                day_quantity = int(day_quantity)
-                percent_should_be_paid = float(percent_should_be_paid)
-                days_diff = start_date.daysTo(today)
-
-                if days_diff % day_quantity == 0 and percent_should_be_paid > 0:
-                    bg_color = QColor("yellow")
-                elif percent_should_be_paid > 0:
-                    bg_color = QColor("red")
-            except Exception:
-                pass  # fallback to white if anything fails
+        except Exception as e:
+            print(f"Delegate error: {e}")
+            bg_color = QColor("white")
 
         option.backgroundBrush = QBrush(bg_color)
-
         super().paint(painter, option, index)

@@ -375,56 +375,73 @@ class ActiveContracts(QWidget):
 
         self.model.select()
 
+
     def row_selected(self, index):
         row = index.row()
+        model = self.model  # QSqlTableModel
 
-        model = self.model  # Your QSqlTableModel
+        def safe_data(field_name, default=None):
+            col = model.fieldIndex(field_name)
+            if col == -1:
+                print(f"Warning: Column '{field_name}' not found")
+                return default
+            val = model.data(model.index(row, col))
+            return val if val is not None else default
 
-        # Example: read column values (replace column names or indexes accordingly)
-        status = model.data(model.index(row, model.fieldIndex("type")))
-        delegate_person = model.data(model.index(row, model.fieldIndex("trusted_person")))
-        comment = model.data(model.index(row, model.fieldIndex("comment")))
+        # Read text/string fields safely
+        status = safe_data("type", "")
+        delegate_person = safe_data("trusted_person", "")
+        comment = safe_data("comment", "")
 
-        date_str = model.data(model.index(row, model.fieldIndex("date")))
-        day_quantity = int(model.data(model.index(row, model.fieldIndex("day_quantity"))))
+        # Read date string and parse
+        date_str = safe_data("date", "")
         contract_datetime = QDateTime.fromString(date_str, "yyyy-MM-dd HH:mm:ss")
-
         if not contract_datetime.isValid():
-            print("Invalid date:", date_str)
+            print(f"Invalid date string: '{date_str}' — using current date as fallback")
+            contract_datetime = QDateTime.currentDateTime()
 
-        # Calculate first payment date
-        next_payment_date = contract_datetime.addDays(day_quantity - 1)
+        # Read day_quantity safely and convert to int
+        try:
+            day_quantity = int(safe_data("day_quantity", 0))
+        except (TypeError, ValueError):
+            day_quantity = 0
 
-        # Move to next due date if already passed
+        # Calculate next payment date based on day_quantity
+        next_payment_date = contract_datetime.addDays(day_quantity - 1) if day_quantity > 0 else contract_datetime
+
+        # Move next_payment_date forward if already passed
         today = QDate.currentDate()
-        while next_payment_date.date() <= today:
+        while next_payment_date.date() <= today and day_quantity > 0:
             next_payment_date = next_payment_date.addDays(day_quantity)
 
-        # Format for display
         next_payment_str = next_payment_date.toString("dd.MM.yyyy")
 
+        # Numeric fields with safe float conversion
+        def safe_float(field_name):
+            try:
+                return float(safe_data(field_name, 0))
+            except (TypeError, ValueError):
+                return 0.0
 
+        principal_given = safe_float("given_money")
+        additional_amounts = safe_float("additional_amounts")
+        percent_should_be_paid = safe_float("percent_should_be_paid")
+        principal_paid = safe_float("principal_paid")
+        percent_paid = safe_float("paid_percents")
+        principal_should_be_paid = safe_float("principal_should_be_paid")
+        total_due = percent_should_be_paid + principal_should_be_paid
 
-        principal_given = model.data(model.index(row, model.fieldIndex("given_money")))
-        additional_amounts = model.data(model.index(row, model.fieldIndex("additional_amounts")))
-        percent_should_be_paid = model.data(model.index(row, model.fieldIndex("percent_should_be_paid")))
-        principal_paid = model.data(model.index(row, model.fieldIndex("principal_paid")))
-        percent_paid = model.data(model.index(row, model.fieldIndex("paid_percents")))
-        principal_should_be_paid = model.data(model.index(row, model.fieldIndex("principal_should_be_paid")))
-        total_due = float(percent_should_be_paid) + float(principal_should_be_paid)
-
-
-        # Set values in QLabel widgets
+        # Update your UI labels safely
         self.blank1_below_box.setText(str(status))
         self.blank2_below_box.setText(str(delegate_person))
         self.blank3_below_box.setText(str(comment))
         self.blank4_below_box.setText(next_payment_str)
-        self.blank5_below_box.setText(str(principal_given))
-        self.blank7_below_box.setText(str(additional_amounts))
-        self.blank8_below_box.setText(str(percent_should_be_paid))
-        self.blank9_below_box.setText(str(principal_paid))
-        self.blank10_below_box.setText(str(percent_paid))
-        self.blank11_below_box.setText(str(total_due))
+        self.blank5_below_box.setText(f"{principal_given:.2f}")
+        self.blank7_below_box.setText(f"{additional_amounts:.2f}")
+        self.blank8_below_box.setText(f"{percent_should_be_paid:.2f}")
+        self.blank9_below_box.setText(f"{principal_paid:.2f}")
+        self.blank10_below_box.setText(f"{percent_paid:.2f}")
+        self.blank11_below_box.setText(f"{total_due:.2f}")
 
     def export_to_excel(self):
 
@@ -791,67 +808,64 @@ class ActiveContracts(QWidget):
         rows = cursor.fetchall()
 
         for row_index, row in enumerate(rows):
+            try:
 
-            # === Extract values ===
-            contract_id = row[0]
-            full_date_str = row[1]
-            contract_date = QDate.fromString(full_date_str.split(" ")[0], "dd.MM.yyyy")
+                contract_id = row[0]
+                full_date_str = row[1]
 
-            name_surname = str(row[3])
-            id_number = str(row[4])
-            tel_number = str(row[5])
-            item_name = str(row[6])
-            model = str(row[7])
-            imei_sn = str(row[8])
-            day_quantity = int(row[14])
-            principal_should_be_paid = float(row[17])
-            percent = int(row[13])
-            paid_percents = float(row[19])
-            percent_should_be_paid = float(row[20])
-            added_percents = float(row[18])
+                contract_datetime = QDateTime.fromString(full_date_str, "yyyy-MM-dd HH:mm:ss")
+                if not contract_datetime.isValid():
+                    raise ValueError(f"Invalid datetime format: {full_date_str}")
+                contract_date = contract_datetime.date()
 
+                name_surname = str(row[3])
+                id_number = str(row[4])
+                tel_number = str(row[5])
+                item_name = str(row[6])
+                model = str(row[7])
+                imei_sn = str(row[8])
 
-            # === 1. Update days_after_C_O ===
-            days_after = contract_date.daysTo(today)
+                # These could crash if values are None or strings
+                day_quantity = int(row[14])
+                percent = int(row[13])
+                principal_should_be_paid = float(row[17])
+                added_percents = float(row[18])
+                paid_percents = float(row[19])
+                percent_should_be_paid = float(row[20])
 
-            # Default: don't change added_percents unless needed
-            new_added_percents = added_percents
-            # === 2. Calculate next payment date and due count ===
-            first_due_day = contract_date.addDays(day_quantity - 1)
+                days_after = contract_date.daysTo(today)
+                new_added_percents = added_percents
+                first_due_day = contract_date.addDays(day_quantity - 1)
+                start_date = min(contract_date, first_due_day)
 
-            # Treat contract opening as first interest day
-            start_date = min(contract_date, first_due_day)
+                if day_quantity > 0:
+                    days_diff = start_date.daysTo(today)
+                    if days_diff % day_quantity == 1:
+                        total_add = (principal_should_be_paid * percent) / 100
+                        new_added_percents = added_percents + total_add
+                        status_for_added_percent = "დარიცხული პროცენტი"
 
-            if start_date.daysTo(today) % day_quantity == 1:
-                total_add = ((principal_should_be_paid * percent) / 100)
-                new_added_percents = added_percents + total_add
-                status_for_added_percent = "დარიცხული პროცენტი"
+                        conn2 = sqlite3.connect("Databases/adding_percent_amount.db")
+                        cursor2 = conn2.cursor()
+                        cursor2.execute("""
+                            INSERT INTO adding_percent_amount (
+                                contract_id, date_of_C_O, name_surname, id_number,
+                                tel_number, item_name, model, IMEI, date_of_percent_addition, percent_amount, status
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            contract_id, full_date_str, name_surname, id_number,
+                            tel_number, item_name, model, imei_sn,
+                            today.toString("yyyy-MM-dd HH:mm:ss"), total_add, status_for_added_percent
+                        ))
+                        conn2.commit()
+                        conn2.close()
 
-                conn = sqlite3.connect("Databases/adding_percent_amount.db")  # Make sure this matches your DB
-                cursor = conn.cursor()
-
-                cursor.execute("""
-                                            INSERT INTO adding_percent_amount (
-                                                    contract_id, date_of_C_O, name_surname, id_number, 
-                                                    tel_number, item_name, model, IMEI, date_of_percent_addition, percent_amount, status
-                                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                            """, (
-                    contract_id,
-                    full_date_str,
-                    name_surname,
-                    id_number,
-                    tel_number,
-                    item_name,
-                    model,
-                    imei_sn,
-                    today,
-                    total_add,
-                    status_for_added_percent
-                ))
-
-            self.update_days_and_percents(contract_id, days_after, new_added_percents)
+                # Update DB
+                self.update_days_and_percents(contract_id, days_after, new_added_percents)
 
 
+            except Exception as e:
+                QMessageBox.critical(self, "Error Loading Data", f"Row {row_index + 1} caused an error:\n{e}")
 
 
     def update_days_and_percents(self, contract_id, days_after, new_added_percents):
