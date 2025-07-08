@@ -17,7 +17,7 @@ class ContractColorDelegate(QStyledItemDelegate):
 
             # ✅ Make green if nothing to pay
             if principal_should_be_paid == 0 and percent_should_be_paid == 0:
-                bg_color = QColor("#34f134")
+                bg_color = QColor("#2ff32f")
             else:
                 contract_date = QDate.fromString(str(date_str).split(" ")[0], "yyyy-MM-dd")
                 today = QDate.currentDate()
@@ -32,9 +32,9 @@ class ContractColorDelegate(QStyledItemDelegate):
 
                         if percent_should_be_paid > 0:
                             if is_payment_day:
-                                bg_color = QColor("#f1f134")  # due today & unpaid
+                                bg_color = QColor("#f3f32f")  # due today & unpaid
                             elif days_diff > 0:
-                                bg_color = QColor("#f13434")     # overdue
+                                bg_color = QColor("#f32f2f")     # overdue
                             else:
                                 bg_color = QColor("white")
                         else:
