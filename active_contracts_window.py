@@ -838,7 +838,7 @@ class ActiveContracts(QWidget):
                 first_due_day = contract_date.addDays(day_quantity - 1)
                 start_date = min(contract_date, first_due_day)
 
-                if days_after > 4 and day_quantity > 0:
+                if days_after > 4 and day_quantity > 0 and principal_should_be_paid > 0 and percent > 0:
                     days_diff = start_date.daysTo(today)
 
                     periods_passed = (days_after - 1) // day_quantity

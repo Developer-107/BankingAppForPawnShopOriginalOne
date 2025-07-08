@@ -13,35 +13,40 @@ class ContractColorDelegate(QStyledItemDelegate):
             day_quantity_raw = rec.value("day_quantity")
             percent_should_be_paid = float(rec.value("percent_should_be_paid") or 0)
             paid_percents = float(rec.value("paid_percents") or 0)
+            principal_should_be_paid = float(rec.value("principal_should_be_paid") or 0)
 
-            contract_date = QDate.fromString(str(date_str).split(" ")[0], "yyyy-MM-dd")
-            today = QDate.currentDate()
+            # ✅ Make green if nothing to pay
+            if principal_should_be_paid == 0 and percent_should_be_paid == 0:
+                bg_color = QColor("lightgreen")
+            else:
+                contract_date = QDate.fromString(str(date_str).split(" ")[0], "yyyy-MM-dd")
+                today = QDate.currentDate()
 
-            if contract_date.isValid() and day_quantity_raw:
-                day_quantity = int(day_quantity_raw)
-                if day_quantity <= 0:
-                    bg_color = QColor("white")
-                else:
-                    days_diff = contract_date.daysTo(today)
-                    is_payment_day = (days_diff >= 0 and days_diff % day_quantity == 0)
+                if contract_date.isValid() and day_quantity_raw:
+                    day_quantity = int(day_quantity_raw)
+                    if day_quantity <= 0:
+                        bg_color = QColor("white")
+                    else:
+                        days_diff = contract_date.daysTo(today)
+                        is_payment_day = (days_diff >= 0 and days_diff % day_quantity == 0)
 
-                    if percent_should_be_paid > 0:
-                        if is_payment_day:
-                            bg_color = QColor("yellow")  # due today & unpaid
-                        elif days_diff > 0:
-                            bg_color = QColor("red")     # overdue
+                        if percent_should_be_paid > 0:
+                            if is_payment_day:
+                                bg_color = QColor("yellow")  # due today & unpaid
+                            elif days_diff > 0:
+                                bg_color = QColor("red")     # overdue
+                            else:
+                                bg_color = QColor("white")
                         else:
                             bg_color = QColor("white")
-                    else:
-                        bg_color = QColor("white")
-            else:
-                bg_color = QColor("white")
+                else:
+                    bg_color = QColor("white")
 
         except Exception as e:
             print(f"Delegate error: {e}")
             bg_color = QColor("white")
 
-        # Explicitly paint background
+        # Paint background
         painter.save()
         painter.fillRect(option.rect, bg_color)
         super().paint(painter, option, index)
