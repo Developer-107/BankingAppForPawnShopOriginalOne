@@ -494,13 +494,13 @@ class ActiveContracts(QWidget):
         add_to_the_black_list_action.setIcon(QIcon("Icons/blacklist.png"))
         add_to_the_black_list_action.triggered.connect(self.add_to_the_black_list_selected_row)
 
-        transfer_to_selling_items_action = QAction(" გასაყიდებში გადატანა ", self)
-        transfer_to_selling_items_action.setIcon(QIcon("Icons/sell_icon.png"))
-        transfer_to_selling_items_action.triggered.connect(self.transfer_to_selling_items_selected_row)
+        # transfer_to_selling_items_action = QAction(" გასაყიდებში გადატანა ", self)
+        # transfer_to_selling_items_action.setIcon(QIcon("Icons/sell_icon.png"))
+        # transfer_to_selling_items_action.triggered.connect(self.transfer_to_selling_items_selected_row)
 
-        got_back_from_police_action = QAction(" პოლიციიდან ამოღებულებში გადატანა ", self)
-        got_back_from_police_action.setIcon(QIcon("Icons/police-badge.png"))
-        got_back_from_police_action.triggered.connect(self.got_back_from_police_action_selected_row)
+        # got_back_from_police_action = QAction(" პოლიციიდან ამოღებულებში გადატანა ", self)
+        # got_back_from_police_action.setIcon(QIcon("Icons/police-badge.png"))
+        # got_back_from_police_action.triggered.connect(self.got_back_from_police_action_selected_row)
 
 
         menu.addAction(print_action)
@@ -508,8 +508,8 @@ class ActiveContracts(QWidget):
         menu.addAction(pay_percent_action)
         menu.addAction(closing_contract_action)
         menu.addAction(add_to_the_black_list_action)
-        menu.addAction(transfer_to_selling_items_action)
-        menu.addAction(got_back_from_police_action)
+        # menu.addAction(transfer_to_selling_items_action)
+        # menu.addAction(got_back_from_police_action)
 
         menu.exec_(self.table.viewport().mapToGlobal(position))
 
@@ -620,24 +620,17 @@ class ActiveContracts(QWidget):
 
 
 
-    # Transfer to selling items selected row function menu
-    def transfer_to_selling_items_selected_row(self):
-        row = self.table.currentIndex().row()
-        record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
-        pass
+    # # Transfer to selling items selected row function menu
+    # def transfer_to_selling_items_selected_row(self):
+    #     row = self.table.currentIndex().row()
+    #     record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
+    #     pass
 
-
-
-
-
-
-
-
-    # Items got back from the police function menu
-    def got_back_from_police_action_selected_row(self):
-        row = self.table.currentIndex().row()
-        record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
-        pass
+    # # Items got back from the police function menu
+    # def got_back_from_police_action_selected_row(self):
+    #     row = self.table.currentIndex().row()
+    #     record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
+    #     pass
 
 
 
