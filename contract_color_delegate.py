@@ -25,10 +25,10 @@ class ContractColorDelegate(QStyledItemDelegate):
                     days_diff = contract_date.daysTo(today)
                     is_payment_day = (days_diff >= 0 and days_diff % day_quantity == 0)
 
-                    if percent_should_be_paid > 0 and paid_percents < percent_should_be_paid:
+                    if percent_should_be_paid > 0:
                         if is_payment_day:
                             bg_color = QColor("yellow")  # due today & unpaid
-                        elif days_diff > 0 and days_diff % day_quantity != 0:
+                        elif days_diff > 0:
                             bg_color = QColor("red")     # overdue
                         else:
                             bg_color = QColor("white")
@@ -41,5 +41,8 @@ class ContractColorDelegate(QStyledItemDelegate):
             print(f"Delegate error: {e}")
             bg_color = QColor("white")
 
-        option.backgroundBrush = QBrush(bg_color)
+        # Explicitly paint background
+        painter.save()
+        painter.fillRect(option.rect, bg_color)
         super().paint(painter, option, index)
+        painter.restore()

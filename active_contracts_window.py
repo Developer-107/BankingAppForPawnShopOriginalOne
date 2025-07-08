@@ -838,25 +838,37 @@ class ActiveContracts(QWidget):
                 first_due_day = contract_date.addDays(day_quantity - 1)
                 start_date = min(contract_date, first_due_day)
 
-                if day_quantity > 0:
+                if days_after > 4 and day_quantity > 0:
                     days_diff = start_date.daysTo(today)
-                    if days_diff % day_quantity == 1:
-                        total_add = (principal_should_be_paid * percent) / 100
-                        new_added_percents = added_percents + total_add
+
+                    periods_passed = (days_after - 1) // day_quantity
+                    total_expected_adds = periods_passed + 1
+
+                    already_added_times = int(added_percents // ((principal_should_be_paid * percent) / 100))
+                    additions_needed = total_expected_adds - already_added_times
+
+                    if additions_needed > 0:
+                        one_period_amount = (principal_should_be_paid * percent) / 100
+                        new_added_percents = added_percents
                         status_for_added_percent = "დარიცხული პროცენტი"
 
                         conn2 = sqlite3.connect("Databases/adding_percent_amount.db")
                         cursor2 = conn2.cursor()
-                        cursor2.execute("""
-                            INSERT INTO adding_percent_amount (
-                                contract_id, date_of_C_O, name_surname, id_number,
-                                tel_number, item_name, model, IMEI, date_of_percent_addition, percent_amount, status
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        """, (
-                            contract_id, full_date_str, name_surname, id_number,
-                            tel_number, item_name, model, imei_sn,
-                            today.toString("yyyy-MM-dd HH:mm:ss"), total_add, status_for_added_percent
-                        ))
+
+                        for i in range(additions_needed):
+                            new_added_percents += one_period_amount
+                            cursor2.execute("""
+                                INSERT INTO adding_percent_amount (
+                                    contract_id, date_of_C_O, name_surname, id_number,
+                                    tel_number, item_name, model, IMEI,
+                                    date_of_percent_addition, percent_amount, status
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """, (
+                                contract_id, full_date_str, name_surname, id_number,
+                                tel_number, item_name, model, imei_sn,
+                                today.toString("yyyy-MM-dd HH:mm:ss"), one_period_amount, status_for_added_percent
+                            ))
+
                         conn2.commit()
                         conn2.close()
 
