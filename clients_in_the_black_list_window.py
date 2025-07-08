@@ -13,11 +13,12 @@ from add_blk_list_window import AddBlkListWindow
 
 
 class ClientsInTheBlackList(QWidget):
-    def __init__(self):
+    def __init__(self, role):
         super().__init__()
         self.setWindowTitle("შავ სიაში მყოფი კლიენტები")
         self.setWindowIcon(QIcon("Icons/blacklist.png"))
         self.resize(900, 500)
+        self.role = role
 
         layout = QGridLayout()
 
@@ -71,6 +72,8 @@ class ClientsInTheBlackList(QWidget):
         edit_blk_list.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         edit_blk_list.setStyleSheet("font-size: 16px;")
         edit_blk_list.clicked.connect(self.open_edit_blk_list_window)
+        if self.role != "admin":
+            edit_blk_list.setEnabled(False)
 
         # Remove
         delete_from_blk_list = QToolButton()
@@ -82,6 +85,8 @@ class ClientsInTheBlackList(QWidget):
         delete_from_blk_list.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         delete_from_blk_list.setStyleSheet("font-size: 16px;")
         delete_from_blk_list.clicked.connect(self.delete_selected_row)
+        if self.role != "admin":
+            delete_from_blk_list.setEnabled(False)
 
         # Export
         export_blk_list = QToolButton()

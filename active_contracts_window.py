@@ -22,7 +22,7 @@ from payment_confirm_window import PaymentConfirmWindow
 from payment_window import PaymentWindow
 
 class ActiveContracts(QWidget):
-    def __init__(self):
+    def __init__(self, role):
         super().__init__()
         self.setWindowTitle("მოქმედი ხელშეკრულებები")
         self.initialize_active_contracts_database()
@@ -44,7 +44,7 @@ class ActiveContracts(QWidget):
 
         self.setWindowIcon(QIcon("Icons/contract_icon.png"))
         self.resize(1400, 800)
-
+        self.role = role
 
         layout = QGridLayout()
 
@@ -333,7 +333,7 @@ class ActiveContracts(QWidget):
             row_index = selected_indexes[0].row()
             model = self.table.model()
             record_id = model.data(model.index(row_index, model.fieldIndex("id")))
-            self.open_edit_window = EditWindow(record_id)
+            self.open_edit_window = EditWindow(record_id, self.role)
             self.open_edit_window.show()
         else:
             QMessageBox.warning(self, "შეცდომა", "გთხოვთ აირჩიოთ შესაცვლელი ჩანაწერი")

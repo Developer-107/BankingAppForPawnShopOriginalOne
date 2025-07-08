@@ -16,11 +16,12 @@ from registry_page_4_edit_window_4_paid_percents import EditPaidPercentWindow
 
 
 class ContractRegistry(QWidget):
-    def __init__(self):
+    def __init__(self, role):
         super().__init__()
         self.setWindowTitle("ხელშეკრულებების რეესტრი")
         self.setWindowIcon(QIcon("Icons/contract_registry.png"))
         self.resize(1701, 700)
+        self.role = role
 
         layout = QGridLayout()
 
@@ -144,6 +145,8 @@ class ContractRegistry(QWidget):
         edit_money_control.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         edit_money_control.setStyleSheet("font-size: 16px;")
         edit_money_control.clicked.connect(self.open_outflow_in_registry_edit_money_control_window)
+        if self.role != "admin":
+            edit_money_control.setEnabled(False)
 
         # Remove
         delete_from_money_control = QToolButton()
@@ -155,6 +158,8 @@ class ContractRegistry(QWidget):
         delete_from_money_control.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         delete_from_money_control.setStyleSheet("font-size: 16px;")
         delete_from_money_control.clicked.connect(self.delete_selected_row)
+        if self.role != "admin":
+            delete_from_money_control.setEnabled(False)
 
         # Export
         export_money_control = QToolButton()
@@ -287,6 +292,8 @@ class ContractRegistry(QWidget):
         edit_button_2.setStyleSheet("font-size: 16px;")
         edit_button_2.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         edit_button_2.clicked.connect(self.open_edit_money_control_window_2)
+        if self.role != "admin":
+            edit_button_2.setEnabled(False)
 
         delete_button_2 = QToolButton()
         delete_button_2.setText(" ამოშლა ")
@@ -294,6 +301,8 @@ class ContractRegistry(QWidget):
         delete_button_2.setStyleSheet("font-size: 16px;")
         delete_button_2.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         delete_button_2.clicked.connect(self.delete_selected_row_2)
+        if self.role != "admin":
+            delete_button_2.setEnabled(False)
 
         export_button_2 = QToolButton()
         export_button_2.setText(" ექსპორტი ")
@@ -418,6 +427,8 @@ class ContractRegistry(QWidget):
         edit_button_3.setStyleSheet("font-size: 16px;")
         edit_button_3.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         edit_button_3.clicked.connect(self.open_edit_money_control_window_3)
+        if self.role != "admin":
+            edit_button_3.setEnabled(False)
 
         delete_button_3 = QToolButton()
         delete_button_3.setText(" ამოშლა ")
@@ -425,6 +436,8 @@ class ContractRegistry(QWidget):
         delete_button_3.setStyleSheet("font-size: 16px;")
         delete_button_3.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         delete_button_3.clicked.connect(self.delete_selected_row_3)
+        if self.role != "admin":
+            delete_button_3.setEnabled(False)
 
         export_button_3 = QToolButton()
         export_button_3.setText(" ექსპორტი ")
@@ -548,6 +561,9 @@ class ContractRegistry(QWidget):
         edit_button_4.setStyleSheet("font-size: 16px;")
         edit_button_4.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         edit_button_4.clicked.connect(self.open_edit_money_control_window_4)
+        if self.role != "admin":
+            edit_button_4.setEnabled(False)
+
 
         delete_button_4 = QToolButton()
         delete_button_4.setText(" ამოშლა ")
@@ -555,6 +571,8 @@ class ContractRegistry(QWidget):
         delete_button_4.setStyleSheet("font-size: 16px;")
         delete_button_4.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         delete_button_4.clicked.connect(self.delete_selected_row_4)
+        if self.role != "admin":
+            delete_button_4.setEnabled(False)
 
         export_button_4 = QToolButton()
         export_button_4.setText(" ექსპორტი ")

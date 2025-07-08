@@ -1,7 +1,7 @@
 import sqlite3
 import sys
 
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget, QLabel, QGroupBox, \
     QVBoxLayout, QToolButton
@@ -11,13 +11,18 @@ from clients_in_the_black_list_window import ClientsInTheBlackList
 from closed_contracts_window import ClosedContracts
 from contract_registry_window import ContractRegistry
 from help_window import HelpWindow
+from login_window import LoginWindow
 from money_control_window import MoneyControl
 
 
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, username, role, name_of_user, organisation):
         super().__init__()
+        self.username = username
+        self.role = role
+        self.name_of_user = name_of_user
+        self.organisation = organisation
 
         self.money_control_window = None
         self.clients_in_the_black_list_window = None
@@ -110,6 +115,7 @@ class MainWindow(QMainWindow):
         box_layout.addWidget(logged_in_the_system, 0, 0)
 
         logged_in_the_system_box = QLabel("")
+        logged_in_the_system_box.setText(self.name_of_user)
         logged_in_the_system_box.setStyleSheet("border: 1px solid gray; padding: 5px;")
         logged_in_the_system_box.setFixedHeight(35)
         # logged_in_the_system_box.setFixedWidth(140)
@@ -122,12 +128,14 @@ class MainWindow(QMainWindow):
         box_layout.addWidget(operational_access, 1, 0)
 
         operational_access_box = QLabel("")
+        operational_access_box.setText(self.role)
         operational_access_box.setStyleSheet("border: 1px solid gray; padding: 5px;")
         operational_access_box.setFixedHeight(35)
         # operational_access_box.setFixedWidth(140)
         box_layout.addWidget(operational_access_box, 1, 1)
 
         operational_access_box1 = QLabel("")
+        operational_access_box1.setText(QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss"))
         operational_access_box1.setStyleSheet("border: 1px solid gray; padding: 5px;")
         operational_access_box1.setFixedHeight(35)
         operational_access_box1.setFixedWidth(190)
@@ -141,6 +149,7 @@ class MainWindow(QMainWindow):
         box_layout.addWidget(organisation_name_label, 2, 0)
 
         organisation_name_label = QLabel("")
+        organisation_name_label.setText(self.organisation)
         organisation_name_label.setStyleSheet("border: 1px solid gray; padding: 5px;")
         organisation_name_label.setFixedHeight(35)
         # organisation_name_label.setFixedWidth(140)
@@ -172,19 +181,19 @@ class MainWindow(QMainWindow):
         self.help_window.show()
 
     def open_active_contracts_window(self):
-        self.active_contracts_window = ActiveContracts()
+        self.active_contracts_window = ActiveContracts(self.role)
         self.active_contracts_window.show()
 
     def open_contract_registry_window(self):
-        self.contract_registry_window = ContractRegistry()
+        self.contract_registry_window = ContractRegistry(self.role)
         self.contract_registry_window.show()
 
     def open_closed_contracts_window(self):
-        self.closed_contracts_window = ClosedContracts()
+        self.closed_contracts_window = ClosedContracts(self.role)
         self.closed_contracts_window.show()
 
     def open_clients_in_the_black_list_window(self):
-        self.clients_in_the_black_list_window = ClientsInTheBlackList()
+        self.clients_in_the_black_list_window = ClientsInTheBlackList(self.role)
         self.clients_in_the_black_list_window.show()
 
     def open_money_control_window(self):
@@ -192,11 +201,29 @@ class MainWindow(QMainWindow):
         self.money_control_window.show()
 
 
+conn = sqlite3.connect("Credentials/users.db")
+cursor = conn.cursor()
 
-# Run the application
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT,
+    name_of_user TEXT,
+    organisation TEXT,
+    role TEXT CHECK(role IN ('admin', 'user'))
+)
+""")
+
+
+def launch_main(username, role, name_of_user, organisation):
+    global main_window  # prevent it from being garbage collected
+    main_window = MainWindow(username, role, name_of_user, organisation)
+    main_window.show()
+
+
+
 app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show()
-
-app.exec()
+login = LoginWindow(app_callback=launch_main)
+login.show()
+sys.exit(app.exec_())

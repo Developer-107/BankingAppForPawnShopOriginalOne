@@ -21,11 +21,12 @@ from payment_confirm_window import PaymentConfirmWindow
 from payment_window import PaymentWindow
 
 class ClosedContracts(QWidget):
-    def __init__(self):
+    def __init__(self, role):
         super().__init__()
         self.setWindowTitle("დახურული ხელშეკრულებები")
         self.setWindowIcon(QIcon("Icons/closed_contracts.png"))
         self.resize(1400, 800)
+        self.role = role
 
 
         layout = QGridLayout()

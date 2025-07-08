@@ -8,12 +8,13 @@ from PyQt5.QtCore import QSize, Qt, QDateTime
 
 
 class EditWindow(QWidget):
-    def __init__(self, record_id):
+    def __init__(self, record_id, role):
         super().__init__()
         self.record_id = record_id
         self.setWindowTitle("რედაქტირება")
         self.setWindowIcon(QIcon("Icons/edit_data.png"))
         self.resize(1400, 500)
+        self.role = role
         self.build_ui()
         self.load_data()
 
@@ -28,20 +29,27 @@ class EditWindow(QWidget):
         self.model_box = QLineEdit()
         self.imei_sn_box = QLineEdit()
         self.choose_the_type_box = QLineEdit()
+        self.choose_the_type_box.setEnabled(False)
         self.trusted_person_box = QLineEdit()
         self.comment_box = QLineEdit()
         self.given_money_box = QLineEdit()
+        if self.role != "admin":
+            self.given_money_box.setEnabled(False)
         # --- Percent ComboBox ---
         self.percent_box = QComboBox()
         self.percent_box.addItems(["2.5", "5", "10", "15"])
         self.percent_box.setCurrentText("10")
         self.percent_box.setStyleSheet("padding: 5px; font-size: 14px;")
+        if self.role != "admin":
+            self.percent_box.setEnabled(False)
 
         # --- Day Quantity ComboBox ---
         self.day_quantity_box = QComboBox()
         self.day_quantity_box.addItems(["10", "15", "30"])
         self.day_quantity_box.setCurrentText("10")
         self.day_quantity_box.setStyleSheet("padding: 5px; font-size: 14px;")
+        if self.role != "admin":
+            self.day_quantity_box.setEnabled(False)
 
 
 
@@ -102,7 +110,7 @@ class EditWindow(QWidget):
             self.choose_the_type_box.setText(row[9])
             self.trusted_person_box.setText(row[10])
             self.comment_box.setText(row[11])
-            self.given_money_box.setText(str(row[12]))
+            self.given_money_box.setText(str(int(row[12])))
             self.percent_box.setCurrentText(str(row[13]))  # ✅
             self.day_quantity_box.setCurrentText(str(row[14]))  # ✅
             self.additional_amounts = row[15]
