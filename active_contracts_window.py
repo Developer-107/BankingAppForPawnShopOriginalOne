@@ -494,11 +494,11 @@ class ActiveContracts(QWidget):
         add_to_the_black_list_action.setIcon(QIcon("Icons/blacklist.png"))
         add_to_the_black_list_action.triggered.connect(self.add_to_the_black_list_selected_row)
 
-        # transfer_to_selling_items_action = QAction(" გასაყიდებში გადატანა ", self)
+        # transfer_to_selling_items_action = QAction("", self)
         # transfer_to_selling_items_action.setIcon(QIcon("Icons/sell_icon.png"))
         # transfer_to_selling_items_action.triggered.connect(self.transfer_to_selling_items_selected_row)
 
-        # got_back_from_police_action = QAction(" პოლიციიდან ამოღებულებში გადატანა ", self)
+        # got_back_from_police_action = QAction("", self)
         # got_back_from_police_action.setIcon(QIcon("Icons/police-badge.png"))
         # got_back_from_police_action.triggered.connect(self.got_back_from_police_action_selected_row)
 
