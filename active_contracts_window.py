@@ -331,7 +331,7 @@ class ActiveContracts(QWidget):
 
         # --------------------------------------------Functions-----------------------------------------------------
     def open_add_window(self):
-        self.open_add_window = AddWindow()
+        self.open_add_window = AddWindow(self.organisation, self.name_of_user)
         self.open_add_window.show()
 
     def open_edit_window(self):
@@ -589,30 +589,28 @@ class ActiveContracts(QWidget):
                         replace_in_paragraph(paragraph, replacements)
 
         # 3. Save new doc
-        # Save to a temporary file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp_file:
-            temp_path = tmp_file.name
-        doc.save(temp_path)
+        # Ensure folder exists
+        output_dir = "GeneratedContracts"
+        os.makedirs(output_dir, exist_ok=True)
 
-        # Open in Word and wait for the user to close it
+        # Construct file name
+        output_filename = f"contract_{contract_id}_{name}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save document
+        doc.save(output_path)
+
+        # Open in Word and wait
         try:
             word = win32com.client.Dispatch("Word.Application")
             word.Visible = True
-            word_doc = word.Documents.Open(os.path.abspath(temp_path))
+            word_doc = word.Documents.Open(os.path.abspath(output_path))
 
             print("Waiting for user to close the Word document...")
 
-            # Wait until the document is closed by the user
-            while word.Documents.Count > 0:
-                time.sleep(1)
-
-            word.Quit()
-            os.remove(temp_path)
-            print("Temporary contract file deleted.")
-
         except Exception as e:
             print("Error:", e)
-            print("Leaving temp file:", temp_path)
+            print("Document saved at:", output_path)
 
         # # 4. Optional: Print using MS Word (Windows only)
         # try:
