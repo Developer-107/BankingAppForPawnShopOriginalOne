@@ -544,45 +544,49 @@ class ActiveContracts(QWidget):
         dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
         date = dt.strftime("%d-%m-%Y")
 
-        # 1. Load Word template
+        replacements = {
+            '{name_surname}': name or "",
+            '{given_money}': str(given_money or ""),
+            '{date}': date or "",
+            '{contract_id}': str(contract_id or ""),
+            '{id_number}': id_number or "",
+            '{IMEI}': imei or "",
+            '{model}': model or "",
+            '{item_name}': item_name or "",
+            '{comment}': comment or "",
+            '{trusted_person}': trusted_person or "",
+            '{tel_number}': tel_number or "",
+            '{organization_name}': getattr(self, "organisation", ""),
+            '{operator_name}': getattr(self, "name_of_user", "")
+        }
+
+        def replace_in_paragraph(paragraph, replacements):
+            full_text = ''.join(run.text for run in paragraph.runs)
+            new_text = full_text
+            for key, value in replacements.items():
+                new_text = new_text.replace(key, str(value))
+
+            if new_text != full_text:
+                for run in paragraph.runs:
+                    run.text = ''
+                if paragraph.runs:
+                    paragraph.runs[0].text = new_text
+                else:
+                    paragraph.add_run(new_text)
+
+        # Load the Word template
         doc = Document("Templates/contract_template.docx")
 
-        # 2. Replace placeholders
+        # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
-            text = paragraph.text
-            text = text.replace('{name_surname}', name or "")
-            text = text.replace('{given_money}', str(given_money or ""))
-            text = text.replace('{date}', date or "")
-            text = text.replace('{contract_id}', str(contract_id or ""))
-            text = text.replace('{id_number}', id_number or "")
-            text = text.replace('{IMEI}', imei or "")
-            text = text.replace('{model}', model or "")
-            text = text.replace('{item_name}', item_name or "")
-            text = text.replace('{comment}', comment or "")
-            text = text.replace('{trusted_person}', trusted_person or "")
-            text = text.replace('{tel_number}', tel_number or "")
-            text = text.replace('{organization_name}', getattr(self, "organisation", ""))
-            text = text.replace('{operator_name}', getattr(self, "name_of_user", ""))
-            paragraph.text = text
+            replace_in_paragraph(paragraph, replacements)
 
+        # Replace in table cells
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
-                    text = cell.text
-                    text = text.replace('{name_surname}', name or "")
-                    text = text.replace('{given_money}', str(given_money or ""))
-                    text = text.replace('{date}', date or "")
-                    text = text.replace('{contract_id}', str(contract_id or ""))
-                    text = text.replace('{id_number}', id_number or "")
-                    text = text.replace('{IMEI}', imei or "")
-                    text = text.replace('{model}', model or "")
-                    text = text.replace('{item_name}', item_name or "")
-                    text = text.replace('{comment}', comment or "")
-                    text = text.replace('{trusted_person}', trusted_person or "")
-                    text = text.replace('{tel_number}', tel_number or "")
-                    text = text.replace('{organization_name}', getattr(self, "organisation", ""))
-                    text = text.replace('{operator_name}', getattr(self, "name_of_user", ""))
-                    cell.text = text
+                    for paragraph in cell.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
 
         # 3. Save new doc
         # Save to a temporary file
