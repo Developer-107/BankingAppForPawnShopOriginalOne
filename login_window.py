@@ -36,7 +36,7 @@ class LoginWindow(QWidget):
 
         conn = sqlite3.connect("Credentials/users.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT role, name_of_user, organisation FROM users WHERE username=? AND password=?", (username, password))
+        cursor.execute("SELECT role, name_of_user, organisation, id_number_of_user FROM users WHERE username=? AND password=?", (username, password))
         result = cursor.fetchone()
         conn.close()
 
@@ -44,7 +44,8 @@ class LoginWindow(QWidget):
             role = result[0]
             name_of_user = result[1]
             organisation = result[2]
-            self.app_callback(username, role, name_of_user, organisation)
+            id_number_of_user = result[3]
+            self.app_callback(username, role, name_of_user, organisation, id_number_of_user)
             self.close()
         else:
             QMessageBox.warning(self, "Login Failed", "Invalid credentials.")

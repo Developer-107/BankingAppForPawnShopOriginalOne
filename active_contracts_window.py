@@ -1,13 +1,17 @@
 import sqlite3
 import sys
+import time
 from datetime import datetime, timedelta
+import win32com.client
 
 from PyQt5.QtCore import Qt, QSize, QDate, QDateTime
-from PyQt5.QtGui import QIcon, QBrush, QColor
+from PyQt5.QtGui import QIcon, QBrush, QColor, QTextDocument
+from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QToolButton, QCheckBox, QLabel, QRadioButton, QButtonGroup, \
     QLineEdit, QDateEdit, QPushButton, QTableView, QAbstractItemView, QMessageBox, QMenu, QAction, QTableWidgetItem
 
+from docx import Document
 import tempfile
 import pandas as pd
 import os
@@ -22,7 +26,7 @@ from payment_confirm_window import PaymentConfirmWindow
 from payment_window import PaymentWindow
 
 class ActiveContracts(QWidget):
-    def __init__(self, role):
+    def __init__(self, role, name_of_user, organisation, id_number_of_user):
         super().__init__()
         self.setWindowTitle("მოქმედი ხელშეკრულებები")
         self.initialize_active_contracts_database()
@@ -45,6 +49,9 @@ class ActiveContracts(QWidget):
         self.setWindowIcon(QIcon("Icons/contract_icon.png"))
         self.resize(1400, 800)
         self.role = role
+        self.name_of_user = name_of_user
+        self.organisation = organisation
+        self.id_number_of_user = id_number_of_user
 
         layout = QGridLayout()
 
@@ -517,8 +524,102 @@ class ActiveContracts(QWidget):
     # Right click menu functions
     # Print function menu
     def print_selected_row(self):
+        selected = self.table.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
 
-        pass
+        row_index = selected[0].row()
+        contract_id = self.model.data(self.model.index(row_index, self.model.fieldIndex("id")))
+        name = self.model.data(self.model.index(row_index, self.model.fieldIndex("name_surname")))
+        given_money = self.model.data(self.model.index(row_index, self.model.fieldIndex("given_money")))
+        date_raw = self.model.data(self.model.index(row_index, self.model.fieldIndex("date")))
+        id_number = self.model.data(self.model.index(row_index, self.model.fieldIndex("id_number")))
+        item_name = self.model.data(self.model.index(row_index, self.model.fieldIndex("item_name")))
+        model = self.model.data(self.model.index(row_index, self.model.fieldIndex("model")))
+        imei = self.model.data(self.model.index(row_index, self.model.fieldIndex("imei")))
+        comment = self.model.data(self.model.index(row_index, self.model.fieldIndex("comment")))
+        trusted_person = self.model.data(self.model.index(row_index, self.model.fieldIndex("trusted_person")))
+        tel_number = self.model.data(self.model.index(row_index, self.model.fieldIndex("tel_number")))
+        dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
+        date = dt.strftime("%d-%m-%Y")
+
+        # 1. Load Word template
+        doc = Document("Templates/contract_template.docx")
+
+        # 2. Replace placeholders
+        for paragraph in doc.paragraphs:
+            text = paragraph.text
+            text = text.replace('{name_surname}', name or "")
+            text = text.replace('{given_money}', str(given_money or ""))
+            text = text.replace('{date}', date or "")
+            text = text.replace('{contract_id}', str(contract_id or ""))
+            text = text.replace('{id_number}', id_number or "")
+            text = text.replace('{IMEI}', imei or "")
+            text = text.replace('{model}', model or "")
+            text = text.replace('{item_name}', item_name or "")
+            text = text.replace('{comment}', comment or "")
+            text = text.replace('{trusted_person}', trusted_person or "")
+            text = text.replace('{tel_number}', tel_number or "")
+            text = text.replace('{organization_name}', getattr(self, "organisation", ""))
+            text = text.replace('{operator_name}', getattr(self, "name_of_user", ""))
+            paragraph.text = text
+
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    text = cell.text
+                    text = text.replace('{name_surname}', name or "")
+                    text = text.replace('{given_money}', str(given_money or ""))
+                    text = text.replace('{date}', date or "")
+                    text = text.replace('{contract_id}', str(contract_id or ""))
+                    text = text.replace('{id_number}', id_number or "")
+                    text = text.replace('{IMEI}', imei or "")
+                    text = text.replace('{model}', model or "")
+                    text = text.replace('{item_name}', item_name or "")
+                    text = text.replace('{comment}', comment or "")
+                    text = text.replace('{trusted_person}', trusted_person or "")
+                    text = text.replace('{tel_number}', tel_number or "")
+                    text = text.replace('{organization_name}', getattr(self, "organisation", ""))
+                    text = text.replace('{operator_name}', getattr(self, "name_of_user", ""))
+                    cell.text = text
+
+        # 3. Save new doc
+        # Save to a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp_file:
+            temp_path = tmp_file.name
+        doc.save(temp_path)
+
+        # Open in Word and wait for the user to close it
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = True
+            word_doc = word.Documents.Open(os.path.abspath(temp_path))
+
+            print("Waiting for user to close the Word document...")
+
+            # Wait until the document is closed by the user
+            while word.Documents.Count > 0:
+                time.sleep(1)
+
+            word.Quit()
+            os.remove(temp_path)
+            print("Temporary contract file deleted.")
+
+        except Exception as e:
+            print("Error:", e)
+            print("Leaving temp file:", temp_path)
+
+        # # 4. Optional: Print using MS Word (Windows only)
+        # try:
+        #     word = win32com.client.Dispatch("Word.Application")
+        #     word.Visible = False
+        #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+        #     word.Quit()
+        # except Exception as e:
+        #     print("Printing failed:", e)
+        #     # fallback: open Word file manually
+        #     os.startfile(output_path)
 
 
 

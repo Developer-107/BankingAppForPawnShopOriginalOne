@@ -17,12 +17,13 @@ from money_control_window import MoneyControl
 
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
-    def __init__(self, username, role, name_of_user, organisation):
+    def __init__(self, username, role, name_of_user, organisation, id_number_of_user):
         super().__init__()
         self.username = username
         self.role = role
         self.name_of_user = name_of_user
         self.organisation = organisation
+        self.id_number_of_user = id_number_of_user
 
         self.money_control_window = None
         self.clients_in_the_black_list_window = None
@@ -181,7 +182,9 @@ class MainWindow(QMainWindow):
         self.help_window.show()
 
     def open_active_contracts_window(self):
-        self.active_contracts_window = ActiveContracts(self.role)
+        self.active_contracts_window = ActiveContracts(self.role, self.name_of_user,
+                                                       self.organisation,
+                                                       self.id_number_of_user)
         self.active_contracts_window.show()
 
     def open_contract_registry_window(self):
@@ -211,14 +214,15 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT,
     name_of_user TEXT,
     organisation TEXT,
+    id_number_of_user TEXT,
     role TEXT CHECK(role IN ('admin', 'user'))
 )
 """)
 
 
-def launch_main(username, role, name_of_user, organisation):
+def launch_main(username, role, name_of_user, organisation, id_number_of_user):
     global main_window  # prevent it from being garbage collected
-    main_window = MainWindow(username, role, name_of_user, organisation)
+    main_window = MainWindow(username, role, name_of_user, organisation, id_number_of_user)
     main_window.show()
 
 
