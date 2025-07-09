@@ -3,7 +3,8 @@ import sys
 from datetime import datetime, timedelta
 
 from PyQt5.QtCore import Qt, QSize, QDate
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QToolButton, QCheckBox, QLabel, QRadioButton, QButtonGroup, \
     QLineEdit, QDateEdit, QPushButton, QTableView, QAbstractItemView, QMessageBox, QMenu, QAction
@@ -159,6 +160,8 @@ class ClosedContracts(QWidget):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table.setSelectionBehavior(QTableView.SelectRows)
         self.table.setSelectionMode(QTableView.SingleSelection)
+        self.table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self.show_closed_contracts_context_menu)
 
         layout.addWidget(self.table, 1, 0, 4, 5)
 
@@ -168,6 +171,61 @@ class ClosedContracts(QWidget):
 
 
         # --------------------------------------------Functions-----------------------------------------------------
+
+    def show_closed_contracts_context_menu(self, position):
+        index = self.table.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+
+        print_action = QAction(" ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_closed_contract_selected_row)
+        menu.addAction(print_action)
+
+        return_action = QAction(" დააბრუნე აქტიურში ", self)
+        return_action.setIcon(QIcon("Icons/return_icon.png"))
+        return_action.triggered.connect(self.return_closed_contract_to_active)
+        menu.addAction(return_action)
+
+        menu.exec_(self.table.viewport().mapToGlobal(position))
+
+    def print_closed_contract_selected_row(self):
+        selected = self.table.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+        name = self.model.data(self.model.index(row_index, self.model.fieldIndex("name_surname")))
+        amount = self.model.data(self.model.index(row_index, self.model.fieldIndex("given_money_with_additional")))
+        date = self.model.data(self.model.index(row_index, self.model.fieldIndex("contract_open_date")))
+
+        html = f"""
+        <h2>დახურული ხელშეკრულება</h2>
+        <p><b>სახელი:</b> {name}</p>
+        <p><b>თანხა დამატებით:</b> {amount}</p>
+        <p><b>გაფორმების თარიღი:</b> {date}</p>
+        """
+        doc = QTextDocument()
+        doc.setHtml(html)
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
+
+    def return_closed_contract_to_active(self):
+        selected = self.table.selectionModel().selectedRows()
+        if not selected:
+            QMessageBox.warning(self, "შეცდომა", "არ არის არჩეული რიგი")
+            return
+
+        row_index = selected[0].row()
+        contract_id = self.model.data(self.model.index(row_index, self.model.fieldIndex("contract_id")))
+
+        # Add logic to move contract to active DB
+
 
     def refresh_table(self):
         self.model.setFilter("")  # Clears filter

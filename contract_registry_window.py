@@ -3,11 +3,13 @@ import sqlite3
 import tempfile
 
 import pandas as pd
-from PyQt5.QtCore import QDate, QSize, Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QDate, QSize, Qt, QPoint
+from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QHBoxLayout, QTabWidget, QLabel, QVBoxLayout, QGroupBox, \
-    QDateEdit, QTableView, QAbstractItemView, QToolButton, QRadioButton, QLineEdit, QButtonGroup, QMessageBox
+    QDateEdit, QTableView, QAbstractItemView, QToolButton, QRadioButton, QLineEdit, QButtonGroup, QMessageBox, QMenu, \
+    QAction
 
 from adding_percent_amount_edit_window import EditAddingPercentWindow
 from outflow_in_registry_edit_money_control_window import EditRegistryOutflowWindow
@@ -195,6 +197,8 @@ class ContractRegistry(QWidget):
         self.table2.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table2.setSelectionBehavior(QTableView.SelectRows)
         self.table2.setSelectionMode(QTableView.SingleSelection)
+        self.table2.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table2.customContextMenuRequested.connect(self.show_registry_page1_table)
 
         layout1.addWidget(self.table2, 1, 1, 2, 3)
 
@@ -665,6 +669,8 @@ class ContractRegistry(QWidget):
         self.table5.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table5.setSelectionBehavior(QTableView.SelectRows)
         self.table5.setSelectionMode(QTableView.SingleSelection)
+        self.table5.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table5.customContextMenuRequested.connect(self.show_table5_context_menu)
 
         layout5.addWidget(self.table5, 1, 0, 4, 4)
 
@@ -726,6 +732,8 @@ class ContractRegistry(QWidget):
         self.table6_1.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table6_1.setSelectionBehavior(QTableView.SelectRows)
         self.table6_1.setSelectionMode(QTableView.SingleSelection)
+        self.table6_1.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table6_1.customContextMenuRequested.connect(self.show_table6_1_context_menu)
 
         layout_tab6_1.addWidget(self.table6_1, 1, 0, 4, 4)
 
@@ -772,6 +780,8 @@ class ContractRegistry(QWidget):
         self.table6_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table6_2.setSelectionBehavior(QTableView.SelectRows)
         self.table6_2.setSelectionMode(QTableView.SingleSelection)
+        self.table6_2.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table6_2.customContextMenuRequested.connect(self.show_table6_2_context_menu)
 
         layout_tab6_2.addWidget(self.table6_2, 1, 0, 4, 4)
 
@@ -820,6 +830,8 @@ class ContractRegistry(QWidget):
         self.table6_3.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table6_3.setSelectionBehavior(QTableView.SelectRows)
         self.table6_3.setSelectionMode(QTableView.SingleSelection)
+        self.table6_3.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table6_3.customContextMenuRequested.connect(self.show_table6_3_context_menu)
 
         layout_tab6_3.addWidget(self.table6_3, 1, 0, 4, 4)
 
@@ -911,6 +923,8 @@ class ContractRegistry(QWidget):
         self.table7.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table7.setSelectionBehavior(QTableView.SelectRows)
         self.table7.setSelectionMode(QTableView.SingleSelection)
+        self.table7.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table7.customContextMenuRequested.connect(self.show_table7_context_menu)
 
         layout7.addWidget(self.table7, 1, 0, 4, 4)
 
@@ -943,6 +957,53 @@ class ContractRegistry(QWidget):
 
 
     # --------------------------------------------page1functions-----------------------------------------------------
+    def show_registry_page1_table(self, position: QPoint):
+        index = self.table2.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+
+        print_action = QAction(" დამატებული თანხის დოკუმენტის ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_registry_page1_selected_row)
+
+        menu.addAction(print_action)
+
+        menu.exec_(self.table2.viewport().mapToGlobal(position))
+
+    def print_registry_page1_selected_row(self):
+        selected = self.table2.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+
+        # Extract values from model (adjust column names as needed)
+        name = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("name_surname")))
+        amount = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("amount")))
+        date = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("payment_date")))
+
+        # Format as HTML (you can style this)
+        html = f"""
+        <h2>Payment Receipt</h2>
+        <p><b>Name:</b> {name}</p>
+        <p><b>Amount:</b> {amount}</p>
+        <p><b>Date:</b> {date}</p>
+        """
+
+        # Create document and print
+        doc = QTextDocument()
+        doc.setHtml(html)
+
+        printer = QPrinter()
+
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
+
+
     def refresh_table(self):
         self.model2.setFilter("")  # Clears filter
         self.model2.select()  # This reloads the data from DB
@@ -1615,6 +1676,44 @@ class ContractRegistry(QWidget):
                 QMessageBox.critical(self, "შეცდომა", "წაშლა ვერ მოხერხდა")
 
     # --------------------------------------------page5functions-----------------------------------------------------
+    def show_table5_context_menu(self, position: QPoint):
+        index = self.table5.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+        print_action = QAction(" ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_table5_selected_row)
+        menu.addAction(print_action)
+        menu.exec_(self.table5.viewport().mapToGlobal(position))
+
+
+    def print_table5_selected_row(self):
+        selected = self.table5.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+        name = self.model5.data(self.model5.index(row_index, self.model5.fieldIndex("name_surname")))
+        amount = self.model5.data(self.model5.index(row_index, self.model5.fieldIndex("amount")))
+        date = self.model5.data(self.model5.index(row_index, self.model5.fieldIndex("payment_date")))
+
+        html = f"""
+        <h2>გადახდის ქვითარი</h2>
+        <p><b>სახელი:</b> {name}</p>
+        <p><b>თანხა:</b> {amount}</p>
+        <p><b>თარიღი:</b> {date}</p>
+        """
+        doc = QTextDocument()
+        doc.setHtml(html)
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
+
+
 
     def apply_text_filter_5(self, text):
         column = ""
@@ -1635,6 +1734,113 @@ class ContractRegistry(QWidget):
         self.model5.select()
 
     # --------------------------------------------page6functions-----------------------------------------------------
+    def show_table6_1_context_menu(self, position):
+        index = self.table6_1.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+        print_action = QAction(" ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_table6_1_selected_row)
+        menu.addAction(print_action)
+        menu.exec_(self.table6_1.viewport().mapToGlobal(position))
+
+    def print_table6_1_selected_row(self):
+        selected = self.table6_1.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+        name = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("name_surname")))
+        amount = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("amount")))
+        date = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("payment_date")))
+
+        html = f"""
+        <h2>გადახდის ქვითარი</h2>
+        <p><b>სახელი:</b> {name}</p>
+        <p><b>თანხა:</b> {amount}</p>
+        <p><b>თარიღი:</b> {date}</p>
+        """
+        doc = QTextDocument()
+        doc.setHtml(html)
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
+
+    def show_table6_2_context_menu(self, position):
+        index = self.table6_2.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+        print_action = QAction(" ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_table6_2_selected_row)
+        menu.addAction(print_action)
+        menu.exec_(self.table6_2.viewport().mapToGlobal(position))
+
+    def print_table6_2_selected_row(self):
+        selected = self.table6_2.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+        name = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("name_surname")))
+        amount = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("amount")))
+        date = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("payment_date")))
+
+        html = f"""
+        <h2>გადახდის ქვითარი</h2>
+        <p><b>სახელი:</b> {name}</p>
+        <p><b>თანხა:</b> {amount}</p>
+        <p><b>თარიღი:</b> {date}</p>
+        """
+        doc = QTextDocument()
+        doc.setHtml(html)
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
+
+    def show_table6_3_context_menu(self, position):
+        index = self.table6_3.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+        print_action = QAction(" ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_table6_3_selected_row)
+        menu.addAction(print_action)
+        menu.exec_(self.table6_3.viewport().mapToGlobal(position))
+
+    def print_table6_3_selected_row(self):
+        selected = self.table6_3.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+        name = self.model6_3.data(self.model6_3.index(row_index, self.model6_3.fieldIndex("name_surname")))
+        amount = self.model6_3.data(self.model6_3.index(row_index, self.model6_3.fieldIndex("amount")))
+        date = self.model6_3.data(self.model6_3.index(row_index, self.model6_3.fieldIndex("payment_date")))
+
+        html = f"""
+        <h2>გადახდის ქვითარი</h2>
+        <p><b>სახელი:</b> {name}</p>
+        <p><b>თანხა:</b> {amount}</p>
+        <p><b>თარიღი:</b> {date}</p>
+        """
+        doc = QTextDocument()
+        doc.setHtml(html)
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
 
     def apply_text_filter_6_1(self, text):
         column = ""
@@ -1687,6 +1893,41 @@ class ContractRegistry(QWidget):
         self.model6_3.select()
 
     # --------------------------------------------page7functions-----------------------------------------------------
+    def show_table7_context_menu(self, position):
+        index = self.table7.indexAt(position)
+        if not index.isValid():
+            return
+
+        menu = QMenu()
+        print_action = QAction(" ამობეჭდვა ", self)
+        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.triggered.connect(self.print_table7_selected_row)
+        menu.addAction(print_action)
+        menu.exec_(self.table7.viewport().mapToGlobal(position))
+
+    def print_table7_selected_row(self):
+        selected = self.table7.selectionModel().selectedRows()
+        if not selected:
+            print("No row selected.")
+            return
+
+        row_index = selected[0].row()
+        name = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("name_surname")))
+        amount = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("given_money_with_additional")))
+        date = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("contract_open_date")))
+
+        html = f"""
+        <h2>ხელშეკრულების ინფორმაცია</h2>
+        <p><b>სახელი:</b> {name}</p>
+        <p><b>თანხა დამატებით:</b> {amount}</p>
+        <p><b>გახსნის თარიღი:</b> {date}</p>
+        """
+        doc = QTextDocument()
+        doc.setHtml(html)
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec_() == QPrintDialog.Accepted:
+            doc.print_(printer)
 
     def apply_text_filter_7(self, text):
         column = ""
