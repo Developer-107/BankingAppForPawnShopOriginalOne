@@ -81,7 +81,7 @@ class MoneyControl(QWidget):
         self.table1.setSelectionBehavior(QTableView.SelectRows)
         self.table1.setSelectionMode(QTableView.SingleSelection)
 
-
+        self.table1.resizeColumnsToContents()
 
         layout.addWidget(self.table1, 2, 0, 1, 2)
 
@@ -116,6 +116,7 @@ class MoneyControl(QWidget):
         self.table2.setSelectionBehavior(QTableView.SelectRows)
         self.table2.setSelectionMode(QTableView.SingleSelection)
 
+        self.table2.resizeColumnsToContents()
         layout.addWidget(self.table2, 2, 2, 1, 2)
 
         # --------------------------------------------Layout-----------------------------------------------------

@@ -164,6 +164,7 @@ class ClosedContracts(QWidget):
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.show_closed_contracts_context_menu)
 
+        self.table.resizeColumnsToContents()
         layout.addWidget(self.table, 1, 0, 4, 5)
 
 

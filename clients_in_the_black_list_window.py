@@ -40,8 +40,7 @@ class ClientsInTheBlackList(QWidget):
         self.table.setSelectionBehavior(QTableView.SelectRows)
 
 
-
-
+        self.table.resizeColumnsToContents()
         layout.addWidget(self.table, 1, 1, 4, 5)
 
         # --------------------------------------------Box1-----------------------------------------------------

@@ -210,6 +210,7 @@ class ActiveContracts(QWidget):
         self.table.customContextMenuRequested.connect(self.show_context_menu)
         self.table.doubleClicked.connect(self.open_detail_window)
 
+        self.table.resizeColumnsToContents()
         layout.addWidget(self.table, 1, 0, 4, 5)
 
 
