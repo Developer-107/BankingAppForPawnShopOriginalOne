@@ -1695,7 +1695,7 @@ class ContractRegistry(QWidget):
     def print_table5_selected_row(self):
         selected = self.table5.selectionModel().selectedRows()
         if not selected:
-            print("No row selected.")
+
             return
 
         row_index = selected[0].row()
@@ -1814,26 +1814,94 @@ class ContractRegistry(QWidget):
     def print_table6_1_selected_row(self):
         selected = self.table6_1.selectionModel().selectedRows()
         if not selected:
-            print("No row selected.")
+
             return
 
         row_index = selected[0].row()
+        contract_id = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("contract_id")))
         name = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("name_surname")))
-        amount = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("amount")))
-        date = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("payment_date")))
+        date_raw = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("payment_date")))
+        unique_id = self.model6_1.data(self.model6_1.index(row_index, self.model6_1.fieldIndex("unique_id")))
+        percent_paid_amount = self.model6_1.data(self.model6_1.index(row_index,
+                                                                   self.model6_1.fieldIndex("percent_paid_amount")))
+        sum_of_paid_amount = self.model6_1.data(self.model6_1.index(row_index,
+                                                                    self.model6_1.fieldIndex("sum_of_money_paid")))
 
-        html = f"""
-        <h2>გადახდის ქვითარი</h2>
-        <p><b>სახელი:</b> {name}</p>
-        <p><b>თანხა:</b> {amount}</p>
-        <p><b>თარიღი:</b> {date}</p>
-        """
-        doc = QTextDocument()
-        doc.setHtml(html)
-        printer = QPrinter()
-        dialog = QPrintDialog(printer, self)
-        if dialog.exec_() == QPrintDialog.Accepted:
-            doc.print_(printer)
+        dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
+        date = dt.strftime("%d-%m-%Y")
+
+        replacements = {
+            '{name_surname}': name or "",
+            '{paid_percent}': str(percent_paid_amount) if percent_paid_amount is not None else "",
+            '{paid_principle}': "0" or "",
+            '{sum}': str(sum_of_paid_amount) if sum_of_paid_amount is not None else "",
+            '{date_of_payment}': date or "",
+            '{contract_id}': str(contract_id or ""),
+            '{unique_id}': unique_id or "",
+            '{organization_name}': getattr(self, "organisation", ""),
+        }
+
+        def replace_in_paragraph(paragraph, replacements):
+            full_text = ''.join(run.text for run in paragraph.runs)
+            new_text = full_text
+            for key, value in replacements.items():
+                new_text = new_text.replace(key, str(value))
+
+            if new_text != full_text:
+                for run in paragraph.runs:
+                    run.text = ''
+                if paragraph.runs:
+                    paragraph.runs[0].text = new_text
+                else:
+                    paragraph.add_run(new_text)
+
+        # Load the Word template
+        doc = Document("Templates/inflow_template.docx")
+
+        # Replace in normal paragraphs
+        for paragraph in doc.paragraphs:
+            replace_in_paragraph(paragraph, replacements)
+
+        # Replace in table cells
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
+
+        # 3. Save new doc
+        # Ensure folder exists
+        output_dir = "GeneratedContracts"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Construct file name
+        output_filename = f"inflow_order_only_percent_{unique_id}_{contract_id}_{name}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save document
+        doc.save(output_path)
+
+        # Open in Word and wait
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = True
+            word_doc = word.Documents.Open(os.path.abspath(output_path))
+
+
+        except Exception as e:
+            print("Error:", e)
+            print("Document saved at:", output_path)
+
+        # # 4. Optional: Print using MS Word (Windows only)
+        # try:
+        #     word = win32com.client.Dispatch("Word.Application")
+        #     word.Visible = False
+        #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+        #     word.Quit()
+        # except Exception as e:
+        #     print("Printing failed:", e)
+        #     # fallback: open Word file manually
+        #     os.startfile(output_path)
 
     def show_table6_2_context_menu(self, position):
         index = self.table6_2.indexAt(position)
@@ -1854,22 +1922,90 @@ class ContractRegistry(QWidget):
             return
 
         row_index = selected[0].row()
+        contract_id = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("contract_id")))
         name = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("name_surname")))
-        amount = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("amount")))
-        date = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("payment_date")))
+        date_raw = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("payment_date")))
+        unique_id = self.model6_2.data(self.model6_2.index(row_index, self.model6_2.fieldIndex("unique_id")))
+        principle_paid_amount = self.model6_2.data(self.model6_2.index(row_index,
+                                                                     self.model6_2.fieldIndex("principle_paid_amount")))
+        sum_of_paid_amount = self.model6_2.data(self.model6_2.index(row_index,
+                                                                    self.model6_2.fieldIndex("sum_of_money_paid")))
 
-        html = f"""
-        <h2>გადახდის ქვითარი</h2>
-        <p><b>სახელი:</b> {name}</p>
-        <p><b>თანხა:</b> {amount}</p>
-        <p><b>თარიღი:</b> {date}</p>
-        """
-        doc = QTextDocument()
-        doc.setHtml(html)
-        printer = QPrinter()
-        dialog = QPrintDialog(printer, self)
-        if dialog.exec_() == QPrintDialog.Accepted:
-            doc.print_(printer)
+        dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
+        date = dt.strftime("%d-%m-%Y")
+
+        replacements = {
+            '{name_surname}': name or "",
+            '{paid_principle}': str(principle_paid_amount) if principle_paid_amount is not None else "",
+            '{paid_percent}': "0" or "",
+            '{sum}': str(sum_of_paid_amount) if sum_of_paid_amount is not None else "",
+            '{date_of_payment}': date or "",
+            '{contract_id}': str(contract_id or ""),
+            '{unique_id}': unique_id or "",
+            '{organization_name}': getattr(self, "organisation", ""),
+        }
+
+        def replace_in_paragraph(paragraph, replacements):
+            full_text = ''.join(run.text for run in paragraph.runs)
+            new_text = full_text
+            for key, value in replacements.items():
+                new_text = new_text.replace(key, str(value))
+
+            if new_text != full_text:
+                for run in paragraph.runs:
+                    run.text = ''
+                if paragraph.runs:
+                    paragraph.runs[0].text = new_text
+                else:
+                    paragraph.add_run(new_text)
+
+        # Load the Word template
+        doc = Document("Templates/inflow_template.docx")
+
+        # Replace in normal paragraphs
+        for paragraph in doc.paragraphs:
+            replace_in_paragraph(paragraph, replacements)
+
+        # Replace in table cells
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
+
+        # 3. Save new doc
+        # Ensure folder exists
+        output_dir = "GeneratedContracts"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Construct file name
+        output_filename = f"inflow_order_only_principle_{unique_id}_{contract_id}_{name}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save document
+        doc.save(output_path)
+
+        # Open in Word and wait
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = True
+            word_doc = word.Documents.Open(os.path.abspath(output_path))
+
+
+        except Exception as e:
+            print("Error:", e)
+            print("Document saved at:", output_path)
+
+        # # 4. Optional: Print using MS Word (Windows only)
+        # try:
+        #     word = win32com.client.Dispatch("Word.Application")
+        #     word.Visible = False
+        #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+        #     word.Quit()
+        # except Exception as e:
+        #     print("Printing failed:", e)
+        #     # fallback: open Word file manually
+        #     os.startfile(output_path)
 
     def show_table6_3_context_menu(self, position):
         index = self.table6_3.indexAt(position)
