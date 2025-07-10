@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from add_money_window import AddMoney
 from contract_color_delegate import ContractColorDelegate
+from detail_window import DetailWindow
 from open_edit_window import EditWindow
 from open_add_window import AddWindow
 from payment_confirm_window import PaymentConfirmWindow
@@ -207,6 +208,7 @@ class ActiveContracts(QWidget):
         self.table.clicked.connect(self.row_selected)
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.show_context_menu)
+        self.table.doubleClicked.connect(self.open_detail_window)
 
         layout.addWidget(self.table, 1, 0, 4, 5)
 
@@ -1248,3 +1250,12 @@ class ActiveContracts(QWidget):
         conn.commit()
         conn.close()
 
+    def open_detail_window(self, index):
+        row = index.row()
+        contract_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
+        name_surname = self.model.data(self.model.index(row, self.model.fieldIndex("name_surname")))
+        item_name = self.model.data(self.model.index(row, self.model.fieldIndex("item_name")))
+
+        # Example: open a custom window and pass the contract ID
+        self.detail_window = DetailWindow(contract_id, name_surname, item_name)
+        self.detail_window.show()
