@@ -654,7 +654,7 @@ class ActiveContracts(QWidget):
         self.open_payment_window(contract_id)
 
     def open_payment_window(self, contract_id):
-        self.payment_window = PaymentWindow(contract_id)
+        self.payment_window = PaymentWindow(contract_id, self.organisation)
         self.payment_window.show()
 
 
