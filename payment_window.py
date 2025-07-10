@@ -161,23 +161,6 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/inflow_order_both.db")
-                cursor = conn.cursor()
-
-                cursor.execute("""
-                                               INSERT INTO inflow_order_both (
-                                               contract_id, payment_date, name_surname, percent_paid_amount
-                                               ) VALUES (?, ?, ?, ?)
-                                           """, (
-                    contract_id,
-                    payment_date,
-                    name_from_contracts,
-                    int(self.payed_percent_amount.text()),
-                ))
-                conn.commit()
-                conn.close()
-
-
 
             if self.amount_input.text().strip():
                 conn = sqlite3.connect("Databases/active_contracts.db")
@@ -253,18 +236,22 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
+            if self.payed_percent_amount.text().strip() and self.amount_input.text().strip():
+
                 conn = sqlite3.connect("Databases/inflow_order_both.db")
                 cursor = conn.cursor()
 
                 cursor.execute("""
-                                       INSERT INTO inflow_order_both (
-                                       contract_id, payment_date, name_surname, principle_paid_amount
-                                       ) VALUES (?, ?, ?, ?)
-                               """, (
+                                                       INSERT INTO inflow_order_both (
+                                                       contract_id, payment_date, name_surname, principle_paid_amount,
+                                                       percent_paid_amount
+                                                       ) VALUES (?, ?, ?, ?, ?)
+                                               """, (
                     contract_id,
                     payment_date,
                     name_from_contracts,
                     int(self.amount_input.text()),
+                    int(self.payed_percent_amount.text())
                 ))
                 conn.commit()
                 conn.close()

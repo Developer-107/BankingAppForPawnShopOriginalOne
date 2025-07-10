@@ -827,7 +827,7 @@ class ContractRegistry(QWidget):
 
         self.table6_3 = QTableView()
         self.model6_3 = QSqlTableModel(self, self.db6_3)
-        self.model6_3.setTable("inflow_order_both")
+        self.model6_3.setTable("inflow_order_both_view")
         self.model6_3.select()
         self.table6_3.setModel(self.model6_3)
         self.table6_3.setEditTriggers(QAbstractItemView.NoEditTriggers)
