@@ -482,7 +482,7 @@ class ActiveContracts(QWidget):
 
         print_action = QAction(" ხელშეკრულების ამობეჭდვა ", self)
         print_action.setIcon(QIcon("Icons/printer_icon.png"))
-        print_action.triggered.connect(self.print_selected_row)
+        print_action.triggered.connect(self.print_selected_row_page7)
 
 
         add_money_action = QAction(" თანხის დამატება ", self)
@@ -523,10 +523,10 @@ class ActiveContracts(QWidget):
 
     # Right click menu functions
     # Print function menu
-    def print_selected_row(self):
+    def print_selected_row_page7(self):
         selected = self.table.selectionModel().selectedRows()
         if not selected:
-            print("No row selected.")
+
             return
 
         row_index = selected[0].row()
@@ -755,6 +755,8 @@ class ActiveContracts(QWidget):
                           item_name TEXT,
                           model TEXT,
                           IMEI TEXT,
+                          trusted_person TEXT,
+                          comment TEXT,
                           given_money INTEGER,
                           percent_day_quantity INTEGER,
                           first_added_percent REAL,
@@ -780,6 +782,8 @@ class ActiveContracts(QWidget):
                 item_name,
                 model,
                 IMEI,
+                trusted_person,
+                comment,
                 given_money,
                 percent_day_quantity,
                 first_added_percent,
@@ -807,6 +811,8 @@ class ActiveContracts(QWidget):
                           item_name TEXT,
                           model TEXT,
                           IMEI TEXT,
+                          trusted_person TEXT,
+                          comment TEXT,
                           percent REAL,
                           percent_day_quantity INTEGER,
                           given_money INTEGER,

@@ -188,7 +188,7 @@ class MainWindow(QMainWindow):
         self.active_contracts_window.show()
 
     def open_contract_registry_window(self):
-        self.contract_registry_window = ContractRegistry(self.role)
+        self.contract_registry_window = ContractRegistry(self.role, self.name_of_user, self.organisation)
         self.contract_registry_window.show()
 
     def open_closed_contracts_window(self):

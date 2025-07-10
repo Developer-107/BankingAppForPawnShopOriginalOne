@@ -223,8 +223,8 @@ class AddWindow(QWidget):
                             INSERT INTO contracts (
                                 contract_id, contract_open_date, first_percent_payment_date, name_surname, id_number, 
                                 tel_number, item_name, model, IMEI, given_money,percent_day_quantity, 
-                                first_added_percent, office_mob_number
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                first_added_percent, office_mob_number, comment, trusted_person
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                 contract_id,
                 self.take_date_box.text(),
@@ -238,7 +238,9 @@ class AddWindow(QWidget):
                 self.given_money_box.text(),
                 int(self.day_quantity_box.currentText()),
                 float(int(self.given_money_box.text()) * float(self.percent_box.currentText()) / 100),
-                office_mob_number
+                office_mob_number,
+                self.comment_box.text(),
+                self.trusted_person_box.text()
             ))
 
             conn.commit()

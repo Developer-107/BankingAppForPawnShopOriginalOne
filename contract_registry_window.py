@@ -1,7 +1,8 @@
 import os
 import sqlite3
 import tempfile
-
+from datetime import datetime
+import win32com.client
 import pandas as pd
 from PyQt5.QtCore import QDate, QSize, Qt, QPoint
 from PyQt5.QtGui import QIcon, QTextDocument
@@ -10,7 +11,7 @@ from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QHBoxLayout, QTabWidget, QLabel, QVBoxLayout, QGroupBox, \
     QDateEdit, QTableView, QAbstractItemView, QToolButton, QRadioButton, QLineEdit, QButtonGroup, QMessageBox, QMenu, \
     QAction
-
+from docx import Document
 from adding_percent_amount_edit_window import EditAddingPercentWindow
 from outflow_in_registry_edit_money_control_window import EditRegistryOutflowWindow
 from open_edit_money_control_window_2 import EditInPrincipalInflowsInRegistryWindow
@@ -18,12 +19,14 @@ from registry_page_4_edit_window_4_paid_percents import EditPaidPercentWindow
 
 
 class ContractRegistry(QWidget):
-    def __init__(self, role):
+    def __init__(self, role, name_of_user, organisation):
         super().__init__()
         self.setWindowTitle("ხელშეკრულებების რეესტრი")
         self.setWindowIcon(QIcon("Icons/contract_registry.png"))
         self.resize(1701, 700)
         self.role = role
+        self.organisation = organisation
+        self.name_of_user = name_of_user
 
         layout = QGridLayout()
 
@@ -1908,26 +1911,102 @@ class ContractRegistry(QWidget):
     def print_table7_selected_row(self):
         selected = self.table7.selectionModel().selectedRows()
         if not selected:
-            print("No row selected.")
+
             return
 
         row_index = selected[0].row()
+        contract_id = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("contract_id")))
         name = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("name_surname")))
-        amount = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("given_money_with_additional")))
-        date = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("contract_open_date")))
+        given_money = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("given_money")))
+        date_raw = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("contract_open_date")))
+        id_number = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("id_number")))
+        item_name = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("item_name")))
+        model = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("model")))
+        imei = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("IMEI")))
+        comment = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("comment")))
+        trusted_person = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("trusted_person")))
+        tel_number = self.model7.data(self.model7.index(row_index, self.model7.fieldIndex("tel_number")))
+        dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
+        date = dt.strftime("%d-%m-%Y")
 
-        html = f"""
-        <h2>ხელშეკრულების ინფორმაცია</h2>
-        <p><b>სახელი:</b> {name}</p>
-        <p><b>თანხა დამატებით:</b> {amount}</p>
-        <p><b>გახსნის თარიღი:</b> {date}</p>
-        """
-        doc = QTextDocument()
-        doc.setHtml(html)
-        printer = QPrinter()
-        dialog = QPrintDialog(printer, self)
-        if dialog.exec_() == QPrintDialog.Accepted:
-            doc.print_(printer)
+        replacements = {
+            '{name_surname}': name or "",
+            '{given_money}': str(given_money or ""),
+            '{date}': date or "",
+            '{contract_id}': str(contract_id or ""),
+            '{id_number}': id_number or "",
+            '{IMEI}': imei or "",
+            '{model}': model or "",
+            '{item_name}': item_name or "",
+            '{comment}': comment or "",
+            '{trusted_person}': trusted_person or "",
+            '{tel_number}': tel_number or "",
+            '{organization_name}': getattr(self, "organisation", ""),
+            '{operator_name}': getattr(self, "name_of_user", "")
+        }
+
+        def replace_in_paragraph(paragraph, replacements):
+            full_text = ''.join(run.text for run in paragraph.runs)
+            new_text = full_text
+            for key, value in replacements.items():
+                new_text = new_text.replace(key, str(value))
+
+            if new_text != full_text:
+                for run in paragraph.runs:
+                    run.text = ''
+                if paragraph.runs:
+                    paragraph.runs[0].text = new_text
+                else:
+                    paragraph.add_run(new_text)
+
+        # Load the Word template
+        doc = Document("Templates/contract_template.docx")
+
+        # Replace in normal paragraphs
+        for paragraph in doc.paragraphs:
+            replace_in_paragraph(paragraph, replacements)
+
+        # Replace in table cells
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
+
+        # 3. Save new doc
+        # Ensure folder exists
+        output_dir = "GeneratedContracts"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Construct file name
+        output_filename = f"contract_{contract_id}_{name}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save document
+        doc.save(output_path)
+
+        # Open in Word and wait
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = True
+            word_doc = word.Documents.Open(os.path.abspath(output_path))
+
+            print("Waiting for user to close the Word document...")
+
+        except Exception as e:
+            print("Error:", e)
+            print("Document saved at:", output_path)
+
+        # # 4. Optional: Print using MS Word (Windows only)
+        # try:
+        #     word = win32com.client.Dispatch("Word.Application")
+        #     word.Visible = False
+        #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+        #     word.Quit()
+        # except Exception as e:
+        #     print("Printing failed:", e)
+        #     # fallback: open Word file manually
+        #     os.startfile(output_path)
 
     def apply_text_filter_7(self, text):
         column = ""
