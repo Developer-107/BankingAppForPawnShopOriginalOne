@@ -302,7 +302,7 @@ class AddWindow(QWidget):
 
             replacements = {
                 '{name_surname}': self.name_surname_box.text() or "",
-                '{given_money}': str(self.given_money_box.text() or ""),
+                '{given_money}': str(self.given_money_box.text()) if self.given_money_box.text() is not None else "",
                 '{date}': date or "",
                 '{contract_id}': str(contract_id or ""),
                 '{id_number}': self.id_number_box.text() or "",

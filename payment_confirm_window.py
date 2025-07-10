@@ -113,6 +113,7 @@ class PaymentConfirmWindow(QWidget):
             status = str(row[20])
             comment = str(row[11])
             trusted_person = str(row[10])
+            date_of_C_O = str(row[1])
 
             conn = sqlite3.connect("Databases/active_contracts.db")
             cur_given = conn.cursor()
@@ -130,12 +131,13 @@ class PaymentConfirmWindow(QWidget):
             # Insert in closed_contracts database
             cursor.execute("""
                             INSERT INTO closed_contracts (
-                                id, name_surname, id_number, tel_number, item_name, model, IMEI, percent,
+                                id, contract_open_date, name_surname, id_number, tel_number, item_name, model, IMEI, percent,
                                 percent_day_quantity, given_money, additional_money, paid_principle, added_percents,
                                 paid_percents, status, date_of_closing, comment, trusted_person
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                 self.contract_id,
+                date_of_C_O,
                 name_surname,
                 id_number,
                 tel_number,

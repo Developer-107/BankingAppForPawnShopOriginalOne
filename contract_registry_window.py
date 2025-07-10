@@ -1931,7 +1931,7 @@ class ContractRegistry(QWidget):
 
         replacements = {
             '{name_surname}': name or "",
-            '{given_money}': str(given_money or ""),
+            '{given_money}': str(given_money) if given_money is not None else "",
             '{date}': date or "",
             '{contract_id}': str(contract_id or ""),
             '{id_number}': id_number or "",
@@ -1991,7 +1991,6 @@ class ContractRegistry(QWidget):
             word.Visible = True
             word_doc = word.Documents.Open(os.path.abspath(output_path))
 
-            print("Waiting for user to close the Word document...")
 
         except Exception as e:
             print("Error:", e)

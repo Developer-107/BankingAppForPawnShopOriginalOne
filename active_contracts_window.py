@@ -546,7 +546,7 @@ class ActiveContracts(QWidget):
 
         replacements = {
             '{name_surname}': name or "",
-            '{given_money}': str(given_money or ""),
+            '{given_money}': str(given_money) if given_money is not None else "",
             '{date}': date or "",
             '{contract_id}': str(contract_id or ""),
             '{id_number}': id_number or "",

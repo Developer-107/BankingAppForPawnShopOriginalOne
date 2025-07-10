@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
         self.contract_registry_window.show()
 
     def open_closed_contracts_window(self):
-        self.closed_contracts_window = ClosedContracts(self.role)
+        self.closed_contracts_window = ClosedContracts(self.role, self.name_of_user, self.organisation)
         self.closed_contracts_window.show()
 
     def open_clients_in_the_black_list_window(self):

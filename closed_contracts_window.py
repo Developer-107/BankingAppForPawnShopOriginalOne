@@ -1,14 +1,14 @@
 import sqlite3
 import sys
 from datetime import datetime, timedelta
-
+import win32com.client
 from PyQt5.QtCore import Qt, QSize, QDate
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QToolButton, QCheckBox, QLabel, QRadioButton, QButtonGroup, \
     QLineEdit, QDateEdit, QPushButton, QTableView, QAbstractItemView, QMessageBox, QMenu, QAction
-
+from docx import Document
 import tempfile
 import pandas as pd
 import os
@@ -22,13 +22,14 @@ from payment_confirm_window import PaymentConfirmWindow
 from payment_window import PaymentWindow
 
 class ClosedContracts(QWidget):
-    def __init__(self, role):
+    def __init__(self, role, name_of_user, organisation):
         super().__init__()
         self.setWindowTitle("დახურული ხელშეკრულებები")
         self.setWindowIcon(QIcon("Icons/closed_contracts.png"))
         self.resize(1400, 800)
         self.role = role
-
+        self.organisation = organisation
+        self.name_of_user = name_of_user
 
         layout = QGridLayout()
 
@@ -198,22 +199,97 @@ class ClosedContracts(QWidget):
             return
 
         row_index = selected[0].row()
+        contract_id = self.model.data(self.model.index(row_index, self.model.fieldIndex("id")))
         name = self.model.data(self.model.index(row_index, self.model.fieldIndex("name_surname")))
-        amount = self.model.data(self.model.index(row_index, self.model.fieldIndex("given_money_with_additional")))
-        date = self.model.data(self.model.index(row_index, self.model.fieldIndex("contract_open_date")))
+        given_money = self.model.data(self.model.index(row_index, self.model.fieldIndex("given_money")))
+        date_raw = self.model.data(self.model.index(row_index, self.model.fieldIndex("contract_open_date")))
+        id_number = self.model.data(self.model.index(row_index, self.model.fieldIndex("id_number")))
+        item_name = self.model.data(self.model.index(row_index, self.model.fieldIndex("item_name")))
+        model = self.model.data(self.model.index(row_index, self.model.fieldIndex("model")))
+        imei = self.model.data(self.model.index(row_index, self.model.fieldIndex("IMEI")))
+        comment = self.model.data(self.model.index(row_index, self.model.fieldIndex("comment")))
+        trusted_person = self.model.data(self.model.index(row_index, self.model.fieldIndex("trusted_person")))
+        tel_number = self.model.data(self.model.index(row_index, self.model.fieldIndex("tel_number")))
+        dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
+        date = dt.strftime("%d-%m-%Y")
 
-        html = f"""
-        <h2>დახურული ხელშეკრულება</h2>
-        <p><b>სახელი:</b> {name}</p>
-        <p><b>თანხა დამატებით:</b> {amount}</p>
-        <p><b>გაფორმების თარიღი:</b> {date}</p>
-        """
-        doc = QTextDocument()
-        doc.setHtml(html)
-        printer = QPrinter()
-        dialog = QPrintDialog(printer, self)
-        if dialog.exec_() == QPrintDialog.Accepted:
-            doc.print_(printer)
+        replacements = {
+            '{name_surname}': name or "",
+            '{given_money}': str(given_money) if given_money is not None else "",
+            '{date}': date or "",
+            '{contract_id}': str(contract_id or ""),
+            '{id_number}': id_number or "",
+            '{IMEI}': imei or "",
+            '{model}': model or "",
+            '{item_name}': item_name or "",
+            '{comment}': comment or "",
+            '{trusted_person}': trusted_person or "",
+            '{tel_number}': tel_number or "",
+            '{organization_name}': getattr(self, "organisation", ""),
+            '{operator_name}': getattr(self, "name_of_user", "")
+        }
+
+        def replace_in_paragraph(paragraph, replacements):
+            full_text = ''.join(run.text for run in paragraph.runs)
+            new_text = full_text
+            for key, value in replacements.items():
+                new_text = new_text.replace(key, str(value))
+
+            if new_text != full_text:
+                for run in paragraph.runs:
+                    run.text = ''
+                if paragraph.runs:
+                    paragraph.runs[0].text = new_text
+                else:
+                    paragraph.add_run(new_text)
+
+        # Load the Word template
+        doc = Document("Templates/contract_template.docx")
+
+        # Replace in normal paragraphs
+        for paragraph in doc.paragraphs:
+            replace_in_paragraph(paragraph, replacements)
+
+        # Replace in table cells
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
+
+        # 3. Save new doc
+        # Ensure folder exists
+        output_dir = "GeneratedContracts"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Construct file name
+        output_filename = f"contract_{contract_id}_{name}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save document
+        doc.save(output_path)
+
+        # Open in Word and wait
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = True
+            word_doc = word.Documents.Open(os.path.abspath(output_path))
+
+
+        except Exception as e:
+            print("Error:", e)
+            print("Document saved at:", output_path)
+
+        # # 4. Optional: Print using MS Word (Windows only)
+        # try:
+        #     word = win32com.client.Dispatch("Word.Application")
+        #     word.Visible = False
+        #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+        #     word.Quit()
+        # except Exception as e:
+        #     print("Printing failed:", e)
+        #     # fallback: open Word file manually
+        #     os.startfile(output_path)
 
     def return_closed_contract_to_active(self):
         selected = self.table.selectionModel().selectedRows()
