@@ -203,6 +203,7 @@ class ContractRegistry(QWidget):
         self.table2.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table2.customContextMenuRequested.connect(self.show_registry_page1_table)
 
+        self.table2.resizeColumnsToContents()
         layout1.addWidget(self.table2, 1, 1, 2, 3)
 
 
@@ -342,6 +343,7 @@ class ContractRegistry(QWidget):
         self.table3.setSelectionBehavior(QTableView.SelectRows)
         self.table3.setSelectionMode(QTableView.SingleSelection)
 
+        self.table3.resizeColumnsToContents()
         layout2.addWidget(self.table3, 1, 1, 2, 3)
 
 
@@ -477,6 +479,7 @@ class ContractRegistry(QWidget):
         self.table3_1.setSelectionBehavior(QTableView.SelectRows)
         self.table3_1.setSelectionMode(QTableView.SingleSelection)
 
+        self.table3_1.resizeColumnsToContents()
         layout3.addWidget(self.table3_1, 1, 0, 2, 4)
 
         # Set layout
@@ -612,6 +615,7 @@ class ContractRegistry(QWidget):
         self.table4.setSelectionBehavior(QTableView.SelectRows)
         self.table4.setSelectionMode(QTableView.SingleSelection)
 
+        self.table4.resizeColumnsToContents()
         layout4.addWidget(self.table4, 1, 1, 2, 3)
 
         # Set final layout
@@ -675,6 +679,7 @@ class ContractRegistry(QWidget):
         self.table5.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table5.customContextMenuRequested.connect(self.show_table5_context_menu)
 
+        self.table5.resizeColumnsToContents()
         layout5.addWidget(self.table5, 1, 0, 4, 4)
 
         # Set layout
@@ -738,6 +743,7 @@ class ContractRegistry(QWidget):
         self.table6_1.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table6_1.customContextMenuRequested.connect(self.show_table6_1_context_menu)
 
+        self.table6_1.resizeColumnsToContents()
         layout_tab6_1.addWidget(self.table6_1, 1, 0, 4, 4)
 
         # Set layout
@@ -786,6 +792,7 @@ class ContractRegistry(QWidget):
         self.table6_2.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table6_2.customContextMenuRequested.connect(self.show_table6_2_context_menu)
 
+        self.table6_2.resizeColumnsToContents()
         layout_tab6_2.addWidget(self.table6_2, 1, 0, 4, 4)
 
         self.tab6_2.setLayout(layout_tab6_2)
@@ -836,6 +843,7 @@ class ContractRegistry(QWidget):
         self.table6_3.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table6_3.customContextMenuRequested.connect(self.show_table6_3_context_menu)
 
+        self.table6_3.resizeColumnsToContents()
         layout_tab6_3.addWidget(self.table6_3, 1, 0, 4, 4)
 
         self.tab6_3.setLayout(layout_tab6_3)
@@ -929,6 +937,8 @@ class ContractRegistry(QWidget):
         self.table7.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table7.customContextMenuRequested.connect(self.show_table7_context_menu)
 
+
+        self.table7.resizeColumnsToContents()
         layout7.addWidget(self.table7, 1, 0, 4, 4)
 
         # Set layout
