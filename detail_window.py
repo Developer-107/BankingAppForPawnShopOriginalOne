@@ -37,7 +37,7 @@ class DetailWindow(QWidget):
         export_table.setIconSize(QSize(37, 40))
         export_table.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         export_table.setStyleSheet("font-size: 16px;")
-        # export_table.clicked.connect(self.export_table_to_excel)
+        export_table.clicked.connect(self.export_both_tables_to_excel)
 
         box_layout.addWidget(export_table, 0, 3)
         # Placing box1
@@ -161,24 +161,46 @@ class DetailWindow(QWidget):
 
         # --------------------------------------------Functions-----------------------------------------------------
 
-    def export_table1_to_excel(self):
-
-        row_count = self.model1.rowCount()
-        col_count = self.model1.columnCount()
-
-        headers = [self.model1.headerData(col, Qt.Horizontal) for col in range(col_count)]
-        data = [
-            [self.model1.data(self.model1.index(row, col)) for col in range(col_count)]
-            for row in range(row_count)
-        ]
-
-        df = pd.DataFrame(data, columns=headers)
-
+    def export_both_tables_to_excel(self):
         try:
-            temp_path = os.path.join(tempfile.gettempdir(), "temp_export.xlsx")
-            df.to_excel(temp_path, index=False)
+            # --- Table 1 ---
+            columns_to_export1 = ["contract_id", "date_of_percent_addition", "percent_amount"]
+            data1 = []
 
-            # Open Excel file
-            os.startfile(temp_path)  # Safer and native on Windows
+            for row in range(self.model1.rowCount()):
+                row_data = []
+                for col in range(self.model1.columnCount()):
+                    header = self.model1.headerData(col, Qt.Horizontal)
+                    if header in columns_to_export1:
+                        value = self.model1.data(self.model1.index(row, col))
+                        row_data.append(value)
+                data1.append(row_data)
+
+            df1 = pd.DataFrame(data1, columns=columns_to_export1)
+
+            # --- Table 2 ---
+            columns_to_export2 = ["date_of_percent_addition", "paid_amount"]
+            data2 = []
+
+            for row in range(self.model2.rowCount()):
+                row_data = []
+                for col in range(self.model2.columnCount()):
+                    header = self.model2.headerData(col, Qt.Horizontal)
+                    if header in columns_to_export2:
+                        value = self.model2.data(self.model2.index(row, col))
+                        row_data.append(value)
+                data2.append(row_data)
+
+            df2 = pd.DataFrame(data2, columns=columns_to_export2)
+
+            # --- Write both tables side by side in Excel ---
+            temp_path = os.path.join(tempfile.gettempdir(), "percent_export.xlsx")
+
+            with pd.ExcelWriter(temp_path, engine='openpyxl') as writer:
+                df1.to_excel(writer, sheet_name='Details', index=False, startrow=0, startcol=0)
+                df2.to_excel(writer, sheet_name='Details', index=False, startrow=0, startcol=len(df1.columns))
+
+            os.startfile(temp_path)
+
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", str(e))
