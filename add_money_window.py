@@ -1,18 +1,23 @@
+import os
 import sqlite3
+from datetime import datetime
 
+import win32com.client
+from docx import Document
 from PyQt5.QtCore import QDate, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox
 
 
 class AddMoney(QWidget):
-    def __init__(self, contract_id, name_surname):
+    def __init__(self, contract_id, name_surname, organisation):
         super().__init__()
         self.contract_id = contract_id
         self.name_surname = name_surname
         self.setWindowTitle("თანხის დამატება")
         self.setWindowIcon(QIcon("Icons/add_money.png"))
         self.setFixedSize(400, 250)
+        self.organisation = organisation
 
         layout = QGridLayout()
 
@@ -150,14 +155,93 @@ class AddMoney(QWidget):
                 status_for_added_money
             ))
 
+            unique_id = cursor.lastrowid
 
             conn.commit()
-
+            conn.close()
 
 
             QMessageBox.information(self, "წარმატება", "მონაცემები შენახულია")
             self.close()
+
+            try:
+                dt = datetime.strptime(date_of_addition, "%Y-%m-%d %H:%M:%S")
+                date = dt.strftime("%d-%m-%Y")
+
+                replacements = {
+                    '{name_surname}': self.name_box.text() or "",
+                    '{additional_amount}': str(int(self.added_money_amount.text())) if
+                                    int(self.added_money_amount.text()) is not None else "",
+                    '{date}': date or "",
+                    '{contract_id}': str(contract_id or ""),
+                    '{unique_id}': unique_id or "",
+                    '{organization_name}': getattr(self, "organisation", ""),
+                }
+
+                def replace_in_paragraph(paragraph, replacements):
+                    full_text = ''.join(run.text for run in paragraph.runs)
+                    new_text = full_text
+                    for key, value in replacements.items():
+                        new_text = new_text.replace(key, str(value))
+
+                    if new_text != full_text:
+                        for run in paragraph.runs:
+                            run.text = ''
+                        if paragraph.runs:
+                            paragraph.runs[0].text = new_text
+                        else:
+                            paragraph.add_run(new_text)
+
+                # Load the Word template
+                doc = Document("Templates/additional_money_template.docx")
+
+                # Replace in normal paragraphs
+                for paragraph in doc.paragraphs:
+                    replace_in_paragraph(paragraph, replacements)
+
+                # Replace in table cells
+                for table in doc.tables:
+                    for row in table.rows:
+                        for cell in row.cells:
+                            for paragraph in cell.paragraphs:
+                                replace_in_paragraph(paragraph, replacements)
+
+                # 3. Save new doc
+                # Ensure folder exists
+                output_dir = "GeneratedContracts"
+                os.makedirs(output_dir, exist_ok=True)
+
+                # Construct file name
+                output_filename = f"outflow_order_{unique_id}_{contract_id}_{self.name_box.text()}.docx"
+                output_path = os.path.join(output_dir, output_filename)
+
+                # Save document
+                doc.save(output_path)
+
+                # Open in Word and wait
+                try:
+                    word = win32com.client.Dispatch("Word.Application")
+                    word.Visible = True
+                    word_doc = word.Documents.Open(os.path.abspath(output_path))
+
+
+                except Exception as e:
+                    print("Error:", e)
+                    print("Document saved at:", output_path)
+
+                # # 4. Optional: Print using MS Word (Windows only)
+                # try:
+                #     word = win32com.client.Dispatch("Word.Application")
+                #     word.Visible = False
+                #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+                #     word.Quit()
+                # except Exception as e:
+                #     print("Printing failed:", e)
+                #     # fallback: open Word file manually
+                #     os.startfile(output_path)
+            except Exception as e:
+                QMessageBox.critical(self, "შეცდომა", f"ამობეჭდვა ვერ მოოხერხდა:\n{e}")
+
+
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"ვერ შევინახე მონაცემები:\n{e}")
-        finally:
-            conn.close()

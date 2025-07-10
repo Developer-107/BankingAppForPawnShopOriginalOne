@@ -638,7 +638,7 @@ class ActiveContracts(QWidget):
 
 
     def open_add_money_window(self, contract_id, name_surname):
-        self.add_money_window = AddMoney(contract_id, name_surname)
+        self.add_money_window = AddMoney(contract_id, name_surname, self.organisation)
         self.add_money_window.show()
 
 
