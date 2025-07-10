@@ -279,86 +279,98 @@ class PaymentWindow(QWidget):
             QMessageBox.information(self, "წარმატება", "მონაცემები შენახულია")
             self.close()
 
-            dt = datetime.strptime(payment_date, "%Y-%m-%d %H:%M:%S")
-            date = dt.strftime("%d-%m-%Y")
-            amount_input_value = int(self.amount_input.text()) if self.amount_input.text().strip().isdigit() else 0
-            percent_input_value = int(
-                self.payed_percent_amount.text()) if self.payed_percent_amount.text().strip().isdigit() else 0
-            sum_of_paid_amount = amount_input_value + percent_input_value
+            reply = QMessageBox.question(
+                self,
+                "ბეჭდვა",
+                "გსურთ დოკუმენტის ამობეჭდვა?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+
+            if reply == QMessageBox.Yes:
+                try:
+                    dt = datetime.strptime(payment_date, "%Y-%m-%d %H:%M:%S")
+                    date = dt.strftime("%d-%m-%Y")
+                    amount_input_value = int(self.amount_input.text()) if self.amount_input.text().strip().isdigit() else 0
+                    percent_input_value = int(
+                        self.payed_percent_amount.text()) if self.payed_percent_amount.text().strip().isdigit() else 0
+                    sum_of_paid_amount = amount_input_value + percent_input_value
 
 
-            replacements = {
-                '{name_surname}': name_from_contracts or "",
-                '{paid_principle}': str(amount_input_value),
-                '{paid_percent}': str(percent_input_value),
-                '{sum}': str(sum_of_paid_amount),
-                '{date_of_payment}': date or "",
-                '{contract_id}': str(contract_id or ""),
-                '{unique_id}': self.unique_id or "",
-                '{organization_name}': getattr(self, "organisation", ""),
-            }
+                    replacements = {
+                        '{name_surname}': name_from_contracts or "",
+                        '{paid_principle}': str(amount_input_value),
+                        '{paid_percent}': str(percent_input_value),
+                        '{sum}': str(sum_of_paid_amount),
+                        '{date_of_payment}': date or "",
+                        '{contract_id}': str(contract_id or ""),
+                        '{unique_id}': self.unique_id or "",
+                        '{organization_name}': getattr(self, "organisation", ""),
+                    }
 
-            def replace_in_paragraph(paragraph, replacements):
-                full_text = ''.join(run.text for run in paragraph.runs)
-                new_text = full_text
-                for key, value in replacements.items():
-                    new_text = new_text.replace(key, str(value))
+                    def replace_in_paragraph(paragraph, replacements):
+                        full_text = ''.join(run.text for run in paragraph.runs)
+                        new_text = full_text
+                        for key, value in replacements.items():
+                            new_text = new_text.replace(key, str(value))
 
-                if new_text != full_text:
-                    for run in paragraph.runs:
-                        run.text = ''
-                    if paragraph.runs:
-                        paragraph.runs[0].text = new_text
-                    else:
-                        paragraph.add_run(new_text)
+                        if new_text != full_text:
+                            for run in paragraph.runs:
+                                run.text = ''
+                            if paragraph.runs:
+                                paragraph.runs[0].text = new_text
+                            else:
+                                paragraph.add_run(new_text)
 
-            # Load the Word template
-            doc = Document("Templates/inflow_template.docx")
+                    # Load the Word template
+                    doc = Document("Templates/inflow_template.docx")
 
-            # Replace in normal paragraphs
-            for paragraph in doc.paragraphs:
-                replace_in_paragraph(paragraph, replacements)
+                    # Replace in normal paragraphs
+                    for paragraph in doc.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
 
-            # Replace in table cells
-            for table in doc.tables:
-                for row in table.rows:
-                    for cell in row.cells:
-                        for paragraph in cell.paragraphs:
-                            replace_in_paragraph(paragraph, replacements)
+                    # Replace in table cells
+                    for table in doc.tables:
+                        for row in table.rows:
+                            for cell in row.cells:
+                                for paragraph in cell.paragraphs:
+                                    replace_in_paragraph(paragraph, replacements)
 
-            # 3. Save new doc
-            # Ensure folder exists
-            output_dir = "GeneratedContracts"
-            os.makedirs(output_dir, exist_ok=True)
+                    # 3. Save new doc
+                    # Ensure folder exists
+                    output_dir = "GeneratedContracts"
+                    os.makedirs(output_dir, exist_ok=True)
 
-            # Construct file name
-            output_filename = f"inflow_order_both_{self.unique_id}_{contract_id}_{name_from_contracts}.docx"
-            output_path = os.path.join(output_dir, output_filename)
+                    # Construct file name
+                    output_filename = f"inflow_order_both_{self.unique_id}_{contract_id}_{name_from_contracts}.docx"
+                    output_path = os.path.join(output_dir, output_filename)
 
-            # Save document
-            doc.save(output_path)
+                    # Save document
+                    doc.save(output_path)
 
-            # Open in Word and wait
-            try:
-                word = win32com.client.Dispatch("Word.Application")
-                word.Visible = True
-                word_doc = word.Documents.Open(os.path.abspath(output_path))
+                    # Open in Word and wait
+                    try:
+                        word = win32com.client.Dispatch("Word.Application")
+                        word.Visible = True
+                        word_doc = word.Documents.Open(os.path.abspath(output_path))
 
 
-            except Exception as e:
-                print("Error:", e)
-                print("Document saved at:", output_path)
+                    except Exception as e:
+                        print("Error:", e)
+                        print("Document saved at:", output_path)
 
-            # # 4. Optional: Print using MS Word (Windows only)
-            # try:
-            #     word = win32com.client.Dispatch("Word.Application")
-            #     word.Visible = False
-            #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
-            #     word.Quit()
-            # except Exception as e:
-            #     print("Printing failed:", e)
-            #     # fallback: open Word file manually
-            #     os.startfile(output_path)
+                    # # 4. Optional: Print using MS Word (Windows only)
+                    # try:
+                    #     word = win32com.client.Dispatch("Word.Application")
+                    #     word.Visible = False
+                    #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
+                    #     word.Quit()
+                    # except Exception as e:
+                    #     print("Printing failed:", e)
+                    #     # fallback: open Word file manually
+                    #     os.startfile(output_path)
+                except Exception as e:
+                    QMessageBox.critical(self, "შეცდომა", f"ამობეჭდვა არ მოხერხდა:\n{e}")
 
 
         except Exception as e:
