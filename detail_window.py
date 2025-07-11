@@ -114,6 +114,30 @@ class DetailWindow(QWidget):
             field = self.model1.headerData(col, Qt.Horizontal)
             self.table1.setColumnHidden(col, field not in columns_to_show)
 
+        record = self.model1.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "contract_id": "ხელშეკრულების N",
+            "date_of_percent_addition": "პროცენტის დამატების თარიღი",
+            "percent_amount": "დარიცხული პროცენტი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model1.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+        # Make header text bold
+        header = self.table1.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+               QHeaderView::section {
+               padding: 4px 8px;
+               }
+                        """)
+
         self.table1.resizeColumnsToContents()
 
         layout.addWidget(self.table1, 2, 0, 1, 2)
@@ -150,6 +174,29 @@ class DetailWindow(QWidget):
         for col in range(self.model2.columnCount()):
             field = self.model2.headerData(col, Qt.Horizontal)
             self.table2.setColumnHidden(col, field not in columns_to_show)
+
+        record = self.model2.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "date_of_percent_addition": "პროცენტის გადახდის თარიღი",
+            "paid_amount": "გადახილი პროცენტი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model2.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
+        header = self.table2.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                            QHeaderView::section {
+                                padding: 4px 8px;
+                            }
+                        """)
 
         self.table2.resizeColumnsToContents()
 
