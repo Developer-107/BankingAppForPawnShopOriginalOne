@@ -196,7 +196,42 @@ class ContractRegistry(QWidget):
         self.model2 = QSqlTableModel(self, self.db2)
         self.model2.setTable("outflow_in_registry")
         self.model2.select()
+        # Block to rename columns
+        record = self.model2.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "date_of_C_O": "გაფორმების თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "given_money": "გაცემული ძირი თანხა",
+            "date_of_addition": "დამატების თარიღი",
+            "additional_amount": "დამატებული თანხები",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model2.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table2.setModel(self.model2)
+        # Make header text bold
+        header = self.table2.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                    QHeaderView::section {
+                        padding: 4px 8px;
+                    }
+                """)
+        # Continue as usual
         self.table2.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table2.setSelectionBehavior(QTableView.SelectRows)
         self.table2.setSelectionMode(QTableView.SingleSelection)
@@ -338,7 +373,42 @@ class ContractRegistry(QWidget):
         self.model3 = QSqlTableModel(self, self.db3)
         self.model3.setTable("paid_principle_registry")  # or another table name
         self.model3.select()
+        # Block to rename columns
+        record = self.model3.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "date_of_C_O": "გაფორმების თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "given_money": "გაცემული ძირი თანხა",
+            "date_of_payment": "გადახდის თარიღი",
+            "payment_amount": "გადახდილი თანხები",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model3.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table3.setModel(self.model3)
+        # Make header text bold
+        header = self.table3.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                            QHeaderView::section {
+                                padding: 4px 8px;
+                            }
+                        """)
+        # Continue as usual
         self.table3.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table3.setSelectionBehavior(QTableView.SelectRows)
         self.table3.setSelectionMode(QTableView.SingleSelection)
@@ -474,7 +544,41 @@ class ContractRegistry(QWidget):
         self.model3_1 = QSqlTableModel(self, self.db3_1)
         self.model3_1.setTable("adding_percent_amount")
         self.model3_1.select()
+        # Block to rename columns
+        record = self.model3_1.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "date_of_C_O": "გაფორმების თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "date_of_percent_addition": "პროცენტის დარიცხვის თარიღი",
+            "percent_amount": "დარიცხული პროცენტი",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model3_1.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table3_1.setModel(self.model3_1)
+        # Make header text bold
+        header = self.table3_1.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                                    QHeaderView::section {
+                                        padding: 4px 8px;
+                                    }
+                                """)
+        # Continue as usual
         self.table3_1.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table3_1.setSelectionBehavior(QTableView.SelectRows)
         self.table3_1.setSelectionMode(QTableView.SingleSelection)
@@ -610,7 +714,43 @@ class ContractRegistry(QWidget):
         self.model4 = QSqlTableModel(self, self.db4)
         self.model4.setTable("paid_percent_amount")
         self.model4.select()
+        # Block to rename columns
+        record = self.model4.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "date_of_C_O": "გაფორმების თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "set_date": "პროცენტის მითითებული თარიღი",
+            "date_of_percent_addition": "გადახდის თარიღი",
+            "paid_amount": "გადახდილი პროცენტის თანხა",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model4.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
+
         self.table4.setModel(self.model4)
+        # Make header text bold
+        header = self.table4.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                                            QHeaderView::section {
+                                                padding: 4px 8px;
+                                            }
+                                        """)
+        # Continue as usual
         self.table4.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table4.setSelectionBehavior(QTableView.SelectRows)
         self.table4.setSelectionMode(QTableView.SingleSelection)
@@ -672,7 +812,37 @@ class ContractRegistry(QWidget):
         self.model5 = QSqlTableModel(self, self.db5)
         self.model5.setTable("outflow_order")
         self.model5.select()
+        # Block to rename columns
+        record = self.model5.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "name_surname": "სახელი და გვარი",
+            "tel_number": "ტელეფონის ნომერი",
+            "amount": "გაცემული თანხა",
+            "date": "თანხის გაცემის თარიღი",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model5.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table5.setModel(self.model5)
+        # Make header text bold
+        header = self.table5.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                                                    QHeaderView::section {
+                                                        padding: 4px 8px;
+                                                    }
+                                                """)
+        # Continue as usual
         self.table5.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table5.setSelectionBehavior(QTableView.SelectRows)
         self.table5.setSelectionMode(QTableView.SingleSelection)
@@ -736,7 +906,38 @@ class ContractRegistry(QWidget):
         self.model6_1 = QSqlTableModel(self, self.db6_1)
         self.model6_1.setTable("inflow_order_only_percent_amount")
         self.model6_1.select()
+
+        # Block to rename columns
+        record = self.model6_1.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "name_surname": "სახელი და გვარი",
+            "payment_date": "გადახდის თარიღი",
+            "percent_paid_amount": "გადახდილი პროცენტის თანხა",
+            "set_date": "მითითებული თარიღი",
+            "sum_of_money_paid": "გადახდილი თანხების ჯამი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model6_1.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table6_1.setModel(self.model6_1)
+        # Make header text bold
+        header = self.table6_1.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                                                            QHeaderView::section {
+                                                                padding: 4px 8px;
+                                                            }
+                                                        """)
+        # Continue as usual
         self.table6_1.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table6_1.setSelectionBehavior(QTableView.SelectRows)
         self.table6_1.setSelectionMode(QTableView.SingleSelection)
@@ -785,7 +986,38 @@ class ContractRegistry(QWidget):
         self.model6_2 = QSqlTableModel(self, self.db6_2)
         self.model6_2.setTable("inflow_order_only_principal_amount")
         self.model6_2.select()
+
+        # Block to rename columns
+        record = self.model6_2.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "name_surname": "სახელი და გვარი",
+            "payment_date": "გადახდის თარიღი",
+            "principle_paid_amount": "გადახდილი ძირი თანხა",
+            "sum_of_money_paid": "გადახდილი თანხების ჯამი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model6_2.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
+
         self.table6_2.setModel(self.model6_2)
+        # Make header text bold
+        header = self.table6_2.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                                                                    QHeaderView::section {
+                                                                        padding: 4px 8px;
+                                                                    }
+                                                                """)
+        # Continue as usual
         self.table6_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table6_2.setSelectionBehavior(QTableView.SelectRows)
         self.table6_2.setSelectionMode(QTableView.SingleSelection)
@@ -836,7 +1068,35 @@ class ContractRegistry(QWidget):
         self.model6_3 = QSqlTableModel(self, self.db6_3)
         self.model6_3.setTable("inflow_order_both_view")
         self.model6_3.select()
+        # Block to rename columns
+        record = self.model6_3.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "name_surname": "სახელი და გვარი",
+            "payment_date": "გადახდის თარიღი",
+            "principle_paid_amount": "გადახდილი ძირი თანხა",
+            "percent_paid_amount": "გადახდილი პროცენტის თანხა",
+            "sum_of_money_paid": "გადახდილი თანხების ჯამი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model6_3.setHeaderData(column_indices[name], Qt.Horizontal, label)
         self.table6_3.setModel(self.model6_3)
+        # Make header text bold
+        header = self.table6_3.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                  QHeaderView::section {
+                      padding: 4px 8px;
+                  }
+        """)
+        # Continue as usual
         self.table6_3.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table6_3.setSelectionBehavior(QTableView.SelectRows)
         self.table6_3.setSelectionMode(QTableView.SingleSelection)
@@ -930,7 +1190,47 @@ class ContractRegistry(QWidget):
         self.model7 = QSqlTableModel(self, self.db7)
         self.model7.setTable("contracts_view")
         self.model7.select()
+        # Block to rename columns
+        record = self.model7.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური  N",
+            "contract_id": "ხელშეკრულების N",
+            "contract_open_date": "გაფორმების თარიღი",
+            "first_percent_payment_day": "პირველი პროცენტის დღე",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "imei": "IMEI",
+            "type": "დატოვების ტიპი",
+            "trusted_person": "მინდობილი პირი",
+            "comment": "კომენტარი",
+            "given_money": "გაცემული ძირი თანხა",
+            "percent_day_quantity": "პროცენტის დღეების რააოდენობა",
+            "first_added_percent": "პირველად დამატებული პროცენტის თანხა",
+            "sum_of_principle_and_percent": "პირველი პროცენტისა და ძირის ჯამი",
+            "office_mob_number": "ოფისის მობილურის ნომერი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model7.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
         self.table7.setModel(self.model7)
+        # Make header text bold
+        header = self.table7.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                          QHeaderView::section {
+                              padding: 4px 8px;
+                          }
+                """)
+        # Continue as usual
         self.table7.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table7.setSelectionBehavior(QTableView.SelectRows)
         self.table7.setSelectionMode(QTableView.SingleSelection)
