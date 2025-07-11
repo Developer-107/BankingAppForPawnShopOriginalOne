@@ -35,7 +35,35 @@ class ClientsInTheBlackList(QWidget):
         self.model = QSqlTableModel(self, self.db)
         self.model.setTable("black_list")
         self.model.select()
+        # Block to rename columns
+        record = self.model.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "id": "უნიკალური ნომერი N",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადობის ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "imei": "IMEI"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table.setModel(self.model)
+        # Make header text bold
+        header = self.table.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                            QHeaderView::section {
+                                padding: 4px 8px;
+                            }
+                        """)
+        # Continue as usual
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table.setSelectionBehavior(QTableView.SelectRows)
 

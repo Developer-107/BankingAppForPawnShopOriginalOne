@@ -199,7 +199,52 @@ class ActiveContracts(QWidget):
         self.model = QSqlTableModel(self, self.db)
         self.model.setTable("active_contracts_view")
         self.model.select()
+
+        # Block to rename columns
+        record = self.model.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "id": "ხელშეკრულების N",
+            "date": "გაფორმების თარიღი",
+            "days_after_C_O":"დღის რაოდენობა",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "imei": "IMEI",
+            "type": "დატოვების ტიპი",
+            "trusted_person": "მინდობილი პირი",
+            "comment": "კომენტარი",
+            "given_money": "გაცემული ძირი თანხა",
+            "percent": "პროცენტი",
+            "day_quantity": "დღეების რაოდენობა",
+            "additional_amounts": "დამატებული თანხები",
+            "principal_paid": "გადახდილი ძირი თანხა",
+            "principal_should_be_paid": "გადასახდელი ძირი თანხა",
+            "added_percents": "დარიცხული პროცენტები",
+            "paid_percents": "გადახდილი პროცენტები",
+            "percent_should_be_paid": "გადასახდელი პროცენტები"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+        # Continue as usual
         self.table.setModel(self.model)
+        # Make header text bold
+        header = self.table.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+            QHeaderView::section {
+                padding: 4px 8px;
+            }
+        """)
+        # Continue as usual
         delegate = ContractColorDelegate(self.table)
         self.table.setItemDelegate(delegate)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table

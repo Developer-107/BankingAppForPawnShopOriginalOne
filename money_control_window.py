@@ -76,7 +76,36 @@ class MoneyControl(QWidget):
         self.model1 = QSqlTableModel(self, self.db1)
         self.model1.setTable("paid_principle_and_paid_percentage_database")
         self.model1.select()
+        # Block to rename columns
+        record = self.model1.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "date_of_inflow": "გადახდის თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "amount": "თანხა",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model1.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table1.setModel(self.model1)
+        # Make header text bold
+        header = self.table1.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                    QHeaderView::section {
+                        padding: 4px 8px;
+                    }
+                """)
+        # Continue as usual
         self.table1.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table1.setSelectionBehavior(QTableView.SelectRows)
         self.table1.setSelectionMode(QTableView.SingleSelection)
@@ -111,7 +140,37 @@ class MoneyControl(QWidget):
         self.model2 = QSqlTableModel(self, self.db2)
         self.model2.setTable("given_and_additional_database")
         self.model2.select()
+
+        # Block to rename columns
+        record = self.model2.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "unique_id": "უნიკალური ნომერი N",
+            "contract_id": "ხელშეკრულების N",
+            "date_of_outflow": "გადახდის თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "amount": "თანხა",
+            "status": "სტატუსი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model2.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table2.setModel(self.model2)
+        # Make header text bold
+        header = self.table2.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                            QHeaderView::section {
+                                padding: 4px 8px;
+                            }
+                        """)
+        # Continue as usual
         self.table2.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table2.setSelectionBehavior(QTableView.SelectRows)
         self.table2.setSelectionMode(QTableView.SingleSelection)

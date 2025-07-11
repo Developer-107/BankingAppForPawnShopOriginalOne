@@ -157,7 +157,48 @@ class ClosedContracts(QWidget):
         self.model = QSqlTableModel(self, self.db)
         self.model.setTable("closed_contracts")
         self.model.select()
+
+        # Block to rename columns
+        record = self.model.record()
+        column_indices = {record.field(i).name(): i for i in range(record.count())}
+
+        column_labels = {
+            "id": "ხელშეკრულების N",
+            "contract_open_date": "გაფორმების თარიღი",
+            "name_surname": "სახელი და გვარი",
+            "id_number": "პირადი ნომერი",
+            "tel_number": "ტელეფონის ნომერი",
+            "item_name": "ნივთის დასახელება",
+            "model": "მოდელი",
+            "trusted_person": "მინდობილი პირი",
+            "comment": "კომენტარი",
+            "given_money": "გაცემული ძირი თანხა",
+            "percent": "პროცენტი",
+            "percent_day_quantity": "დღეების რაოდენობა",
+            "additional_money": "დამატებული თანხები",
+            "paid_principle": "გადახდილი ძირი თანხა",
+            "added_percents": "დარიცხული პროცენტები",
+            "paid_percents": "გადახდილი პროცენტები",
+            "status": "სტატუსი",
+            "date_of_closing": "ხელშეკრულების დახურვის თარიღი"
+        }
+
+        for name, label in column_labels.items():
+            if name in column_indices:
+                self.model.setHeaderData(column_indices[name], Qt.Horizontal, label)
+
+
         self.table.setModel(self.model)
+        # Make header text bold
+        header = self.table.horizontalHeader()
+        font = header.font()
+        font.setBold(True)
+        header.setFont(font)
+        header.setStyleSheet("""
+                    QHeaderView::section {
+                        padding: 4px 8px;
+                    }
+                """)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Read-only table
         self.table.setSelectionBehavior(QTableView.SelectRows)
         self.table.setSelectionMode(QTableView.SingleSelection)
