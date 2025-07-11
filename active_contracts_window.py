@@ -198,6 +198,7 @@ class ActiveContracts(QWidget):
         self.table = QTableView()
         self.model = QSqlTableModel(self, self.db)
         self.model.setTable("active_contracts_view")
+        self.model.setFilter("is_visible = 'აქტიური'")
         self.model.select()
 
         # Block to rename columns
@@ -219,13 +220,14 @@ class ActiveContracts(QWidget):
             "comment": "კომენტარი",
             "given_money": "გაცემული ძირი თანხა",
             "percent": "პროცენტი",
-            "day_quantity": "დღეების რაოდენობა",
+            "day_quantity": "პროცენტის დღეების რაოდენობა",
             "additional_amounts": "დამატებული თანხები",
             "principal_paid": "გადახდილი ძირი თანხა",
             "principal_should_be_paid": "გადასახდელი ძირი თანხა",
             "added_percents": "დარიცხული პროცენტები",
             "paid_percents": "გადახდილი პროცენტები",
-            "percent_should_be_paid": "გადასახდელი პროცენტები"
+            "percent_should_be_paid": "გადასახდელი პროცენტები",
+            "is_visible": "ხელშეკრულების სტატუსი"
         }
 
         for name, label in column_labels.items():
@@ -394,7 +396,7 @@ class ActiveContracts(QWidget):
             QMessageBox.warning(self, "შეცდომა", "გთხოვთ აირჩიოთ შესაცვლელი ჩანაწერი")
 
     def refresh_table(self):
-        self.model.setFilter("")  # Clears filter
+        self.model.setFilter("is_visible = 'აქტიური'")  # Clears filter
         self.model.select()  # This reloads the data from DB
 
     def search_by_date(self):
@@ -403,7 +405,7 @@ class ActiveContracts(QWidget):
 
         # Assuming your table has a date column named 'date'
         filter_str = f"date >= '{from_date_str}' AND date <= '{to_date_str}'"
-        self.model.setFilter(filter_str)
+        self.model.setFilter(f"{filter_str} AND is_visible = 'აქტიური'")
         self.model.select()
 
     def apply_text_filter(self, text):
@@ -424,9 +426,9 @@ class ActiveContracts(QWidget):
 
         if column:
             filter_str = f"{column} LIKE '%{text}%'"
-            self.model.setFilter(filter_str)
+            self.model.setFilter(f"{filter_str} AND is_visible = 'აქტიური'")
         else:
-            self.model.setFilter("")  # No filter if nothing selected
+            self.model.setFilter("is_visible = 'აქტიური'")  # No filter if nothing selected
 
         self.model.select()
 
@@ -906,7 +908,8 @@ class ActiveContracts(QWidget):
                 paid_percents REAL NOT NULL DEFAULT 0,
                 percent_should_be_paid REAL GENERATED ALWAYS AS (
                     added_percents - paid_percents
-                ) STORED
+                ) STORED,
+                is_visible TEXT DEFAULT 'აქტიური'
             )
         """)
 
@@ -937,7 +940,8 @@ class ActiveContracts(QWidget):
                    (given_money + additional_amounts - principal_paid) AS principal_should_be_paid,
                    added_percents,
                    paid_percents,
-                   (added_percents - paid_percents) AS percent_should_be_paid
+                   (added_percents - paid_percents) AS percent_should_be_paid,
+                   is_visible
                FROM active_contracts
            """)
 

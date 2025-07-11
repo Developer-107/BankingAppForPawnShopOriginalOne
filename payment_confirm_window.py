@@ -118,10 +118,10 @@ class PaymentConfirmWindow(QWidget):
             conn = sqlite3.connect("Databases/active_contracts.db")
             cur_given = conn.cursor()
             cur_given.execute("""
-                                 DELETE FROM active_contracts
-                                 WHERE id = ?
-                              """,
-                              (self.contract_id,))
+                UPDATE active_contracts
+                SET is_visible = 'დახურული'
+                WHERE id = ?
+            """, (self.contract_id,))
             conn.commit()
             conn.close()
 
