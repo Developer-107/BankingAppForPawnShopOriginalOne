@@ -530,7 +530,7 @@ class ActiveContracts(QWidget):
 
         print_action = QAction(" ხელშეკრულების ამობეჭდვა ", self)
         print_action.setIcon(QIcon("Icons/printer_icon.png"))
-        print_action.triggered.connect(self.print_selected_row_page7)
+        print_action.triggered.connect(self.print_selected_row_page)
 
 
         add_money_action = QAction(" თანხის დამატება ", self)
@@ -571,7 +571,7 @@ class ActiveContracts(QWidget):
 
     # Right click menu functions
     # Print function menu
-    def print_selected_row_page7(self):
+    def print_selected_row_page(self):
         selected = self.table.selectionModel().selectedRows()
         if not selected:
 
@@ -654,7 +654,6 @@ class ActiveContracts(QWidget):
             word.Visible = True
             word_doc = word.Documents.Open(os.path.abspath(output_path))
 
-            print("Waiting for user to close the Word document...")
 
         except Exception as e:
             print("Error:", e)
