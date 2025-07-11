@@ -142,6 +142,30 @@ class DetailWindow(QWidget):
 
         layout.addWidget(self.table1, 2, 0, 1, 2)
 
+        # --------------------------------------------SumQLabel--------------------------------------------------
+        # Footer for table1
+        self.left_footer_label = QLabel("სულ: 0.00 ₾")
+        self.left_footer_label.setAlignment(Qt.AlignRight)
+        self.left_footer_label.setStyleSheet("""
+            background-color: yellow;
+            font-weight: bold;
+            padding: 6px;
+            font-size: 14px;
+        """)
+        layout.addWidget(self.left_footer_label, 3, 0, 1, 2)  # Below table1
+
+        # Footer for table2
+        self.right_footer_label = QLabel("სულ: 0.00 ₾")
+        self.right_footer_label.setAlignment(Qt.AlignRight)
+        self.right_footer_label.setStyleSheet("""
+            background-color: yellow;
+            font-weight: bold;
+            padding: 6px;
+            font-size: 14px;
+        """)
+        layout.addWidget(self.right_footer_label, 3, 2, 1, 2)  # Below table2
+
+
 
         # --------------------------------------------Table2-----------------------------------------------------
 
@@ -202,6 +226,11 @@ class DetailWindow(QWidget):
 
         layout.addWidget(self.table2, 2, 2, 1, 2)
 
+        # --------------------------------------------FunctionsForSum-----------------------------------------------------
+
+        self.update_footer_sum(self.model1, self.left_footer_label, "percent_amount")
+        self.update_footer_sum(self.model2, self.right_footer_label, "paid_amount")
+
         # --------------------------------------------Layout-----------------------------------------------------
         self.setLayout(layout)
 
@@ -251,3 +280,19 @@ class DetailWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", str(e))
+
+    def update_footer_sum(self, model, footer_label, column_name):
+        total = 0.0
+        record = model.record()
+        col_index = next((i for i in range(record.count()) if record.field(i).name() == column_name), -1)
+
+        if col_index != -1:
+            for row in range(model.rowCount()):
+                index = model.index(row, col_index)
+                value = model.data(index)
+                try:
+                    total += float(value)
+                except (TypeError, ValueError):
+                    pass
+
+        footer_label.setText(f"სულ: {total:.2f} ₾")
