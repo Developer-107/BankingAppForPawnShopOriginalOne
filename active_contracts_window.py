@@ -400,8 +400,8 @@ class ActiveContracts(QWidget):
         self.model.select()  # This reloads the data from DB
 
     def search_by_date(self):
-        from_date_str = self.from_date.date().toString("dd.MM.yyyy")
-        to_date_str = self.to_date.date().toString("dd.MM.yyyy")
+        from_date_str = self.from_date.date().toString("yyyy-MM-dd")
+        to_date_str = self.to_date.date().toString("yyyy-MM-dd")
 
         # Assuming your table has a date column named 'date'
         filter_str = f"date >= '{from_date_str}' AND date <= '{to_date_str}'"

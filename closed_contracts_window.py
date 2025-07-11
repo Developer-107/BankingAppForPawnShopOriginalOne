@@ -340,9 +340,34 @@ class ClosedContracts(QWidget):
             return
 
         row_index = selected[0].row()
-        contract_id = self.model.data(self.model.index(row_index, self.model.fieldIndex("contract_id")))
+        contract_id = self.model.data(self.model.index(row_index, self.model.fieldIndex("id")))
 
-        # Add logic to move contract to active DB
+        try:
+            # 1. Delete from closed_contracts DB
+            conn_closed = sqlite3.connect("Databases/closed_contracts.db")
+            cursor_closed = conn_closed.cursor()
+            cursor_closed.execute("DELETE FROM closed_contracts WHERE id = ?", (contract_id,))
+            conn_closed.commit()
+            conn_closed.close()
+
+            # 2. Update is_visible = 'აქტიური' in active_contracts DB
+            conn_active = sqlite3.connect("Databases/active_contracts.db")
+            cursor_active = conn_active.cursor()
+            cursor_active.execute("""
+                UPDATE active_contracts
+                SET is_visible = 'აქტიური'
+                WHERE id = ?
+            """, (contract_id,))
+            conn_active.commit()
+            conn_active.close()
+
+            QMessageBox.information(self, "წარმატება", "ხელშეკრულება დაბრუნდა აქტიურებში")
+
+            # Optional: Refresh the model/view after changes
+            self.model.select()
+
+        except Exception as e:
+            QMessageBox.critical(self, "შეცდომა", f"მოცემულობის დამუშავებისას მოხდა შეცდომა:\n{e}")
 
 
     def refresh_table(self):
