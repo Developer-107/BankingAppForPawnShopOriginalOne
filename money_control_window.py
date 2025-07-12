@@ -178,6 +178,33 @@ class MoneyControl(QWidget):
         self.table2.resizeColumnsToContents()
         layout.addWidget(self.table2, 2, 2, 1, 2)
 
+        # Footer for table1
+        self.left_footer_label = QLabel("სულ: 0.00 ₾")
+        self.left_footer_label.setAlignment(Qt.AlignRight)
+        self.left_footer_label.setStyleSheet("""
+                    background-color: #f7f3e9;
+                    font-weight: bold;
+                    padding: 6px;
+                    font-size: 14px;
+                    border: 1px solid gray;
+                """)
+        layout.addWidget(self.left_footer_label, 4, 0, 1, 2)  # Below table1
+
+        # Footer for table2
+        self.right_footer_label = QLabel("სულ: 0.00 ₾")
+        self.right_footer_label.setAlignment(Qt.AlignRight)
+        self.right_footer_label.setStyleSheet("""
+                    background-color: #f7f3e9;
+                    font-weight: bold;
+                    padding: 6px;
+                    font-size: 14px;
+                    border: 1px solid gray;
+                """)
+        layout.addWidget(self.right_footer_label, 4, 2, 1, 2)  # Below table2
+
+        self.update_footer_sum(self.model1, self.left_footer_label, "amount")
+        self.update_footer_sum(self.model2, self.right_footer_label, "amount")
+
         # --------------------------------------------Layout-----------------------------------------------------
         self.setLayout(layout)
 
@@ -189,6 +216,9 @@ class MoneyControl(QWidget):
 
         self.model2.setFilter("")
         self.model2.select()
+
+        self.update_footer_sum(self.model1, self.left_footer_label, "amount")
+        self.update_footer_sum(self.model2, self.right_footer_label, "amount")
 
     def search_by_date(self):
         from_date_str = self.from_date.date().toString("yyyy-MM-dd HH:mm:ss")
@@ -205,6 +235,10 @@ class MoneyControl(QWidget):
         filter_str1 = f"{date_column1} >= '{from_date_str}' AND {date_column1} <= '{to_date_str}'"
         self.model2.setFilter(filter_str1)
         self.model2.select()
+
+        self.update_footer_sum(self.model1, self.left_footer_label, "amount")
+        self.update_footer_sum(self.model2, self.right_footer_label, "amount")
+
 
     def export_table1_to_excel(self):
 
@@ -250,3 +284,19 @@ class MoneyControl(QWidget):
             os.startfile(temp_path)  # Safer and native on Windows
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", str(e))
+
+    def update_footer_sum(self, model, footer_label, column_name):
+        total = 0.0
+        record = model.record()
+        col_index = next((i for i in range(record.count()) if record.field(i).name() == column_name), -1)
+
+        if col_index != -1:
+            for row in range(model.rowCount()):
+                index = model.index(row, col_index)
+                value = model.data(index)
+                try:
+                    total += float(value)
+                except (TypeError, ValueError):
+                    pass
+
+        footer_label.setText(f"სულ: {total:.2f} ₾")
