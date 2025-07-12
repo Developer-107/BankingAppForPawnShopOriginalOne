@@ -261,6 +261,24 @@ class ActiveContracts(QWidget):
         layout.addWidget(self.table, 1, 0, 4, 5)
 
 
+
+        # Create QLabel to display the total sums
+        self.total_label = QLabel("")
+        self.total_label.setStyleSheet("""
+            background-color: #f7f3e9;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 2px;
+            border: 1px solid gray;
+        """)
+        self.total_label.setFixedHeight(28)
+        self.total_label.setAlignment(Qt.AlignCenter)
+
+        # Add the label below the table
+        layout.addWidget(self.total_label, 6, 1, 1, 3)
+
+        self.update_summary_footer()
+
     # --------------------------------------------BelowBox1-----------------------------------------------------
         below_box1 = QGroupBox("სტატუსი და მინდობილობა")
         below_box1.setStyleSheet("QGroupBox {font-style: italic; font-size: 10pt; }")
@@ -398,6 +416,7 @@ class ActiveContracts(QWidget):
     def refresh_table(self):
         self.model.setFilter("is_visible = 'აქტიური'")  # Clears filter
         self.model.select()  # This reloads the data from DB
+        self.update_summary_footer()
 
     def search_by_date(self):
         from_date_str = self.from_date.date().toString("yyyy-MM-dd")
@@ -407,6 +426,7 @@ class ActiveContracts(QWidget):
         filter_str = f"date >= '{from_date_str}' AND date <= '{to_date_str}'"
         self.model.setFilter(f"{filter_str} AND is_visible = 'აქტიური'")
         self.model.select()
+        self.update_summary_footer()
 
     def apply_text_filter(self, text):
         column = ""
@@ -431,6 +451,7 @@ class ActiveContracts(QWidget):
             self.model.setFilter("is_visible = 'აქტიური'")  # No filter if nothing selected
 
         self.model.select()
+        self.update_summary_footer()
 
 
     def row_selected(self, index):
@@ -1308,3 +1329,24 @@ class ActiveContracts(QWidget):
         # Example: open a custom window and pass the contract ID
         self.detail_window = DetailWindow(contract_id, name_surname, item_name)
         self.detail_window.show()
+
+    def update_summary_footer(self):
+        sum_principal = 0.0
+        sum_added_percents = 0.0
+
+        for row in range(self.model.rowCount()):
+            try:
+                principal_index = self.model.index(row, self.model.fieldIndex("principal_should_be_paid"))
+                percent_index = self.model.index(row, self.model.fieldIndex("added_percents"))
+
+                principal_value = float(self.model.data(principal_index) or 0)
+                percent_value = float(self.model.data(percent_index) or 0)
+
+                sum_principal += principal_value
+                sum_added_percents += percent_value
+            except:
+                continue
+
+        self.total_label.setText(
+            f"დაბანდებული თანხა (ძირი): {sum_principal:.2f} ₾     |     სულ დარიცხული პროცენტების ჯამი: {sum_added_percents:.2f} ₾"
+        )
