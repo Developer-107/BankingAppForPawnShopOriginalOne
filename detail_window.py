@@ -147,10 +147,11 @@ class DetailWindow(QWidget):
         self.left_footer_label = QLabel("სულ: 0.00 ₾")
         self.left_footer_label.setAlignment(Qt.AlignRight)
         self.left_footer_label.setStyleSheet("""
-            background-color: yellow;
+            background-color: #f7f3e9;
             font-weight: bold;
             padding: 6px;
             font-size: 14px;
+            border: 1px solid gray;
         """)
         layout.addWidget(self.left_footer_label, 3, 0, 1, 2)  # Below table1
 
@@ -158,10 +159,11 @@ class DetailWindow(QWidget):
         self.right_footer_label = QLabel("სულ: 0.00 ₾")
         self.right_footer_label.setAlignment(Qt.AlignRight)
         self.right_footer_label.setStyleSheet("""
-            background-color: yellow;
+            background-color: #f7f3e9;
             font-weight: bold;
             padding: 6px;
             font-size: 14px;
+            border: 1px solid gray;
         """)
         layout.addWidget(self.right_footer_label, 3, 2, 1, 2)  # Below table2
 
