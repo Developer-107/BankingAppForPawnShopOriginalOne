@@ -883,7 +883,7 @@ class ContractRegistry(QWidget):
         self.total_label5.setAlignment(Qt.AlignRight)
 
         # Add the label below the table
-        layout5.addWidget(self.total_label5, 6, 0, 1, 4)
+        layout5.addWidget(self.total_label5, 5, 0, 1, 4)
 
         self.update_summary_footer5()
 
@@ -982,6 +982,23 @@ class ContractRegistry(QWidget):
         self.table6_1.resizeColumnsToContents()
         layout_tab6_1.addWidget(self.table6_1, 1, 0, 4, 4)
 
+        # Create QLabel to display the total sums
+        self.total_label6_1 = QLabel("")
+        self.total_label6_1.setStyleSheet("""
+                                    background-color: #f7f3e9;
+                                    font-weight: bold;
+                                    font-size: 14px;
+                                    padding: 2px;
+                                    border: 1px solid gray;
+                                """)
+        self.total_label6_1.setFixedHeight(28)
+        self.total_label6_1.setAlignment(Qt.AlignRight)
+
+        # Add the label below the table
+        layout_tab6_1.addWidget(self.total_label6_1, 5, 0, 1, 4)
+
+        self.update_summary_footer6_1()
+
         # Set layout
         self.tab6_1.setLayout(layout_tab6_1)
 
@@ -1061,6 +1078,23 @@ class ContractRegistry(QWidget):
 
         self.table6_2.resizeColumnsToContents()
         layout_tab6_2.addWidget(self.table6_2, 1, 0, 4, 4)
+
+        # Create QLabel to display the total sums
+        self.total_label6_2 = QLabel("")
+        self.total_label6_2.setStyleSheet("""
+                                            background-color: #f7f3e9;
+                                            font-weight: bold;
+                                            font-size: 14px;
+                                            padding: 2px;
+                                            border: 1px solid gray;
+                                        """)
+        self.total_label6_2.setFixedHeight(28)
+        self.total_label6_2.setAlignment(Qt.AlignRight)
+
+        # Add the label below the table
+        layout_tab6_2.addWidget(self.total_label6_2, 5, 0, 1, 4)
+
+        self.update_summary_footer6_2()
 
         self.tab6_2.setLayout(layout_tab6_2)
 
@@ -2183,6 +2217,23 @@ class ContractRegistry(QWidget):
         self.update_summary_footer5()
 
     # --------------------------------------------page6functions-----------------------------------------------------
+    def update_summary_footer6_1(self):
+        sum_added_percents = 0.0
+
+        for row in range(self.model6_1.rowCount()):
+            try:
+                percent_index = self.model6_1.index(row, self.model6_1.fieldIndex("percent_paid_amount"))
+
+                percent_value = float(self.model6_1.data(percent_index) or 0)
+
+                sum_added_percents += percent_value
+            except:
+                continue
+
+        self.total_label6_1.setText(
+            f" სულ გადახდილი პროცენტების ჯამი: {sum_added_percents:.2f} ₾ "
+        )
+
     def show_table6_1_context_menu(self, position):
         index = self.table6_1.indexAt(position)
         if not index.isValid():
@@ -2286,6 +2337,25 @@ class ContractRegistry(QWidget):
         #     print("Printing failed:", e)
         #     # fallback: open Word file manually
         #     os.startfile(output_path)
+
+    def update_summary_footer6_2(self):
+        sum_added_principles = 0.0
+
+        for row in range(self.model6_2.rowCount()):
+            try:
+                principle_index = self.model6_2.index(row, self.model6_2.fieldIndex("principle_paid_amount"))
+
+                principle_value = float(self.model6_2.data(principle_index) or 0)
+
+                sum_added_principles += principle_value
+            except:
+                continue
+
+        self.total_label6_2.setText(
+            f" სულ გადახდილი ძირი თანხის ჯამი: {sum_added_principles:.2f} ₾ "
+        )
+
+
 
     def show_table6_2_context_menu(self, position):
         index = self.table6_2.indexAt(position)
@@ -2514,6 +2584,7 @@ class ContractRegistry(QWidget):
             self.model6_1.setFilter("")
 
         self.model6_1.select()
+        self.update_summary_footer6_1()
 
 
     def apply_text_filter_6_2(self, text):
@@ -2531,6 +2602,7 @@ class ContractRegistry(QWidget):
             self.model6_2.setFilter("")
 
         self.model6_2.select()
+        self.update_summary_footer6_2()
 
 
     def apply_text_filter_6_3(self, text):
