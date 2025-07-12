@@ -758,6 +758,24 @@ class ContractRegistry(QWidget):
         self.table4.resizeColumnsToContents()
         layout4.addWidget(self.table4, 1, 1, 2, 3)
 
+        # Create QLabel to display the total sums
+        self.total_label4 = QLabel("")
+        self.total_label4.setStyleSheet("""
+                    background-color: #f7f3e9;
+                    font-weight: bold;
+                    font-size: 14px;
+                    padding: 2px;
+                    border: 1px solid gray;
+                """)
+        self.total_label4.setFixedHeight(28)
+        self.total_label4.setAlignment(Qt.AlignRight)
+
+        # Add the label below the table
+        layout4.addWidget(self.total_label4, 3, 1, 1, 3)
+
+        self.update_summary_footer4()
+
+
         # Set final layout
         self.page4.setLayout(layout4)
 
@@ -1818,10 +1836,28 @@ class ContractRegistry(QWidget):
 
 
     # --------------------------------------------page4functions-----------------------------------------------------
+    def update_summary_footer4(self):
+        sum_added_percents = 0.0
+
+        for row in range(self.model4.rowCount()):
+            try:
+                percent_index = self.model4.index(row, self.model4.fieldIndex("paid_amount"))
+
+                percent_value = float(self.model4.data(percent_index) or 0)
+
+                sum_added_percents += percent_value
+            except:
+                continue
+
+        self.total_label4.setText(
+            f" სულ დარიცხული პროცენტების ჯამი: {sum_added_percents:.2f} ₾ "
+        )
+
 
     def refresh_table_4(self):
         self.model4.setFilter("")
         self.model4.select()
+        self.update_summary_footer4()
 
     def search_by_date_4(self):
         from_date_str = self.from_date_4.date().toString("yyyy-MM-dd HH:mm:ss")
@@ -1838,6 +1874,7 @@ class ContractRegistry(QWidget):
         filter_str = f"{date_column} >= '{from_date_str}' AND {date_column} <= '{to_date_str}'"
         self.model4.setFilter(filter_str)
         self.model4.select()
+        self.update_summary_footer4()
 
     def apply_text_filter_4(self, text):
         column = ""
@@ -1862,6 +1899,7 @@ class ContractRegistry(QWidget):
             self.model4.setFilter("")
 
         self.model4.select()
+        self.update_summary_footer4()
 
     def export_to_excel_4(self):
         row_count = self.model4.rowCount()
