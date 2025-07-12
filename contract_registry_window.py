@@ -870,6 +870,23 @@ class ContractRegistry(QWidget):
         self.table5.resizeColumnsToContents()
         layout5.addWidget(self.table5, 1, 0, 4, 4)
 
+        # Create QLabel to display the total sums
+        self.total_label5 = QLabel("")
+        self.total_label5.setStyleSheet("""
+                            background-color: #f7f3e9;
+                            font-weight: bold;
+                            font-size: 14px;
+                            padding: 2px;
+                            border: 1px solid gray;
+                        """)
+        self.total_label5.setFixedHeight(28)
+        self.total_label5.setAlignment(Qt.AlignRight)
+
+        # Add the label below the table
+        layout5.addWidget(self.total_label5, 6, 0, 1, 4)
+
+        self.update_summary_footer5()
+
         # Set layout
         self.page5.setLayout(layout5)
 
@@ -2027,6 +2044,24 @@ class ContractRegistry(QWidget):
                 QMessageBox.critical(self, "შეცდომა", "წაშლა ვერ მოხერხდა")
 
     # --------------------------------------------page5functions-----------------------------------------------------
+    def update_summary_footer5(self):
+        sum_added_percents = 0.0
+
+        for row in range(self.model5.rowCount()):
+            try:
+                percent_index = self.model5.index(row, self.model5.fieldIndex("amount"))
+
+                percent_value = float(self.model5.data(percent_index) or 0)
+
+                sum_added_percents += percent_value
+            except:
+                continue
+
+        self.total_label5.setText(
+            f" სულ გაცემული თანხების ჯამი: {sum_added_percents:.2f} ₾ "
+        )
+
+
     def show_table5_context_menu(self, position: QPoint):
         index = self.table5.indexAt(position)
         if not index.isValid():
@@ -2145,6 +2180,7 @@ class ContractRegistry(QWidget):
             self.model5.setFilter("")
 
         self.model5.select()
+        self.update_summary_footer5()
 
     # --------------------------------------------page6functions-----------------------------------------------------
     def show_table6_1_context_menu(self, position):
