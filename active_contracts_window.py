@@ -1050,7 +1050,8 @@ class ActiveContracts(QWidget):
                             """, (
                                 contract_id, full_date_str, name_surname, id_number,
                                 tel_number, item_name, model, imei_sn,
-                                today.toString("yyyy-MM-dd HH:mm:ss"), one_period_amount, status_for_added_percent
+                                QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss"), one_period_amount,
+                                status_for_added_percent
                             ))
 
                         conn2.commit()
