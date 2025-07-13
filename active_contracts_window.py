@@ -2,6 +2,8 @@ import sqlite3
 import sys
 import time
 from datetime import datetime, timedelta
+from email.policy import default
+
 import win32com.client
 
 from PyQt5.QtCore import Qt, QSize, QDate, QDateTime
@@ -480,17 +482,21 @@ class ActiveContracts(QWidget):
 
         # Read day_quantity safely and convert to int
         try:
-            day_quantity = int(safe_data("day_quantity", 0))
+            day_quantity = int(safe_data("day_quantity"))
+            days_after_c_o = int(safe_data("days_after_C_O"))
         except (TypeError, ValueError):
             day_quantity = 0
+            days_after_c_o = 0
 
         # Calculate next payment date based on day_quantity
         next_payment_date = contract_datetime.addDays(day_quantity - 1) if day_quantity >= 0 else contract_datetime
 
         # Move next_payment_date forward if already passed
         today = QDate.currentDate()
+        days_on_excess = days_after_c_o % day_quantity
+        days_to_add = day_quantity - days_on_excess
         while next_payment_date.date() < today and day_quantity > 0:
-            next_payment_date = next_payment_date.addDays(day_quantity - next_payment_date.date().daysTo(today) - 1)
+                next_payment_date = next_payment_date.addDays(days_to_add)
 
         next_payment_str = next_payment_date.toString("dd.MM.yyyy")
 
