@@ -969,6 +969,15 @@ class ActiveContracts(QWidget):
         conn.commit()
         conn.close()
 
+    @staticmethod
+    def get_already_added_times(contract_id):
+        conn_1 = sqlite3.connect("Databases/adding_percent_amount.db")
+        cursor_1 = conn_1.cursor()
+        cursor_1.execute("SELECT COUNT(*) FROM adding_percent_amount WHERE contract_id = ?",
+                         (contract_id,))
+        result = cursor_1.fetchone()[0]
+        conn_1.close()
+        return result
 
     def load_data(self):
 
@@ -1012,13 +1021,14 @@ class ActiveContracts(QWidget):
                 first_due_day = contract_date.addDays(day_quantity - 1)
                 start_date = min(contract_date, first_due_day)
 
-                if days_after > 4 and day_quantity > 0 and principal_should_be_paid > 0 and percent > 0:
+                if days_after >= day_quantity > 0 and principal_should_be_paid > 0 and percent > 0:
                     days_diff = start_date.daysTo(today)
 
-                    periods_passed = (days_after - 1) // day_quantity
+                    periods_passed = days_after // day_quantity
                     total_expected_adds = periods_passed + 1
 
-                    already_added_times = int(added_percents // ((principal_should_be_paid * percent) / 100))
+
+                    already_added_times = self.get_already_added_times(contract_id)
                     additions_needed = total_expected_adds - already_added_times
 
                     if additions_needed > 0:

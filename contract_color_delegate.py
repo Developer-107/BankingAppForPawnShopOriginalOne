@@ -28,7 +28,7 @@ class ContractColorDelegate(QStyledItemDelegate):
                         bg_color = QColor("white")
                     else:
                         days_diff = contract_date.daysTo(today)
-                        is_payment_day = (days_diff >= day_quantity and days_diff % day_quantity == 0)
+                        is_payment_day = (days_diff + 1 >= day_quantity and (days_diff + 1) % day_quantity == 0)
 
                         if percent_should_be_paid > 0:
                             if is_payment_day:
