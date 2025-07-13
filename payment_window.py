@@ -348,27 +348,20 @@ class PaymentWindow(QWidget):
                     # Save document
                     doc.save(output_path)
 
-                    # Open in Word and wait
                     try:
                         word = win32com.client.Dispatch("Word.Application")
-                        word.Visible = True
+                        word.Visible = False
                         word_doc = word.Documents.Open(os.path.abspath(output_path))
-
-
+                        word_doc.PrintOut()  # Try to print
+                        word_doc.Close(False)  # Close document without saving
+                        word.Quit()
                     except Exception as e:
-                        print("Error:", e)
-                        print("Document saved at:", output_path)
-
-                    # # 4. Optional: Print using MS Word (Windows only)
-                    # try:
-                    #     word = win32com.client.Dispatch("Word.Application")
-                    #     word.Visible = False
-                    #     word.Documents.Open(os.path.abspath(output_path)).PrintOut()
-                    #     word.Quit()
-                    # except Exception as e:
-                    #     print("Printing failed:", e)
-                    #     # fallback: open Word file manually
-                    #     os.startfile(output_path)
+                        print("Printing failed:", e)
+                        print("Opening document instead...")
+                        try:
+                            os.startfile(output_path)  # Open in Word as fallback
+                        except Exception as open_error:
+                            print("Could not open Word document:", open_error)
                 except Exception as e:
                     QMessageBox.critical(self, "შეცდომა", f"ამობეჭდვა არ მოხერხდა:\n{e}")
 
