@@ -5,7 +5,8 @@ import win32com.client
 from docx import Document
 from PyQt5.QtCore import QDate, QSize, Qt, QDateTime
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox, QComboBox
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox, QComboBox, \
+    QCompleter
 
 
 class AddWindow(QWidget):
@@ -70,6 +71,15 @@ class AddWindow(QWidget):
         layout.addWidget(self.model_box, 5, 1)
         layout.addWidget(self.imei_sn_box, 6, 1)
         layout.addWidget(self.choose_the_type_box, 7, 1)
+
+
+        # Set up autocomplete and autofill
+        self.name_list = self.load_name_list_from_db()
+        self.completer = QCompleter(self.name_list)
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.name_surname_box.setCompleter(self.completer)
+        self.name_surname_box.editingFinished.connect(self.autofill_id_from_name)
+
 
         trusted_person = QLabel("მინდობილობა:")
         comment = QLabel("კომენტარი:")
@@ -151,8 +161,40 @@ class AddWindow(QWidget):
         # --------------------------------------------Layout-----------------------------------------------------
         self.setLayout(layout)
 
+    def load_name_list_from_db(self):
+        try:
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT DISTINCT name_surname FROM active_contracts")
+            names = [row[0] for row in cursor.fetchall()]
+            conn.close()
+            return names
+        except Exception as e:
+            print("Error loading names:", e)
+            return []
 
 
+
+    def autofill_id_from_name(self):
+        name = self.name_surname_box.text()
+        if not name:
+            return
+        try:
+            conn = sqlite3.connect("Databases/active_contracts.db")
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id_number FROM active_contracts 
+                WHERE name_surname = ? 
+                ORDER BY date DESC LIMIT 1
+            """, (name,))
+            result = cursor.fetchone()
+            conn.close()
+            if result:
+                self.id_number_box.setText(str(result[0]))
+            else:
+                self.id_number_box.clear()
+        except Exception as e:
+            print("Autofill error:", e)
 
 
     def save_to_sql(self):
