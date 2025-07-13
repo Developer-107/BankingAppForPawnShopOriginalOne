@@ -23,7 +23,6 @@ class EditAddingPercentWindow(QWidget):
         self.contract_id_box = QLineEdit()
         self.contract_id_box.setReadOnly(True)
         self.percent_addition_date_box = QLineEdit()
-        self.percent_addition_date_box.setReadOnly(True)
         self.percent_amount_box = QLineEdit()
         self.name_surname_box = QLineEdit()
         self.name_surname_box.setReadOnly(True)
@@ -76,6 +75,7 @@ class EditAddingPercentWindow(QWidget):
             self.name_surname_box.setText(str(row[3]))
             self.id_number_box.setText(str(row[5]))
             self.amount_before_editing = float(row[10])
+            self.percent_addition_date_before = str(row[9])
 
     def update_record(self):
         try:
@@ -85,12 +85,13 @@ class EditAddingPercentWindow(QWidget):
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE adding_percent_amount SET
-                    percent_amount = ?
+                    percent_amount = ?, date_of_percent_addition = ?
                 WHERE contract_id = ? AND date_of_percent_addition = ?
             """, (
                 new_amount,
+                self.percent_addition_date_box.text(),
                 self.contract_id_box.text(),
-                self.percent_addition_date_box.text()
+                self.percent_addition_date_before
             ))
             conn.commit()
             conn.close()
