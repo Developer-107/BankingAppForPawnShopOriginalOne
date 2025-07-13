@@ -1282,7 +1282,8 @@ class ContractRegistry(QWidget):
             "percent_day_quantity": "პროცენტის დღეების რააოდენობა",
             "first_added_percent": "პირველად დამატებული პროცენტის თანხა",
             "sum_of_principle_and_percent": "პირველი პროცენტისა და ძირის ჯამი",
-            "office_mob_number": "ოფისის მობილურის ნომერი"
+            "office_mob_number": "ოფისის მობილურის ნომერი",
+            "first_percent_payment_date": "პირველად გადახდილი პროცენტის თარიღი"
         }
 
         for name, label in column_labels.items():
