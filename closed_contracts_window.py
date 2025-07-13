@@ -115,13 +115,13 @@ class ClosedContracts(QWidget):
         box3.setStyleSheet("QGroupBox {font-style: italic; font-size: 10pt; }")
         box_layout3 = QGridLayout()
 
-
         self.from_date = QDateEdit()
         self.from_date.setCalendarPopup(True)
-        self.from_date.setDate(QDate.currentDate().addMonths(-1))
+        self.from_date.setDate(QDate.currentDate())  # Today
+
         self.to_date = QDateEdit()
         self.to_date.setCalendarPopup(True)
-        self.to_date.setDate(QDate.currentDate())
+        self.to_date.setDate(QDate.currentDate().addDays(1))  # Tomorrow
 
         self.contract_date_radio = QRadioButton("გაფორმების თარიღით")
         self.contract_date_radio.setChecked(True)  # Default

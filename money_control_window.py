@@ -29,10 +29,11 @@ class MoneyControl(QWidget):
 
         self.from_date = QDateEdit()
         self.from_date.setCalendarPopup(True)
-        self.from_date.setDate(QDate.currentDate().addMonths(-1))
+        self.from_date.setDate(QDate.currentDate())  # Today
+
         self.to_date = QDateEdit()
         self.to_date.setCalendarPopup(True)
-        self.to_date.setDate(QDate.currentDate())
+        self.to_date.setDate(QDate.currentDate().addDays(1))  # Tomorrow
         #
         box_layout1.addWidget(QLabel("*დან თარიღი:"))
         box_layout1.addWidget(self.from_date)

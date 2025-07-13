@@ -68,10 +68,11 @@ class ContractRegistry(QWidget):
 
         self.from_date = QDateEdit()
         self.from_date.setCalendarPopup(True)
-        self.from_date.setDate(QDate.currentDate().addMonths(-1))
+        self.from_date.setDate(QDate.currentDate())  # Today
+
         self.to_date = QDateEdit()
         self.to_date.setCalendarPopup(True)
-        self.to_date.setDate(QDate.currentDate())
+        self.to_date.setDate(QDate.currentDate().addDays(1))  # Tomorrow
 
         self.contract_date_radio = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
         self.closing_date_radio = QRadioButton("დამატების თარიღით")
@@ -260,10 +261,10 @@ class ContractRegistry(QWidget):
 
         self.from_date_2 = QDateEdit()
         self.from_date_2.setCalendarPopup(True)
-        self.from_date_2.setDate(QDate.currentDate().addMonths(-1))
+        self.from_date_2.setDate(QDate.currentDate())
         self.to_date_2 = QDateEdit()
         self.to_date_2.setCalendarPopup(True)
-        self.to_date_2.setDate(QDate.currentDate())
+        self.to_date_2.setDate(QDate.currentDate().addDays(1))
 
         self.date_radio_2 = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
         self.closing_date_radio_2 = QRadioButton("ძირის შემოტანის თარიღით")
@@ -433,10 +434,10 @@ class ContractRegistry(QWidget):
 
         self.from_date_3 = QDateEdit()
         self.from_date_3.setCalendarPopup(True)
-        self.from_date_3.setDate(QDate.currentDate().addMonths(-1))
+        self.from_date_3.setDate(QDate.currentDate())
         self.to_date_3 = QDateEdit()
         self.to_date_3.setCalendarPopup(True)
-        self.to_date_3.setDate(QDate.currentDate())
+        self.to_date_3.setDate(QDate.currentDate().addDays(1))
 
         self.date_radio_3 = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
         self.closing_date_radio_3 = QRadioButton("პროცენტის დარიცხვის თარიღით")
@@ -602,10 +603,10 @@ class ContractRegistry(QWidget):
 
         self.from_date_4 = QDateEdit()
         self.from_date_4.setCalendarPopup(True)
-        self.from_date_4.setDate(QDate.currentDate().addMonths(-1))
+        self.from_date_4.setDate(QDate.currentDate())
         self.to_date_4 = QDateEdit()
         self.to_date_4.setCalendarPopup(True)
-        self.to_date_4.setDate(QDate.currentDate())
+        self.to_date_4.setDate(QDate.currentDate().addDays(1))
 
         self.date_radio_4 = QRadioButton("ხელშეკრულების გაფორმების თარიღით")
         self.closing_date_radio_4 = QRadioButton("პროცენტის გადახდის თარიღით")
