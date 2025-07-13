@@ -27,6 +27,8 @@ from open_edit_window import EditWindow
 from open_add_window import AddWindow
 from payment_confirm_window import PaymentConfirmWindow
 from payment_window import PaymentWindow
+from utils import resource_path
+
 
 class ActiveContracts(QWidget):
     def __init__(self, role, name_of_user, organisation, id_number_of_user):
@@ -49,7 +51,7 @@ class ActiveContracts(QWidget):
 
 
 
-        self.setWindowIcon(QIcon("Icons/contract_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/contract_icon.png")))
         self.resize(1400, 800)
         self.role = role
         self.name_of_user = name_of_user
@@ -67,7 +69,7 @@ class ActiveContracts(QWidget):
         # Add_item
         add_item = QToolButton()
         add_item.setText(" დამატება ")
-        add_item.setIcon(QIcon("Icons/add_data.png"))
+        add_item.setIcon(QIcon(resource_path("Icons/add_data.png")))
         add_item.setIconSize(QSize(37, 40))
         add_item.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         add_item.setStyleSheet("font-size: 16px;")
@@ -76,7 +78,7 @@ class ActiveContracts(QWidget):
         # Edit item
         edit_item = QToolButton()
         edit_item.setText(" რედაქტირება ")
-        edit_item.setIcon(QIcon("Icons/edit_data.png"))
+        edit_item.setIcon(QIcon(resource_path("Icons/edit_data.png")))
         edit_item.setIconSize(QSize(37, 40))
         edit_item.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         edit_item.setStyleSheet("font-size: 16px;")
@@ -85,7 +87,7 @@ class ActiveContracts(QWidget):
         # Choosing fields
         choosing_the_field = QToolButton()
         choosing_the_field.setText(" ველების არჩევა ")
-        choosing_the_field.setIcon(QIcon("Icons/data_modify.png"))
+        choosing_the_field.setIcon(QIcon(resource_path("Icons/data_modify.png")))
         choosing_the_field.setIconSize(QSize(37, 40))
         choosing_the_field.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         choosing_the_field.setStyleSheet("font-size: 16px;")
@@ -94,7 +96,7 @@ class ActiveContracts(QWidget):
         # Export
         export = QToolButton()
         export.setText(" ექსპორტი ")
-        export.setIcon(QIcon("Icons/excel_icon.png"))
+        export.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export.setIconSize(QSize(37, 40))
         export.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         export.setStyleSheet("font-size: 16px;")
@@ -193,7 +195,7 @@ class ActiveContracts(QWidget):
 
         # --------------------------------------------Table-----------------------------------------------------
         self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName("Databases/active_contracts.db")
+        self.db.setDatabaseName(resource_path("Databases/active_contracts.db"))
         if not self.db.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -558,32 +560,32 @@ class ActiveContracts(QWidget):
         menu = QMenu()
 
         print_action = QAction(" ხელშეკრულების ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_selected_row_page)
 
 
         add_money_action = QAction(" თანხის დამატება ", self)
-        add_money_action.setIcon(QIcon("Icons/add_money.png"))
+        add_money_action.setIcon(QIcon(resource_path("Icons/add_money.png")))
         add_money_action.triggered.connect(self.add_money_selected_row)
 
         pay_percent_action = QAction(" პროცენტის ან ძირი თანხის გადახდა ", self)
-        pay_percent_action.setIcon(QIcon("Icons/percent_payment_icon.png"))
+        pay_percent_action.setIcon(QIcon(resource_path("Icons/percent_payment_icon.png")))
         pay_percent_action.triggered.connect(self.pay_percent_selected_row)
 
         closing_contract_action = QAction(" ხელშეკრულების დახურვა ", self)
-        closing_contract_action.setIcon(QIcon("Icons/closed_contracts.png"))
+        closing_contract_action.setIcon(QIcon(resource_path("Icons/closed_contracts.png")))
         closing_contract_action.triggered.connect(self.closing_contract_selected_row)
 
         add_to_the_black_list_action = QAction(" შავ სიაში შეტანა ", self)
-        add_to_the_black_list_action.setIcon(QIcon("Icons/blacklist.png"))
+        add_to_the_black_list_action.setIcon(QIcon(resource_path("Icons/blacklist.png")))
         add_to_the_black_list_action.triggered.connect(self.add_to_the_black_list_selected_row)
 
         # transfer_to_selling_items_action = QAction("", self)
-        # transfer_to_selling_items_action.setIcon(QIcon("Icons/sell_icon.png"))
+        # transfer_to_selling_items_action.setIcon(QIcon(resource_path("Icons/sell_icon.png")))
         # transfer_to_selling_items_action.triggered.connect(self.transfer_to_selling_items_selected_row)
 
         # got_back_from_police_action = QAction("", self)
-        # got_back_from_police_action.setIcon(QIcon("Icons/police-badge.png"))
+        # got_back_from_police_action.setIcon(QIcon(resource_path("Icons/police-badge.png")))
         # got_back_from_police_action.triggered.connect(self.got_back_from_police_action_selected_row)
 
 
@@ -652,7 +654,7 @@ class ActiveContracts(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/contract_template.docx")
+        doc = Document(resource_path("Templates/contract_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
@@ -768,7 +770,7 @@ class ActiveContracts(QWidget):
         imei_blk_list = self.model.data(self.model.index(row, self.model.fieldIndex("imei")))
 
         try:
-            conn = sqlite3.connect("Databases/black_list.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/black_list.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -810,7 +812,7 @@ class ActiveContracts(QWidget):
 
     # Initializing databases for money control window tables
     def initialize_contracts_database(self):
-        conn = sqlite3.connect("Databases/contracts.db")
+        conn = sqlite3.connect(resource_path("Databases/contracts.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -868,7 +870,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_closed_contracts_database(self):
-        conn = sqlite3.connect("Databases/closed_contracts.db")
+        conn = sqlite3.connect(resource_path("Databases/closed_contracts.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -900,7 +902,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_active_contracts_database(self):
-        conn = sqlite3.connect("Databases/active_contracts.db")
+        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -971,7 +973,7 @@ class ActiveContracts(QWidget):
 
     @staticmethod
     def get_already_added_times(contract_id):
-        conn_1 = sqlite3.connect("Databases/adding_percent_amount.db")
+        conn_1 = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
         cursor_1 = conn_1.cursor()
         cursor_1.execute("SELECT COUNT(*) FROM adding_percent_amount WHERE contract_id = ?",
                          (contract_id,))
@@ -984,7 +986,7 @@ class ActiveContracts(QWidget):
         today = QDate.currentDate()
 
         # Open DB connection (adjust DB path as needed)
-        conn = sqlite3.connect("Databases/active_contracts.db")
+        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM active_contracts_view")  # Adjust table name & columns accordingly
@@ -1036,7 +1038,7 @@ class ActiveContracts(QWidget):
                         new_added_percents = added_percents
                         status_for_added_percent = "დარიცხული პროცენტი"
 
-                        conn2 = sqlite3.connect("Databases/adding_percent_amount.db")
+                        conn2 = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
                         cursor2 = conn2.cursor()
 
                         for i in range(additions_needed):
@@ -1066,7 +1068,7 @@ class ActiveContracts(QWidget):
 
 
     def update_days_and_percents(self, contract_id, days_after, new_added_percents):
-        conn = sqlite3.connect("Databases/active_contracts.db")
+        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE active_contracts
@@ -1078,7 +1080,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_given_and_additional_database(self):
-        conn = sqlite3.connect("Databases/given_and_additional_database.db")
+        conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1097,7 +1099,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_paid_principle_and_paid_percentage_database(self):
-        conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+        conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1115,7 +1117,7 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_paid_principle_registry_database(self):
-        conn = sqlite3.connect("Databases/paid_principle_registry.db")
+        conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1141,7 +1143,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_outflow_order_database(self):
-        conn = sqlite3.connect("Databases/outflow_order.db")
+        conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1161,7 +1163,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_outflow_in_registry_database(self):
-        conn = sqlite3.connect("Databases/outflow_in_registry.db")
+        conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1186,7 +1188,7 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_adding_percent_amount_database(self):
-        conn = sqlite3.connect("Databases/adding_percent_amount.db")
+        conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1211,7 +1213,7 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_paid_percent_amount_database(self):
-        conn = sqlite3.connect("Databases/paid_percent_amount.db")
+        conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1237,7 +1239,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_inflow_order_only_principal_amount_database(self):
-        conn = sqlite3.connect("Databases/inflow_order_only_principal_amount.db")
+        conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1256,7 +1258,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_inflow_order_only_percent_amount_database(self):
-        conn = sqlite3.connect("Databases/inflow_order_only_percent_amount.db")
+        conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1276,7 +1278,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_blk_list_database(self):
-        conn = sqlite3.connect("Databases/black_list.db")
+        conn = sqlite3.connect(resource_path("Databases/black_list.db"))
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -1293,7 +1295,7 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_inflow_order_both_database(self):
-        conn = sqlite3.connect("Databases/inflow_order_both.db")
+        conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
         cursor = conn.cursor()
 
         cursor.execute("""

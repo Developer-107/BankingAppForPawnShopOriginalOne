@@ -16,13 +16,14 @@ from adding_percent_amount_edit_window import EditAddingPercentWindow
 from outflow_in_registry_edit_money_control_window import EditRegistryOutflowWindow
 from open_edit_money_control_window_2 import EditInPrincipalInflowsInRegistryWindow
 from registry_page_4_edit_window_4_paid_percents import EditPaidPercentWindow
+from utils import resource_path
 
 
 class ContractRegistry(QWidget):
     def __init__(self, role, name_of_user, organisation):
         super().__init__()
         self.setWindowTitle("ხელშეკრულებების რეესტრი")
-        self.setWindowIcon(QIcon("Icons/contract_registry.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/contract_registry.png")))
         self.resize(1701, 700)
         self.role = role
         self.organisation = organisation
@@ -170,7 +171,7 @@ class ContractRegistry(QWidget):
         # Export
         export_money_control = QToolButton()
         export_money_control.setText(" ექსპორტი ")
-        export_money_control.setIcon(QIcon("Icons/excel_icon.png"))
+        export_money_control.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_money_control.setIconSize(QSize(37, 40))
         export_money_control.setFixedHeight(45)
         export_money_control.setFixedWidth(145)
@@ -189,7 +190,7 @@ class ContractRegistry(QWidget):
 
 
         self.db2 = QSqlDatabase.addDatabase("QSQLITE", "outflow_in_registry")
-        self.db2.setDatabaseName("Databases/outflow_in_registry.db")
+        self.db2.setDatabaseName(resource_path("Databases/outflow_in_registry.db"))
         if not self.db2.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -350,7 +351,7 @@ class ContractRegistry(QWidget):
 
         export_button_2 = QToolButton()
         export_button_2.setText(" ექსპორტი ")
-        export_button_2.setIcon(QIcon("Icons/excel_icon.png"))
+        export_button_2.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_button_2.setIconSize(QSize(37, 40))
         export_button_2.setFixedSize(145, 45)
         export_button_2.setStyleSheet("font-size: 16px;")
@@ -366,7 +367,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db3 = QSqlDatabase.addDatabase("QSQLITE","paid_principle_registry")
-        self.db3.setDatabaseName("Databases/paid_principle_registry.db")
+        self.db3.setDatabaseName(resource_path("Databases/paid_principle_registry.db"))
         if not self.db3.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -521,7 +522,7 @@ class ContractRegistry(QWidget):
 
         export_button_3 = QToolButton()
         export_button_3.setText(" ექსპორტი ")
-        export_button_3.setIcon(QIcon("Icons/excel_icon.png"))
+        export_button_3.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_button_3.setIconSize(QSize(37, 40))
         export_button_3.setFixedSize(145, 45)
         export_button_3.setStyleSheet("font-size: 16px;")
@@ -537,7 +538,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db3_1 = QSqlDatabase.addDatabase("QSQLITE", "adding_percent_amount")
-        self.db3_1.setDatabaseName("Databases/adding_percent_amount.db")
+        self.db3_1.setDatabaseName(resource_path("Databases/adding_percent_amount.db"))
         if not self.db3_1.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -691,7 +692,7 @@ class ContractRegistry(QWidget):
 
         export_button_4 = QToolButton()
         export_button_4.setText(" ექსპორტი ")
-        export_button_4.setIcon(QIcon("Icons/excel_icon.png"))
+        export_button_4.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_button_4.setIconSize(QSize(37, 40))
         export_button_4.setFixedSize(145, 45)
         export_button_4.setStyleSheet("font-size: 16px;")
@@ -707,7 +708,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db4 = QSqlDatabase.addDatabase("QSQLITE", "paid_percent_amount")
-        self.db4.setDatabaseName("Databases/paid_percent_amount.db")
+        self.db4.setDatabaseName(resource_path("Databases/paid_percent_amount.db"))
         if not self.db4.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -823,7 +824,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db5 = QSqlDatabase.addDatabase("QSQLITE", "outflow_order")
-        self.db5.setDatabaseName("Databases/outflow_order.db")
+        self.db5.setDatabaseName(resource_path("Databases/outflow_order.db"))
         if not self.db5.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხქერდა")
 
@@ -934,7 +935,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db6_1 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_only_percent_amount")
-        self.db6_1.setDatabaseName("Databases/inflow_order_only_percent_amount.db")
+        self.db6_1.setDatabaseName(resource_path("Databases/inflow_order_only_percent_amount.db"))
         if not self.db6_1.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -1031,7 +1032,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db6_2 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_only_principal_amount")
-        self.db6_2.setDatabaseName("Databases/inflow_order_only_principal_amount.db")
+        self.db6_2.setDatabaseName(resource_path("Databases/inflow_order_only_principal_amount.db"))
         if not self.db6_2.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -1130,7 +1131,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db6_3 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_both")
-        self.db6_3.setDatabaseName("Databases/inflow_order_both.db")
+        self.db6_3.setDatabaseName(resource_path("Databases/inflow_order_both.db"))
         if not self.db6_3.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -1252,7 +1253,7 @@ class ContractRegistry(QWidget):
 
         # --- Table Setup ---
         self.db7 = QSqlDatabase.addDatabase("QSQLITE", "contracts_connection")
-        self.db7.setDatabaseName("Databases/contracts.db")
+        self.db7.setDatabaseName(resource_path("Databases/contracts.db"))
         if not self.db7.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -1349,7 +1350,7 @@ class ContractRegistry(QWidget):
         menu = QMenu()
 
         print_action = QAction(" დამატებული თანხის დოკუმენტის ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_registry_page1_selected_row)
 
         menu.addAction(print_action)
@@ -1364,28 +1365,78 @@ class ContractRegistry(QWidget):
 
         row_index = selected[0].row()
 
-        # Extract values from model (adjust column names as needed)
+        contract_id = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("contract_id")))
         name = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("name_surname")))
-        amount = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("amount")))
-        date = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("payment_date")))
+        date_raw = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("date_of_C_O")))
+        additional_amount = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("additional_amount")))
+        unique_id = self.model2.data(self.model2.index(row_index, self.model2.fieldIndex("unique_id")))
+        dt = datetime.strptime(date_raw, "%Y-%m-%d %H:%M:%S")
+        date = dt.strftime("%d-%m-%Y")
 
-        # Format as HTML (you can style this)
-        html = f"""
-        <h2>Payment Receipt</h2>
-        <p><b>Name:</b> {name}</p>
-        <p><b>Amount:</b> {amount}</p>
-        <p><b>Date:</b> {date}</p>
-        """
+        replacements = {
+            '{name_surname}': name or "",
+            '{date}': date or "",
+            '{additional_amount}': str(additional_amount) if
+            additional_amount is not None else "",
+            '{contract_id}': str(contract_id or ""),
+            '{unique_id}': unique_id or "",
+            '{organization_name}': getattr(self, "organisation", "")
+        }
 
-        # Create document and print
-        doc = QTextDocument()
-        doc.setHtml(html)
+        def replace_in_paragraph(paragraph, replacements):
+            full_text = ''.join(run.text for run in paragraph.runs)
+            new_text = full_text
+            for key, value in replacements.items():
+                new_text = new_text.replace(key, str(value))
 
-        printer = QPrinter()
+            if new_text != full_text:
+                for run in paragraph.runs:
+                    run.text = ''
+                if paragraph.runs:
+                    paragraph.runs[0].text = new_text
+                else:
+                    paragraph.add_run(new_text)
 
-        dialog = QPrintDialog(printer, self)
-        if dialog.exec_() == QPrintDialog.Accepted:
-            doc.print_(printer)
+        # Load the Word template
+        doc = Document("Templates/additional_money_template.docx")
+
+        # Replace in normal paragraphs
+        for paragraph in doc.paragraphs:
+            replace_in_paragraph(paragraph, replacements)
+
+        # Replace in table cells
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        replace_in_paragraph(paragraph, replacements)
+
+        # 3. Save new doc
+        # Ensure folder exists
+        output_dir = "GeneratedContracts"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Construct file name
+        output_filename = f"contract_{contract_id}_{name}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save document
+        doc.save(output_path)
+
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = False
+            word_doc = word.Documents.Open(os.path.abspath(output_path))
+            word_doc.PrintOut()  # Try to print
+            word_doc.Close(False)  # Close document without saving
+            word.Quit()
+        except Exception as e:
+            print("Printing failed:", e)
+            print("Opening document instead...")
+            try:
+                os.startfile(output_path)  # Open in Word as fallback
+            except Exception as open_error:
+                print("Could not open Word document:", open_error)
 
 
     def refresh_table(self):
@@ -1506,7 +1557,7 @@ class ContractRegistry(QWidget):
             model.removeRow(row_index)
 
             # 2. Delete from given_and_additional_database
-            conn_given = sqlite3.connect("Databases/given_and_additional_database.db")
+            conn_given = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
             cur_given = conn_given.cursor()
             cur_given.execute("""
                     DELETE FROM given_and_additional_database
@@ -1516,7 +1567,7 @@ class ContractRegistry(QWidget):
             conn_given.close()
 
             # 3. Delete from outflow_order
-            conn_outflow = sqlite3.connect("Databases/outflow_order.db")
+            conn_outflow = sqlite3.connect(resource_path("Databases/outflow_order.db"))
             cur_outflow = conn_outflow.cursor()
             cur_outflow.execute("""
                     DELETE FROM outflow_order
@@ -1526,7 +1577,7 @@ class ContractRegistry(QWidget):
             conn_outflow.close()
 
             # 4. Delete amount from active_contracts database
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             # Fetch old value
@@ -1680,7 +1731,7 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model_page2.removeRow(row_index)
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("SELECT principal_paid FROM active_contracts WHERE id = ?", (contract_id_page2,))
@@ -1692,7 +1743,7 @@ class ContractRegistry(QWidget):
 
             new_principles_amount = paid_principles_before - principle_page2
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -1707,7 +1758,7 @@ class ContractRegistry(QWidget):
             conn.close()
 
             # Deleting from paid_principle_and_paid_percentage_database
-            conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                                             DELETE FROM paid_principle_and_paid_percentage_database
@@ -1717,7 +1768,7 @@ class ContractRegistry(QWidget):
             conn.close()
 
             # Deleting from inflow_order_only_principal_amount
-            conn = sqlite3.connect("Databases/inflow_order_only_principal_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                                DELETE FROM inflow_order_only_principal_amount
@@ -1728,7 +1779,7 @@ class ContractRegistry(QWidget):
             conn.close()
 
             # Deleting from inflow_order_in_both
-            conn = sqlite3.connect("Databases/inflow_order_both.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                                            DELETE FROM inflow_order_both
@@ -1852,7 +1903,7 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model_3_1.removeRow(row_index)
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("SELECT added_percents FROM active_contracts WHERE id = ?", (contract_id_page3,))
@@ -1867,7 +1918,7 @@ class ContractRegistry(QWidget):
 
             new_percents_amount = added_percents_before - percent_amount_page3
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -2016,7 +2067,7 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model4.removeRow(row_index)
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("SELECT paid_percents FROM active_contracts WHERE id = ?", (contract_id,))
@@ -2028,7 +2079,7 @@ class ContractRegistry(QWidget):
 
             new_percents_amount = paid_percents_before - paid_percent_amount
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -2042,7 +2093,7 @@ class ContractRegistry(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                                    DELETE FROM paid_principle_and_paid_percentage_database
@@ -2052,7 +2103,7 @@ class ContractRegistry(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/inflow_order_only_percent_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                                                DELETE FROM inflow_order_only_percent_amount
@@ -2063,7 +2114,7 @@ class ContractRegistry(QWidget):
             conn.close()
 
             # Deleting from inflow_order_in_both
-            conn = sqlite3.connect("Databases/inflow_order_both.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                                   DELETE FROM inflow_order_both
@@ -2105,7 +2156,7 @@ class ContractRegistry(QWidget):
 
         menu = QMenu()
         print_action = QAction(" ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_table5_selected_row)
         menu.addAction(print_action)
         menu.exec_(self.table5.viewport().mapToGlobal(position))
@@ -2150,7 +2201,7 @@ class ContractRegistry(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/additional_money_template.docx")
+        doc = Document(resource_path("Templates/additional_money_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
@@ -2236,7 +2287,7 @@ class ContractRegistry(QWidget):
 
         menu = QMenu()
         print_action = QAction(" ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_table6_1_selected_row)
         menu.addAction(print_action)
         menu.exec_(self.table6_1.viewport().mapToGlobal(position))
@@ -2286,7 +2337,7 @@ class ContractRegistry(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/inflow_template.docx")
+        doc = Document(resource_path("Templates/inflow_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
@@ -2352,7 +2403,7 @@ class ContractRegistry(QWidget):
 
         menu = QMenu()
         print_action = QAction(" ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_table6_2_selected_row)
         menu.addAction(print_action)
         menu.exec_(self.table6_2.viewport().mapToGlobal(position))
@@ -2402,7 +2453,7 @@ class ContractRegistry(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/inflow_template.docx")
+        doc = Document(resource_path("Templates/inflow_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
@@ -2449,7 +2500,7 @@ class ContractRegistry(QWidget):
 
         menu = QMenu()
         print_action = QAction(" ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_table6_3_selected_row)
         menu.addAction(print_action)
         menu.exec_(self.table6_3.viewport().mapToGlobal(position))
@@ -2503,7 +2554,7 @@ class ContractRegistry(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/inflow_template.docx")
+        doc = Document(resource_path("Templates/inflow_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
@@ -2603,7 +2654,7 @@ class ContractRegistry(QWidget):
 
         menu = QMenu()
         print_action = QAction(" ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_table7_selected_row)
         menu.addAction(print_action)
         menu.exec_(self.table7.viewport().mapToGlobal(position))

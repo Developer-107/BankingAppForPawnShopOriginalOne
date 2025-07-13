@@ -13,6 +13,7 @@ from contract_registry_window import ContractRegistry
 from help_window import HelpWindow
 from login_window import LoginWindow
 from money_control_window import MoneyControl
+from utils import resource_path
 
 
 # Subclass QMainWindow to customize your application's main window
@@ -32,7 +33,7 @@ class MainWindow(QMainWindow):
         self.active_contracts_window = None
         self.help_window = None
         self.setWindowTitle("ლომბარდი")
-        self.setWindowIcon(QIcon("Icons/app_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/app_icon.png")))
 
         layout = QGridLayout()
         layout.setContentsMargins(10, 40, 10, 140)
@@ -41,7 +42,7 @@ class MainWindow(QMainWindow):
         # Active contracts settings
         active_contracts = QToolButton()
         active_contracts.setText("\n    მოქმედი ხელშეკრულებები    ")
-        active_contracts.setIcon(QIcon("Icons/contract_icon.png"))
+        active_contracts.setIcon(QIcon(resource_path("Icons/contract_icon.png")))
         active_contracts.setIconSize(QSize(80, 80))
         active_contracts.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         active_contracts.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -50,7 +51,7 @@ class MainWindow(QMainWindow):
         # Contract registry settings
         contract_registry = QToolButton()
         contract_registry.setText("\n  ხელშეკრულებების რეესტრი   ")
-        contract_registry.setIcon(QIcon("Icons/contract_registry.png"))
+        contract_registry.setIcon(QIcon(resource_path("Icons/contract_registry.png")))
         contract_registry.setIconSize(QSize(80, 80))
         contract_registry.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         contract_registry.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -59,7 +60,7 @@ class MainWindow(QMainWindow):
         # Closed contracts settings
         closed_contracts = QToolButton()
         closed_contracts.setText("\n  დახურული ხელშეკრულებები   ")
-        closed_contracts.setIcon(QIcon("Icons/closed_contracts.png"))
+        closed_contracts.setIcon(QIcon(resource_path("Icons/closed_contracts.png")))
         closed_contracts.setIconSize(QSize(80, 80))
         closed_contracts.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         closed_contracts.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -68,7 +69,7 @@ class MainWindow(QMainWindow):
         # clients in black list settings
         clients_in_the_black_list = QToolButton()
         clients_in_the_black_list.setText("\n შავ სიაში მყოფი კლიენტები  ")
-        clients_in_the_black_list.setIcon(QIcon("Icons/blacklist.png"))
+        clients_in_the_black_list.setIcon(QIcon(resource_path("Icons/blacklist.png")))
         clients_in_the_black_list.setIconSize(QSize(80, 80))
         clients_in_the_black_list.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         clients_in_the_black_list.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -77,7 +78,7 @@ class MainWindow(QMainWindow):
         # Rate the client settings
         money_control = QToolButton()
         money_control.setText("\n   თანხების კონტროლი    ")
-        money_control.setIcon(QIcon("Icons/money_control.png"))
+        money_control.setIcon(QIcon(resource_path("Icons/money_control.png")))
         money_control.setIconSize(QSize(80, 80))
         money_control.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         money_control.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -86,7 +87,7 @@ class MainWindow(QMainWindow):
         # Help button settings
         help_button = QToolButton()
         help_button.setText("\n         დახმარება         ")
-        help_button.setIcon(QIcon("Icons/help.png"))
+        help_button.setIcon(QIcon(resource_path("Icons/help.png")))
         help_button.setIconSize(QSize(80, 80))
         help_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         help_button.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -204,7 +205,7 @@ class MainWindow(QMainWindow):
         self.money_control_window.show()
 
 
-conn = sqlite3.connect("Credentials/users.db")
+conn = sqlite3.connect(resource_path("Credentials/users.db"))
 cursor = conn.cursor()
 
 cursor.execute("""

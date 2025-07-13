@@ -4,12 +4,14 @@ from PyQt5.QtCore import QDate, QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox
 
+from utils import resource_path
+
 
 class AddBlkListWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("დამატება")
-        self.setWindowIcon(QIcon("Icons/blacklist.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/blacklist.png")))
         self.resize(400, 100)
 
         layout = QGridLayout()
@@ -45,7 +47,7 @@ class AddBlkListWindow(QWidget):
 
         save_button = QToolButton()
         save_button.setText(" შენახვა ")
-        save_button.setIcon(QIcon("Icons/save_icon.png"))
+        save_button.setIcon(QIcon(resource_path("Icons/save_icon.png")))
         save_button.setIconSize(QSize(35, 35))
         save_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         save_button.setStyleSheet("font-size: 16px;")
@@ -53,7 +55,7 @@ class AddBlkListWindow(QWidget):
 
         close_window = QToolButton()
         close_window.setText(" დახურვა ")
-        close_window.setIcon(QIcon("Icons/cancel_icon.png"))
+        close_window.setIcon(QIcon(resource_path("Icons/cancel_icon.png")))
         close_window.setIconSize(QSize(35, 35))
         close_window.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         close_window.setStyleSheet("font-size: 16px;")
@@ -79,7 +81,7 @@ class AddBlkListWindow(QWidget):
 
     def save_to_blk_list_sql(self):
         try:
-            conn = sqlite3.connect("Databases/black_list.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/black_list.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""

@@ -6,13 +6,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
 
+from utils import resource_path
+
 
 class EditAddingPercentWindow(QWidget):
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
         self.setWindowTitle("დამატებული პროცენტის რედაქტირება")
-        self.setWindowIcon(QIcon("Icons/edit_data.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/edit_data.png")))
         self.resize(600, 300)
         self.build_ui()
         self.load_data()
@@ -42,13 +44,13 @@ class EditAddingPercentWindow(QWidget):
             self.layout.addWidget(widget, i, 1)
 
         save_button = QPushButton("შენახვა")
-        save_button.setIcon(QIcon("Icons/save_icon.png"))
+        save_button.setIcon(QIcon(resource_path("Icons/save_icon.png")))
         save_button.setIconSize(QSize(35, 35))
         save_button.setStyleSheet("font-size: 16px;")
         save_button.clicked.connect(self.update_record)
 
         cancel_button = QPushButton("დახურვა")
-        cancel_button.setIcon(QIcon("Icons/cancel_icon.png"))
+        cancel_button.setIcon(QIcon(resource_path("Icons/cancel_icon.png")))
         cancel_button.setIconSize(QSize(35, 35))
         cancel_button.setStyleSheet("font-size: 16px;")
         cancel_button.clicked.connect(self.close)
@@ -61,7 +63,7 @@ class EditAddingPercentWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect("Databases/adding_percent_amount.db")
+        conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM adding_percent_amount WHERE unique_id = ?", (self.record_id,))
         row = cursor.fetchone()
@@ -81,7 +83,7 @@ class EditAddingPercentWindow(QWidget):
         try:
             new_amount = float(self.percent_amount_box.text())
 
-            conn = sqlite3.connect("Databases/adding_percent_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE adding_percent_amount SET
@@ -96,7 +98,7 @@ class EditAddingPercentWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("SELECT added_percents FROM active_contracts WHERE id = ?", (self.contract_id_box.text(),))
@@ -111,7 +113,7 @@ class EditAddingPercentWindow(QWidget):
             difference_between_last_and_new_amounts = -self.amount_before_editing + new_amount
             new_percents_amount = added_percents_before + difference_between_last_and_new_amounts
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("""

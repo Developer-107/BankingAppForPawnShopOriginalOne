@@ -10,13 +10,14 @@ from PyQt5.QtWidgets import QWidget, QTableView, QGridLayout, QToolButton, QGrou
 
 from edit_blk_list_window import EditBlkListWindow
 from add_blk_list_window import AddBlkListWindow
+from utils import resource_path
 
 
 class ClientsInTheBlackList(QWidget):
     def __init__(self, role):
         super().__init__()
         self.setWindowTitle("შავ სიაში მყოფი კლიენტები")
-        self.setWindowIcon(QIcon("Icons/blacklist.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/blacklist.png")))
         self.resize(900, 500)
         self.role = role
 
@@ -27,7 +28,7 @@ class ClientsInTheBlackList(QWidget):
         # --------------------------------------------Table-----------------------------------------------------
 
         self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName("Databases/black_list.db")
+        self.db.setDatabaseName(resource_path("Databases/black_list.db"))
         if not self.db.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 

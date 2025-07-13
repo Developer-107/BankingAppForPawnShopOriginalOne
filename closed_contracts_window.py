@@ -20,12 +20,14 @@ from open_edit_window import EditWindow
 from open_add_window import AddWindow
 from payment_confirm_window import PaymentConfirmWindow
 from payment_window import PaymentWindow
+from utils import resource_path
+
 
 class ClosedContracts(QWidget):
     def __init__(self, role, name_of_user, organisation):
         super().__init__()
         self.setWindowTitle("დახურული ხელშეკრულებები")
-        self.setWindowIcon(QIcon("Icons/closed_contracts.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/closed_contracts.png")))
         self.resize(1400, 800)
         self.role = role
         self.organisation = organisation
@@ -43,7 +45,7 @@ class ClosedContracts(QWidget):
         # Export
         export = QToolButton()
         export.setText(" ექსპორტი ")
-        export.setIcon(QIcon("Icons/excel_icon.png"))
+        export.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export.setIconSize(QSize(37, 40))
         export.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         export.setStyleSheet("font-size: 16px;")
@@ -149,7 +151,7 @@ class ClosedContracts(QWidget):
 
         # --------------------------------------------Table-----------------------------------------------------
         self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName("Databases/closed_contracts.db")
+        self.db.setDatabaseName(resource_path("Databases/closed_contracts.db"))
         if not self.db.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -223,12 +225,12 @@ class ClosedContracts(QWidget):
         menu = QMenu()
 
         print_action = QAction(" ამობეჭდვა ", self)
-        print_action.setIcon(QIcon("Icons/printer_icon.png"))
+        print_action.setIcon(QIcon(resource_path("Icons/printer_icon.png")))
         print_action.triggered.connect(self.print_closed_contract_selected_row)
         menu.addAction(print_action)
 
         return_action = QAction(" დააბრუნე აქტიურში ", self)
-        return_action.setIcon(QIcon("Icons/return_icon.png"))
+        return_action.setIcon(QIcon(resource_path("Icons/return_icon.png")))
         return_action.triggered.connect(self.return_closed_contract_to_active)
         menu.addAction(return_action)
 
@@ -286,7 +288,7 @@ class ClosedContracts(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/contract_template.docx")
+        doc = Document(resource_path("Templates/contract_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:
@@ -337,14 +339,14 @@ class ClosedContracts(QWidget):
 
         try:
             # 1. Delete from closed_contracts DB
-            conn_closed = sqlite3.connect("Databases/closed_contracts.db")
+            conn_closed = sqlite3.connect(resource_path("Databases/closed_contracts.db"))
             cursor_closed = conn_closed.cursor()
             cursor_closed.execute("DELETE FROM closed_contracts WHERE id = ?", (contract_id,))
             conn_closed.commit()
             conn_closed.close()
 
             # 2. Update is_visible = 'აქტიური' in active_contracts DB
-            conn_active = sqlite3.connect("Databases/active_contracts.db")
+            conn_active = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor_active = conn_active.cursor()
             cursor_active.execute("""
                 UPDATE active_contracts

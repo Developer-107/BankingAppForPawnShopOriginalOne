@@ -8,6 +8,8 @@ from PyQt5.QtCore import QDate, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox
 
+from utils import resource_path
+
 
 class AddMoney(QWidget):
     def __init__(self, contract_id, name_surname, organisation):
@@ -15,7 +17,7 @@ class AddMoney(QWidget):
         self.contract_id = contract_id
         self.name_surname = name_surname
         self.setWindowTitle("თანხის დამატება")
-        self.setWindowIcon(QIcon("Icons/add_money.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/add_money.png")))
         self.setFixedSize(400, 250)
         self.organisation = organisation
 
@@ -57,7 +59,7 @@ class AddMoney(QWidget):
 
         try:
             # Step 1: Get the id_number from the original active_contracts table
-            source_conn = sqlite3.connect("Databases/active_contracts.db")
+            source_conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             source_cursor = source_conn.cursor()
             source_cursor.execute("""SELECT id_number, additional_amounts, date, item_name, 
                                                  model, imei, given_money, tel_number, percent
@@ -91,7 +93,7 @@ class AddMoney(QWidget):
 
 
 
-            conn = sqlite3.connect("Databases/given_and_additional_database.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
 
@@ -111,7 +113,7 @@ class AddMoney(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/outflow_order.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             # Insert in outflow_order database
@@ -131,7 +133,7 @@ class AddMoney(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/outflow_in_registry.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             # Insert in outflow_in_registry database
@@ -193,7 +195,7 @@ class AddMoney(QWidget):
                             paragraph.add_run(new_text)
 
                 # Load the Word template
-                doc = Document("Templates/additional_money_template.docx")
+                doc = Document(resource_path("Templates/additional_money_template.docx"))
 
                 # Replace in normal paragraphs
                 for paragraph in doc.paragraphs:
