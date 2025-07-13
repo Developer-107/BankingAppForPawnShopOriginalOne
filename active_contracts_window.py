@@ -485,12 +485,12 @@ class ActiveContracts(QWidget):
             day_quantity = 0
 
         # Calculate next payment date based on day_quantity
-        next_payment_date = contract_datetime.addDays(day_quantity - 1) if day_quantity > 0 else contract_datetime
+        next_payment_date = contract_datetime.addDays(day_quantity - 1) if day_quantity >= 0 else contract_datetime
 
         # Move next_payment_date forward if already passed
         today = QDate.currentDate()
-        while next_payment_date.date() <= today and day_quantity > 0:
-            next_payment_date = next_payment_date.addDays(day_quantity)
+        while next_payment_date.date() < today and day_quantity > 0:
+            next_payment_date = next_payment_date.addDays(day_quantity - next_payment_date.date().daysTo(today) - 1)
 
         next_payment_str = next_payment_date.toString("dd.MM.yyyy")
 
