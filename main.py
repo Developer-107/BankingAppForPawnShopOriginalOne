@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import sys
 
@@ -205,20 +206,26 @@ class MainWindow(QMainWindow):
         self.money_control_window.show()
 
 
-conn = sqlite3.connect(resource_path("Credentials/users.db"))
-cursor = conn.cursor()
+def init_user_db():
+    base_folder = os.path.dirname(sys.argv[0])
+    db_path = os.path.join(base_folder, "Credentials", "users.db")
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    password TEXT,
-    name_of_user TEXT,
-    organisation TEXT,
-    id_number_of_user TEXT,
-    role TEXT CHECK(role IN ('admin', 'user'))
-)
-""")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT,
+        name_of_user TEXT,
+        organisation TEXT,
+        id_number_of_user TEXT,
+        role TEXT CHECK(role IN ('admin', 'user'))
+    )
+    """)
+    conn.commit()
+    conn.close()
 
 
 def launch_main(username, role, name_of_user, organisation, id_number_of_user):
@@ -228,7 +235,9 @@ def launch_main(username, role, name_of_user, organisation, id_number_of_user):
 
 
 
-app = QApplication(sys.argv)
-login = LoginWindow(app_callback=launch_main)
-login.show()
-sys.exit(app.exec_())
+if __name__ == "__main__":
+    init_user_db()  # <- move DB setup here so PyInstaller unpacking finishes first
+    app = QApplication(sys.argv)
+    login = LoginWindow(app_callback=launch_main)
+    login.show()
+    sys.exit(app.exec_())
