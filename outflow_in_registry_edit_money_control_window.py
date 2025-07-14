@@ -6,13 +6,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
 
+from utils import resource_path
+
 
 class EditRegistryOutflowWindow(QWidget):
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
         self.setWindowTitle("შემოსვლის ჩანაწერის რედაქტირება")
-        self.setWindowIcon(QIcon("Icons/edit_data.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/edit_data.png")))
         self.resize(600, 300)
         self.build_ui()
         self.load_data()
@@ -64,7 +66,7 @@ class EditRegistryOutflowWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect("Databases/outflow_in_registry.db")
+        conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM outflow_in_registry WHERE unique_id = ?", (self.record_id,))
         row = cursor.fetchone()
@@ -82,7 +84,7 @@ class EditRegistryOutflowWindow(QWidget):
 
     def update_record(self):
         try:
-            conn = sqlite3.connect("Databases/outflow_in_registry.db")
+            conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE outflow_in_registry SET
@@ -103,7 +105,7 @@ class EditRegistryOutflowWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/given_and_additional_database.db")
+            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE given_and_additional_database SET
@@ -119,7 +121,7 @@ class EditRegistryOutflowWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/outflow_order.db")
+            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))
             cursor = conn.cursor()
             cursor.execute("""
                                         UPDATE outflow_order SET
@@ -135,7 +137,7 @@ class EditRegistryOutflowWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             # Fetch old value

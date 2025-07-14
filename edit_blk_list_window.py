@@ -3,13 +3,15 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
+from utils import resource_path
+
 
 class EditBlkListWindow(QWidget):
     def __init__(self, record_id, parent=None):
         super().__init__(parent)
         self.record_id = record_id
         self.setWindowTitle("შავი სიის ჩანაწერის რედაქტირება")
-        self.setWindowIcon(QIcon("Icons/edit_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/edit_icon.png")))
         self.resize(600, 300)
         self.build_ui()
         self.load_data()
@@ -38,7 +40,7 @@ class EditBlkListWindow(QWidget):
         self.setLayout(layout)
 
     def load_data(self):
-        conn = sqlite3.connect("Databases/black_list.db")
+        conn = sqlite3.connect(resource_path("Databases/black_list.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM black_list WHERE id = ?", (self.record_id,))
         row = cursor.fetchone()
@@ -51,7 +53,7 @@ class EditBlkListWindow(QWidget):
             self.imei_box.setText(row[4])
 
     def save_changes(self):
-        conn = sqlite3.connect("Databases/black_list.db")
+        conn = sqlite3.connect(resource_path("Databases/black_list.db"))
         cursor = conn.cursor()
         try:
             cursor.execute("""

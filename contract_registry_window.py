@@ -1398,7 +1398,7 @@ class ContractRegistry(QWidget):
                     paragraph.add_run(new_text)
 
         # Load the Word template
-        doc = Document("Templates/additional_money_template.docx")
+        doc = Document(resource_path("Templates/additional_money_template.docx"))
 
         # Replace in normal paragraphs
         for paragraph in doc.paragraphs:

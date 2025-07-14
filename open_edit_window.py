@@ -6,13 +6,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt, QDateTime
 
+from utils import resource_path
+
 
 class EditWindow(QWidget):
     def __init__(self, record_id, role):
         super().__init__()
         self.record_id = record_id
         self.setWindowTitle("რედაქტირება")
-        self.setWindowIcon(QIcon("Icons/edit_data.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/edit_data.png")))
         self.resize(1400, 500)
         self.role = role
         self.build_ui()
@@ -74,14 +76,14 @@ class EditWindow(QWidget):
 
         # Save Button
         save_button = QPushButton("შენახვა")
-        save_button.setIcon(QIcon("Icons/save_icon.png"))
+        save_button.setIcon(QIcon(resource_path("Icons/save_icon.png")))
         save_button.setIconSize(QSize(35, 35))
         save_button.setStyleSheet("font-size: 16px;")
         save_button.clicked.connect(self.update_record)
 
         # Cancel Button
         cancel_button = QPushButton("დახურვა")
-        cancel_button.setIcon(QIcon("Icons/cancel_icon.png"))
+        cancel_button.setIcon(QIcon(resource_path("Icons/cancel_icon.png")))
         cancel_button.setIconSize(QSize(35, 35))
         cancel_button.setStyleSheet("font-size: 16px;")
         cancel_button.clicked.connect(self.close)
@@ -94,7 +96,7 @@ class EditWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect("Databases/active_contracts.db")
+        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM active_contracts_view WHERE id = ?", (self.record_id,))
         row = cursor.fetchone()
@@ -121,7 +123,7 @@ class EditWindow(QWidget):
     def update_record(self):
         try:
             # 1. Update active_contracts.db
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE active_contracts SET
@@ -161,7 +163,7 @@ class EditWindow(QWidget):
             status = 'გაცემული ძირი თანხა'
 
             # 2. Update given_and_additional_database.db
-            conn = sqlite3.connect("Databases/given_and_additional_database.db")
+            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE given_and_additional_database SET
@@ -181,7 +183,7 @@ class EditWindow(QWidget):
 
             office_mob_number = "599 222 918"
 
-            conn = sqlite3.connect("Databases/contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/contracts.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE contracts SET
@@ -213,7 +215,7 @@ class EditWindow(QWidget):
             conn.close()
 
             # 4. Update outflow_order.db
-            conn = sqlite3.connect("Databases/outflow_order.db")
+            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE outflow_order SET
@@ -235,7 +237,7 @@ class EditWindow(QWidget):
 
 
             # 5. Update adding_percent_amount.db
-            conn = sqlite3.connect("Databases/adding_percent_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
             cursor = conn.cursor()
             cursor.execute("""
                            UPDATE adding_percent_amount SET

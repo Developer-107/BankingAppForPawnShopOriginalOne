@@ -8,12 +8,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox, QComboBox, \
     QCompleter
 
+from utils import resource_path
+
 
 class AddWindow(QWidget):
     def __init__(self, organisation, name_of_user):
         super().__init__()
         self.setWindowTitle("დამატება")
-        self.setWindowIcon(QIcon("Icons/add_data.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/add_data.png")))
         self.resize(1400, 500)
 
         self.name_of_user = name_of_user
@@ -126,7 +128,7 @@ class AddWindow(QWidget):
 
         save_button = QToolButton()
         save_button.setText(" შენახვა ")
-        save_button.setIcon(QIcon("Icons/save_icon.png"))
+        save_button.setIcon(QIcon(resource_path("Icons/save_icon.png")))
         save_button.setIconSize(QSize(35, 35))
         save_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         save_button.setStyleSheet("font-size: 16px;")
@@ -134,7 +136,7 @@ class AddWindow(QWidget):
 
         close_window = QToolButton()
         close_window.setText(" დახურვა ")
-        close_window.setIcon(QIcon("Icons/cancel_icon.png"))
+        close_window.setIcon(QIcon(resource_path("Icons/cancel_icon.png")))
         close_window.setIconSize(QSize(35, 35))
         close_window.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         close_window.setStyleSheet("font-size: 16px;")
@@ -163,7 +165,7 @@ class AddWindow(QWidget):
 
     def load_name_list_from_db(self):
         try:
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
             cursor.execute("SELECT DISTINCT name_surname FROM active_contracts")
             names = [row[0] for row in cursor.fetchall()]
@@ -180,7 +182,7 @@ class AddWindow(QWidget):
         if not name:
             return
         try:
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT id_number FROM active_contracts 
@@ -199,7 +201,7 @@ class AddWindow(QWidget):
 
     def save_to_sql(self):
         try:
-            conn = sqlite3.connect("Databases/active_contracts.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -234,7 +236,7 @@ class AddWindow(QWidget):
 
             status_for_given_principle = "გაცემული ძირი თანხა"
 
-            conn = sqlite3.connect("Databases/given_and_additional_database.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -258,7 +260,7 @@ class AddWindow(QWidget):
                 .toString("yyyy-MM-dd HH:mm:ss")
             office_mob_number = "599 222 918"
 
-            conn = sqlite3.connect("Databases/contracts.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/contracts.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -288,7 +290,7 @@ class AddWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/outflow_order.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -309,7 +311,7 @@ class AddWindow(QWidget):
 
             status_for_added_percent = "დარიცხული პროცენტი"
 
-            conn = sqlite3.connect("Databases/adding_percent_amount.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -373,7 +375,7 @@ class AddWindow(QWidget):
                         paragraph.add_run(new_text)
 
             # Load the Word template
-            doc = Document("Templates/contract_template.docx")
+            doc = Document(resource_path("Templates/contract_template.docx"))
 
             # Replace in normal paragraphs
             for paragraph in doc.paragraphs:

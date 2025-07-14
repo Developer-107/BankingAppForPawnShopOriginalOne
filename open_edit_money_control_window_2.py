@@ -6,13 +6,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
 
+from utils import resource_path
+
 
 class EditInPrincipalInflowsInRegistryWindow(QWidget):
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
         self.setWindowTitle("შემოსვლის ჩანაწერის რედაქტირება")
-        self.setWindowIcon(QIcon("Icons/edit_data.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/edit_data.png")))
         self.resize(600, 300)
         self.build_ui()
         self.load_data()
@@ -43,13 +45,13 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             self.layout.addWidget(widget, i, 1)
 
         save_button = QPushButton("შენახვა")
-        save_button.setIcon(QIcon("Icons/save_icon.png"))
+        save_button.setIcon(QIcon(resource_path("Icons/save_icon.png")))
         save_button.setIconSize(QSize(35, 35))
         save_button.setStyleSheet("font-size: 16px;")
         save_button.clicked.connect(self.update_record)
 
         cancel_button = QPushButton("დახურვა")
-        cancel_button.setIcon(QIcon("Icons/cancel_icon.png"))
+        cancel_button.setIcon(QIcon(resource_path("Icons/cancel_icon.png")))
         cancel_button.setIconSize(QSize(35, 35))
         cancel_button.setStyleSheet("font-size: 16px;")
         cancel_button.clicked.connect(self.close)
@@ -62,7 +64,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect("Databases/paid_principle_registry.db")
+        conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM paid_principle_registry WHERE unique_id = ?", (self.record_id,))
         row = cursor.fetchone()
@@ -78,7 +80,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
 
     def update_record(self):
         try:
-            conn = sqlite3.connect("Databases/paid_principle_registry.db")
+            conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE paid_principle_registry SET
@@ -91,7 +93,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
@@ -106,7 +108,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/inflow_order_only_principal_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
             cursor = conn.cursor()
             cursor.execute("""
                                 UPDATE inflow_order_only_principal_amount SET
@@ -121,7 +123,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/inflow_order_both.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
             cursor = conn.cursor()
             cursor.execute("""
                                UPDATE inflow_order_both SET
@@ -136,7 +138,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT principal_paid FROM active_contracts WHERE id = ?
@@ -153,7 +155,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             principal_paid_new_amount = principal_paid_before + difference_between_changed_and_before
 
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE active_contracts SET

@@ -5,12 +5,14 @@ from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QGridLayout
 from PyQt5.QtGui import QFont, QPalette, QColor, QIcon
 from pandas.core.dtypes.inference import is_number
 
+from utils import resource_path
+
 
 class PaymentConfirmWindow(QWidget):
     def __init__(self, contract_id, name_surname, principal_paid, percent_paid, given_money, principal_should_be_paid):
         super().__init__()
         self.setWindowTitle("გადახდის დადასტურება")
-        self.setWindowIcon(QIcon("Icons/closed_contracts.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/closed_contracts.png")))
         self.setFixedSize(705, 250)
 
         layout = QGridLayout()
@@ -90,7 +92,7 @@ class PaymentConfirmWindow(QWidget):
     def confirm_payment(self):
         # You can connect this to your DB update
         try:
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cursor = conn.cursor()
 
             cursor.execute("SELECT * FROM active_contracts WHERE id = ?", (self.contract_id,))
@@ -115,7 +117,7 @@ class PaymentConfirmWindow(QWidget):
             trusted_person = str(row[10])
             date_of_C_O = str(row[1])
 
-            conn = sqlite3.connect("Databases/active_contracts.db")
+            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             cur_given = conn.cursor()
             cur_given.execute("""
                 UPDATE active_contracts
@@ -125,7 +127,7 @@ class PaymentConfirmWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/closed_contracts.db")  # Make sure this matches your DB
+            conn = sqlite3.connect(resource_path("Databases/closed_contracts.db"))  # Make sure this matches your DB
             cursor = conn.cursor()
 
             # Insert in closed_contracts database

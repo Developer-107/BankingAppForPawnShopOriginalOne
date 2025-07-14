@@ -10,12 +10,14 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QDateEdit, QLabel, 
     QAbstractItemView, QToolButton, QMessageBox
 from openpyxl.chart import layout
 
+from utils import resource_path
+
 
 class MoneyControl(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("თანხების კონეტროლი")
-        self.setWindowIcon(QIcon("Icons/money_control.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/money_control.png")))
         self.resize(1400, 701)
 
 
@@ -56,7 +58,7 @@ class MoneyControl(QWidget):
         # Export
         export_table1 = QToolButton()
         export_table1.setText(" ექსპორტი ")
-        export_table1.setIcon(QIcon("Icons/excel_icon.png"))
+        export_table1.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_table1.setIconSize(QSize(37, 40))
         export_table1.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         export_table1.setStyleSheet("font-size: 16px;")
@@ -69,7 +71,7 @@ class MoneyControl(QWidget):
         layout.addWidget(name_table1, 1, 1)
 
         self.db1 = QSqlDatabase.addDatabase("QSQLITE", "paid_principle_and_paid_percentage_database")
-        self.db1.setDatabaseName("Databases/paid_principle_and_paid_percentage_database.db")
+        self.db1.setDatabaseName(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
         if not self.db1.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -120,7 +122,7 @@ class MoneyControl(QWidget):
         # Export
         export_table2 = QToolButton()
         export_table2.setText(" ექსპორტი ")
-        export_table2.setIcon(QIcon("Icons/excel_icon.png"))
+        export_table2.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_table2.setIconSize(QSize(37, 40))
         export_table2.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         export_table2.setStyleSheet("font-size: 16px;")
@@ -133,7 +135,7 @@ class MoneyControl(QWidget):
         layout.addWidget(name_table2, 1, 3)
 
         self.db2 = QSqlDatabase.addDatabase("QSQLITE", "given_and_additional_database")
-        self.db2.setDatabaseName("Databases/given_and_additional_database.db")
+        self.db2.setDatabaseName(resource_path("Databases/given_and_additional_database.db"))
         if not self.db2.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 

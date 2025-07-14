@@ -10,12 +10,14 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QDateEdit, QLabel, 
     QAbstractItemView, QToolButton, QMessageBox
 from openpyxl.chart import layout
 
+from utils import resource_path
+
 
 class DetailWindow(QWidget):
     def __init__(self, contract_id, name_surname, item_name):
         super().__init__()
         self.setWindowTitle("დარიცხული და გადახდილი პროცენტები")
-        self.setWindowIcon(QIcon("Icons/percent_payment_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/percent_payment_icon.png")))
         self.resize(1250, 540)
         self.contract_id = contract_id
         self.name_surname = name_surname
@@ -33,7 +35,7 @@ class DetailWindow(QWidget):
         # Export
         export_table = QToolButton()
         export_table.setText(" ექსპორტი ")
-        export_table.setIcon(QIcon("Icons/excel_icon.png"))
+        export_table.setIcon(QIcon(resource_path("Icons/excel_icon.png")))
         export_table.setIconSize(QSize(37, 40))
         export_table.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         export_table.setStyleSheet("font-size: 16px;")
@@ -91,7 +93,7 @@ class DetailWindow(QWidget):
         layout.addWidget(name_table1, 1, 0)
 
         self.db1 = QSqlDatabase.addDatabase("QSQLITE", "adding_percent_amount")
-        self.db1.setDatabaseName("Databases/adding_percent_amount.db")
+        self.db1.setDatabaseName(resource_path("Databases/adding_percent_amount.db"))
         if not self.db1.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
@@ -178,7 +180,7 @@ class DetailWindow(QWidget):
         layout.addWidget(name_table2, 1, 2)
 
         self.db2 = QSqlDatabase.addDatabase("QSQLITE", "paid_percent_amount")
-        self.db2.setDatabaseName("Databases/paid_percent_amount.db")
+        self.db2.setDatabaseName(resource_path("Databases/paid_percent_amount.db"))
         if not self.db2.open():
             raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 

@@ -6,13 +6,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
 
+from utils import resource_path
+
 
 class EditPaidPercentWindow(QWidget):
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
         self.setWindowTitle("პროცენტის გადახდის რედაქტირება")
-        self.setWindowIcon(QIcon("Icons/edit_data.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/edit_data.png")))
         self.resize(600, 300)
         self.build_ui()
         self.load_data()
@@ -43,13 +45,13 @@ class EditPaidPercentWindow(QWidget):
             self.layout.addWidget(widget, i, 1)
 
         save_button = QPushButton("შენახვა")
-        save_button.setIcon(QIcon("Icons/save_icon.png"))
+        save_button.setIcon(QIcon(resource_path("Icons/save_icon.png")))
         save_button.setIconSize(QSize(35, 35))
         save_button.setStyleSheet("font-size: 16px;")
         save_button.clicked.connect(self.update_record)
 
         cancel_button = QPushButton("დახურვა")
-        cancel_button.setIcon(QIcon("Icons/cancel_icon.png"))
+        cancel_button.setIcon(QIcon(resource_path("Icons/cancel_icon.png")))
         cancel_button.setIconSize(QSize(35, 35))
         cancel_button.setStyleSheet("font-size: 16px;")
         cancel_button.clicked.connect(self.close)
@@ -62,7 +64,7 @@ class EditPaidPercentWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect("Databases/paid_percent_amount.db")
+        conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM paid_percent_amount WHERE unique_id = ?", (self.record_id,))
         row = cursor.fetchone()
@@ -84,7 +86,7 @@ class EditPaidPercentWindow(QWidget):
             status = self.status_box.text()
 
             # 1. Update paid_percent_amount
-            conn = sqlite3.connect("Databases/paid_percent_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE paid_percent_amount SET
@@ -94,7 +96,7 @@ class EditPaidPercentWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
@@ -104,7 +106,7 @@ class EditPaidPercentWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/inflow_order_only_percent_amount.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
             cursor = conn.cursor()
             cursor.execute("""
                                         UPDATE inflow_order_only_percent_amount SET
@@ -114,7 +116,7 @@ class EditPaidPercentWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect("Databases/inflow_order_both.db")
+            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
             cursor = conn.cursor()
             cursor.execute("""
                                 UPDATE inflow_order_both SET

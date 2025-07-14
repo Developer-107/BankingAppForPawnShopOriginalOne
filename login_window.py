@@ -2,11 +2,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMessageBox
 import sqlite3
 
+from utils import resource_path
+
+
 class LoginWindow(QWidget):
     def __init__(self, app_callback):
         super().__init__()
         self.setWindowTitle("შესვლა")
-        self.setWindowIcon(QIcon("Icons/login_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/login_icon.png")))
         self.resize(400, 190)
         self.app_callback = app_callback
 
@@ -34,7 +37,7 @@ class LoginWindow(QWidget):
         username = self.username_input.text()
         password = self.password_input.text()
 
-        conn = sqlite3.connect("Credentials/users.db")
+        conn = sqlite3.connect(resource_path("Credentials/users.db"))
         cursor = conn.cursor()
         cursor.execute("SELECT role, name_of_user, organisation, id_number_of_user FROM users WHERE username=? AND password=?", (username, password))
         result = cursor.fetchone()

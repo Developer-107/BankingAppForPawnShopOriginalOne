@@ -1,14 +1,13 @@
 import os
 import sqlite3
 from datetime import datetime
-
 import win32com.client
 from docx import Document
-
 from PyQt5.QtCore import QDate, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox, \
     QDateTimeEdit
+from utils import resource_path
 
 
 class PaymentWindow(QWidget):
@@ -16,7 +15,7 @@ class PaymentWindow(QWidget):
         super().__init__()
         self.contract_id = contract_id
         self.setWindowTitle("პროცენტის ან ძირი თანხის გადახდა")
-        self.setWindowIcon(QIcon("Icons/percent_payment_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/percent_payment_icon.png")))
         self.setFixedSize(400, 250)
         self.organisation = organisation
 
@@ -67,7 +66,7 @@ class PaymentWindow(QWidget):
 
         try:
             # Step 1: Get the id_number from the original active_contracts table
-            source_conn = sqlite3.connect("Databases/active_contracts.db")
+            source_conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
             source_cursor = source_conn.cursor()
             source_cursor.execute("""SELECT id_number, name_surname, principal_paid, date, item_name, imei, 
                                         tel_number, model, given_money, paid_percents 
@@ -92,7 +91,7 @@ class PaymentWindow(QWidget):
 
 
             if self.payed_percent_amount.text().strip():
-                conn = sqlite3.connect("Databases/active_contracts.db")
+                conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
                 cursor = conn.cursor()
 
                 new_percent_amount = old_percent_paid + int(self.payed_percent_amount.text())
@@ -106,7 +105,7 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/paid_percent_amount.db")
+                conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -131,7 +130,7 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+                conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -148,7 +147,7 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/inflow_order_only_percent_amount.db")
+                conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -172,7 +171,7 @@ class PaymentWindow(QWidget):
 
 
             if self.amount_input.text().strip():
-                conn = sqlite3.connect("Databases/active_contracts.db")
+                conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
                 cursor = conn.cursor()
 
                 new_principal_amount = old_principal_paid + int(self.amount_input.text())
@@ -186,7 +185,7 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/paid_principle_registry.db")
+                conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -211,7 +210,7 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/paid_principle_and_paid_percentage_database.db")
+                conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -228,7 +227,7 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect("Databases/inflow_order_only_principal_amount.db")
+                conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -250,7 +249,7 @@ class PaymentWindow(QWidget):
 
             if self.payed_percent_amount.text().strip() and self.amount_input.text().strip():
 
-                conn = sqlite3.connect("Databases/inflow_order_both.db")
+                conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -323,7 +322,7 @@ class PaymentWindow(QWidget):
                                 paragraph.add_run(new_text)
 
                     # Load the Word template
-                    doc = Document("Templates/inflow_template.docx")
+                    doc = Document(resource_path("Templates/inflow_template.docx"))
 
                     # Replace in normal paragraphs
                     for paragraph in doc.paragraphs:

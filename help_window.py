@@ -2,12 +2,14 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QGroupBox
 
+from utils import resource_path
+
 
 class HelpWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("დახმარება")
-        self.setWindowIcon(QIcon("Icons/help.png"))
+        self.setWindowIcon(QIcon(resource_path("Icons/help.png")))
         self.resize(400, 100)
 
         label = QLabel("დახმარებისთვის მიმართეთ შესაბამის სამსახურს!")
