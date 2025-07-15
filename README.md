@@ -100,6 +100,6 @@ Multiple **SQLite** databases are used to organize data:
 
 ---
 
-##⚠️ Additional Note
+## ⚠️ Additional Note
 
 - 🖨️ A few features (like printing) are implemented only for Windows
