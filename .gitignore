@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# PyCharm
+.idea/
+
+# Virtual env
+venv/
+.env
+
+# Databases
+*.db
+
+# Excel exports
+*.xlsx

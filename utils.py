@@ -1,5 +1,10 @@
 import os
 import sys
+import psycopg
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 def resource_path(relative_path):
     """
@@ -8,3 +13,8 @@ def resource_path(relative_path):
     """
     base_path = os.path.dirname(sys.argv[0])
     return os.path.normpath(os.path.join(base_path, relative_path))
+
+def get_conn():
+    conn = psycopg.connect(os.environ["DATABASE_URL"])
+    conn.autocommit = True
+    return conn

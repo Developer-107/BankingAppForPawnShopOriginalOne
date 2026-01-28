@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 from PyQt5.QtWidgets import (
     QWidget, QGridLayout, QLabel, QLineEdit, QPushButton,
     QMessageBox, QHBoxLayout
@@ -64,9 +64,9 @@ class EditPaidPercentWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
+        conn = get_conn
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM paid_percent_amount WHERE unique_id = ?", (self.record_id,))
+        cursor.execute("SELECT * FROM paid_percent_amount WHERE unique_id = %s", (self.record_id,))
         row = cursor.fetchone()
         conn.close()
 
@@ -86,42 +86,42 @@ class EditPaidPercentWindow(QWidget):
             status = self.status_box.text()
 
             # 1. Update paid_percent_amount
-            conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE paid_percent_amount SET
-                    paid_amount = ?
-                WHERE unique_id = ?
+                    paid_amount = %s%s
+                WHERE unique_id = %s%s
             """, (new_amount, self.record_id))
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+            conn = get_conn
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
-                                amount = ?
-                            WHERE contract_id = ? AND status = ? AND date_of_inflow = ?
+                                amount = %s%s
+                            WHERE contract_id = %s%s AND status = %s%s AND date_of_inflow = %s
                         """, (new_amount, contract_id, status, payment_date))
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                                         UPDATE inflow_order_only_percent_amount SET
-                                            percent_paid_amount = ?, sum_of_money_paid= ?
-                                        WHERE contract_id = ? AND payment_date = ?
+                                            percent_paid_amount = %s, sum_of_money_paid= %s
+                                        WHERE contract_id = %s AND payment_date = %s
                                     """, (new_amount, new_amount, contract_id, payment_date))
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                                 UPDATE inflow_order_both SET
-                                    percent_paid_amount = ?
-                                WHERE contract_id = ? AND payment_date = ? AND principle_paid_amount = ?
+                                    percent_paid_amount = %s
+                                WHERE contract_id = %s AND payment_date = %s AND principle_paid_amount = %s
                                 """, (new_amount, contract_id, payment_date, 0))
             conn.commit()
             conn.close()

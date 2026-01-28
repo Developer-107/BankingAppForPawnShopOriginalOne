@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 
 from PyQt5.QtCore import QDate, QSize, Qt
 from PyQt5.QtGui import QIcon
@@ -81,13 +81,13 @@ class AddBlkListWindow(QWidget):
 
     def save_to_blk_list_sql(self):
         try:
-            conn = sqlite3.connect(resource_path("Databases/black_list.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                     INSERT INTO black_list (
                         name_surname, id_number, tel_number, imei
-                    ) VALUES (?, ?, ?, ?)
+                    ) VALUES (%s, %s, %s, %s)
                 """, (
                 self.name_surname_box.text(),
                 self.id_number_box.text(),

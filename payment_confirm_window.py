@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 
 from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QGridLayout, QMessageBox
@@ -92,10 +92,10 @@ class PaymentConfirmWindow(QWidget):
     def confirm_payment(self):
         # You can connect this to your DB update
         try:
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
-            cursor.execute("SELECT * FROM active_contracts WHERE id = ?", (self.contract_id,))
+            cursor.execute("SELECT * FROM active_contracts WHERE id = %s", (self.contract_id,))
             row = cursor.fetchone()
             conn.close()
 
@@ -117,17 +117,17 @@ class PaymentConfirmWindow(QWidget):
             trusted_person = str(row[10])
             date_of_C_O = str(row[1])
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                 UPDATE active_contracts
                 SET is_visible = 'დახურული'
-                WHERE id = ?
+                WHERE id = %s
             """, (self.contract_id,))
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/closed_contracts.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             # Insert in closed_contracts database
@@ -136,7 +136,7 @@ class PaymentConfirmWindow(QWidget):
                                 id, contract_open_date, name_surname, id_number, tel_number, item_name, model, IMEI, percent,
                                 percent_day_quantity, given_money, additional_money, paid_principle, added_percents,
                                 paid_percents, status, date_of_closing, comment, trusted_person
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         """, (
                 self.contract_id,
                 date_of_C_O,

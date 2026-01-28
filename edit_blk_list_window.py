@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -40,9 +40,9 @@ class EditBlkListWindow(QWidget):
         self.setLayout(layout)
 
     def load_data(self):
-        conn = sqlite3.connect(resource_path("Databases/black_list.db"))
+        conn = get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM black_list WHERE id = ?", (self.record_id,))
+        cursor.execute("SELECT * FROM black_list WHERE id = %s", (self.record_id,))
         row = cursor.fetchone()
         conn.close()
 
@@ -53,16 +53,16 @@ class EditBlkListWindow(QWidget):
             self.imei_box.setText(row[4])
 
     def save_changes(self):
-        conn = sqlite3.connect(resource_path("Databases/black_list.db"))
+        conn = get_conn()
         cursor = conn.cursor()
         try:
             cursor.execute("""
                 UPDATE black_list SET 
-                    name_surname = ?, 
-                    id_number = ?, 
-                    tel_number = ?, 
-                    imei = ?
-                WHERE id = ?
+                    name_surname = %s, 
+                    id_number = %s, 
+                    tel_number = %s, 
+                    imei = %s
+                WHERE id = %s
             """, (
                 self.name_surname_box.text(),
                 self.id_number_box.text(),

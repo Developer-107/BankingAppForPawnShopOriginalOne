@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 from PyQt5.QtWidgets import (
     QWidget, QGridLayout, QLabel, QLineEdit, QPushButton,
     QMessageBox, QHBoxLayout, QComboBox
@@ -96,9 +96,9 @@ class EditWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+        conn = get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM active_contracts_view WHERE id = ?", (self.record_id,))
+        cursor.execute("SELECT * FROM active_contracts_view WHERE id = %s", (self.record_id,))
         row = cursor.fetchone()
         conn.close()
 
@@ -123,24 +123,24 @@ class EditWindow(QWidget):
     def update_record(self):
         try:
             # 1. Update active_contracts.db
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE active_contracts SET
-                    name_surname = ?,
-                    id_number = ?,
-                    tel_number = ?,
-                    item_name = ?,
-                    model = ?,
-                    imei = ?,
-                    type = ?,
-                    trusted_person = ?,
-                    comment = ?,
-                    given_money = ?,
-                    percent = ?,
-                    day_quantity = ?,
-                    added_percents = ?
-                WHERE id = ?
+                    name_surname = %s,
+                    id_number = %s,
+                    tel_number = %s,
+                    item_name = %s,
+                    model = %s,
+                    imei = %s,
+                    type = %s,
+                    trusted_person = %s,
+                    comment = %s,
+                    given_money = %s,
+                    percent = %s,
+                    day_quantity = %s,
+                    added_percents = %s
+                WHERE id = %s
             """, (
                 self.name_surname_box.text(),
                 self.id_number_box.text(),
@@ -163,13 +163,13 @@ class EditWindow(QWidget):
             status = 'გაცემული ძირი თანხა'
 
             # 2. Update given_and_additional_database.db
-            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE given_and_additional_database SET
-                    name_surname = ?,
-                    amount = ?
-                WHERE contract_id = ? AND status = ? and date_of_outflow = ?
+                    name_surname = %s,
+                    amount = %s
+                WHERE contract_id = %s AND status = %s and date_of_outflow = %s
             """, (
                 self.name_surname_box.text(),
                 self.given_money_box.text(),
@@ -183,21 +183,21 @@ class EditWindow(QWidget):
 
             office_mob_number = "599 222 918"
 
-            conn = sqlite3.connect(resource_path("Databases/contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE contracts SET
-                    name_surname = ?,
-                    id_number = ?,
-                    tel_number = ?,
-                    item_name = ?,
-                    model = ?,
-                    IMEI = ?,
-                    given_money = ?,
-                    percent_day_quantity = ?,
-                    first_added_percent = ?,
-                    office_mob_number = ?
-                WHERE contract_id = ?
+                    name_surname = %s,
+                    id_number = %s,
+                    tel_number = %s,
+                    item_name = %s,
+                    model = %s,
+                    IMEI = %s,
+                    given_money = %s,
+                    percent_day_quantity = %s,
+                    first_added_percent = %s,
+                    office_mob_number = %s
+                WHERE contract_id = %s
             """, (
                 self.name_surname_box.text(),
                 self.id_number_box.text(),
@@ -215,14 +215,14 @@ class EditWindow(QWidget):
             conn.close()
 
             # 4. Update outflow_order.db
-            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE outflow_order SET
-                    name_surname = ?,
-                    tel_number = ?,
-                    amount = ?
-                WHERE contract_id = ? and amount = ? and status = ? and date = ?
+                    name_surname = %s,
+                    tel_number = %s,
+                    amount = %s
+                WHERE contract_id = %s and amount = %s and status = %s and date = %s
             """, (
                 self.name_surname_box.text(),
                 self.tel_number_box.text(),
@@ -237,12 +237,12 @@ class EditWindow(QWidget):
 
 
             # 5. Update adding_percent_amount.db
-            conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                            UPDATE adding_percent_amount SET
-                               percent_amount = ?
-                           WHERE contract_id = ? AND date_of_percent_addition = ?
+                               percent_amount = %s
+                           WHERE contract_id = %s AND date_of_percent_addition = %s
                        """, (
                 float((int(self.given_money_box.text()) + self.additional_amounts) * (float(self.percent_box.currentText()) / 100)),
                 self.record_id,

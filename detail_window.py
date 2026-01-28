@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from utils import get_conn
 import tempfile
 
 import pandas as pd

@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from utils import get_conn
 from datetime import datetime
 
 import win32com.client
@@ -59,11 +59,11 @@ class AddMoney(QWidget):
 
         try:
             # Step 1: Get the id_number from the original active_contracts table
-            source_conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            source_conn = get_conn()
             source_cursor = source_conn.cursor()
             source_cursor.execute("""SELECT id_number, additional_amounts, date, item_name, 
                                                  model, imei, given_money, tel_number, percent
-                                            FROM active_contracts WHERE id = ?""", (contract_id,))
+                                            FROM active_contracts WHERE id = %s""", (contract_id,))
             result = source_cursor.fetchone()
 
             if not result:
@@ -84,8 +84,8 @@ class AddMoney(QWidget):
             new_added_percents = (given_money + updated_additional_amount) * percent / 100
             source_cursor.execute("""
                     UPDATE active_contracts
-                    SET additional_amounts = ?, added_percents = ?
-                    WHERE id = ?
+                    SET additional_amounts = %s, added_percents = %s
+                    WHERE id = %s
                     """, (updated_additional_amount, new_added_percents,contract_id,))
 
             source_conn.commit()
@@ -93,7 +93,7 @@ class AddMoney(QWidget):
 
 
 
-            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
 
@@ -101,7 +101,7 @@ class AddMoney(QWidget):
             cursor.execute("""
                 INSERT INTO given_and_additional_database (
                     contract_id, date_of_outflow, name_surname, amount, status
-                ) VALUES (?, ?, ?, ?, ?)
+                ) VALUES (%s, %s, %s, %s, %s)
             """, (
                 self.contract_id_box.text(),
                 date_of_addition,
@@ -113,14 +113,14 @@ class AddMoney(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             # Insert in outflow_order database
             cursor.execute("""
                             INSERT INTO outflow_order (
                                 contract_id, date, name_surname, tel_number, amount, status
-                            ) VALUES (?, ?, ?, ?, ?, ?)
+                            ) VALUES (%s, %s, %s, %s, %s, %s)
                         """, (
                 self.contract_id_box.text(),
                 date_of_addition,
@@ -133,7 +133,7 @@ class AddMoney(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             # Insert in outflow_in_registry database
@@ -141,7 +141,7 @@ class AddMoney(QWidget):
                             INSERT INTO outflow_in_registry (
                                 contract_id, date_of_C_O, name_surname, tel_number, id_number, item_name, model, IMEI,
                                 given_money, date_of_addition, additional_amount, status
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         """, (
                 self.contract_id_box.text(),
                 contract_open_date,

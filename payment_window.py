@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from utils import get_conn
 from datetime import datetime
 import win32com.client
 from docx import Document
@@ -66,11 +66,11 @@ class PaymentWindow(QWidget):
 
         try:
             # Step 1: Get the id_number from the original active_contracts table
-            source_conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            source_conn = get_conn()
             source_cursor = source_conn.cursor()
             source_cursor.execute("""SELECT id_number, name_surname, principal_paid, date, item_name, imei, 
                                         tel_number, model, given_money, paid_percents 
-                                        FROM active_contracts WHERE id = ?""", (contract_id,))
+                                        FROM active_contracts WHERE id = %s""", (contract_id,))
             result = source_cursor.fetchone()
             source_conn.close()
 
@@ -91,28 +91,28 @@ class PaymentWindow(QWidget):
 
 
             if self.payed_percent_amount.text().strip():
-                conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 new_percent_amount = old_percent_paid + int(self.payed_percent_amount.text())
 
                 cursor.execute("""
                                     UPDATE active_contracts
-                                    SET paid_percents = ?
-                                    WHERE id = ?
+                                    SET paid_percents = %s
+                                    WHERE id = %s
                                 """, (new_percent_amount, contract_id))
 
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                                INSERT INTO paid_percent_amount (
                                                    contract_id, date_of_C_O, name_surname, tel_number, id_number, item_name,
                                                    model, IMEI, date_of_percent_addition, paid_amount, status, set_date
-                                                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                                   ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                                            """, (
                     contract_id,
                     date_of_c_o,
@@ -130,13 +130,13 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                     INSERT INTO paid_principle_and_paid_percentage_database (
                                     contract_id, date_of_inflow, name_surname, amount, status
-                                    ) VALUES (?, ?, ?, ?, ?)
+                                    ) VALUES (%s, %s, %s, %s, %s)
                                """, (
                     contract_id,
                     payment_date,
@@ -147,14 +147,14 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                       INSERT INTO inflow_order_only_percent_amount (
                                       contract_id, payment_date, name_surname, percent_paid_amount, sum_of_money_paid, 
                                       set_date
-                                      ) VALUES (?, ?, ?, ?, ?, ?)
+                                      ) VALUES (%s, %s, %s, %s, %s, %s)
                                """, (
                     contract_id,
                     payment_date,
@@ -171,28 +171,28 @@ class PaymentWindow(QWidget):
 
 
             if self.amount_input.text().strip():
-                conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 new_principal_amount = old_principal_paid + int(self.amount_input.text())
 
                 cursor.execute("""
                     UPDATE active_contracts
-                    SET principal_paid = ?
-                    WHERE id = ?
+                    SET principal_paid = %s
+                    WHERE id = %s
                 """, (new_principal_amount, contract_id))
 
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                 INSERT INTO paid_principle_registry (
                                     contract_id, date_of_C_O, name_surname, tel_number, id_number, item_name,
                                     model, IMEI, given_money, date_of_payment, payment_amount, status
-                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """, (
                     contract_id,
                     date_of_c_o,
@@ -210,13 +210,13 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                                INSERT INTO paid_principle_and_paid_percentage_database (
                                                    contract_id, date_of_inflow, name_surname, amount, status
-                                                   ) VALUES (?, ?, ?, ?, ?)
+                                                   ) VALUES (%s, %s, %s, %s, %s)
                                            """, (
                     contract_id,
                     payment_date,
@@ -227,13 +227,13 @@ class PaymentWindow(QWidget):
                 conn.commit()
                 conn.close()
 
-                conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                 INSERT INTO inflow_order_only_principal_amount (
                                 contract_id, payment_date, name_surname, principle_paid_amount, sum_of_money_paid
-                                ) VALUES (?, ?, ?, ?, ?)
+                                ) VALUES (%s, %s, %s, %s, %s)
                     """, (
                     contract_id,
                     payment_date,
@@ -249,14 +249,14 @@ class PaymentWindow(QWidget):
 
             if self.payed_percent_amount.text().strip() and self.amount_input.text().strip():
 
-                conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
+                conn = get_conn()
                 cursor = conn.cursor()
 
                 cursor.execute("""
                                                        INSERT INTO inflow_order_both (
                                                        contract_id, payment_date, name_surname, principle_paid_amount,
                                                        percent_paid_amount
-                                                       ) VALUES (?, ?, ?, ?, ?)
+                                                       ) VALUES (%s, %s, %s, %s, %s)
                                                """, (
                     contract_id,
                     payment_date,

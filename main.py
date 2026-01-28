@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from utils import get_conn
 import sys
 
 from PyQt5.QtCore import QSize, Qt, QDateTime
@@ -210,12 +210,12 @@ def init_user_db():
     base_folder = os.path.dirname(sys.argv[0])
     db_path = os.path.join(base_folder, "Credentials", "users.db")
 
-    conn = sqlite3.connect(db_path)
+    conn = get_conn()
     cursor = conn.cursor()
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         username TEXT,
         password TEXT,
         name_of_user TEXT,
