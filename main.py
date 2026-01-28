@@ -215,7 +215,7 @@ def init_user_db():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id STRING PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         username TEXT,
         password TEXT,
         name_of_user TEXT,
