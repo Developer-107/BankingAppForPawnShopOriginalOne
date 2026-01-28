@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 from PyQt5.QtWidgets import (
     QWidget, QGridLayout, QLabel, QLineEdit, QPushButton,
     QMessageBox, QHBoxLayout
@@ -64,9 +64,9 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
+        conn = get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM paid_principle_registry WHERE unique_id = ?", (self.record_id,))
+        cursor.execute("SELECT * FROM paid_principle_registry WHERE unique_id = %s", (self.record_id,))
         row = cursor.fetchone()
         conn.close()
 
@@ -80,12 +80,12 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
 
     def update_record(self):
         try:
-            conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE paid_principle_registry SET
-                    payment_amount = ?
-                WHERE unique_id = ?
+                    payment_amount = %s
+                WHERE unique_id = %s
             """, (
                 self.payment_amount_box.text(),
                 self.record_id
@@ -93,12 +93,12 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
-                                amount = ?
-                            WHERE contract_id = ? and date_of_inflow = ? and status = ?
+                                amount = %s
+                            WHERE contract_id = %s and date_of_inflow = %s and status = %s
                         """, (
                 self.payment_amount_box.text(),
                 self.contract_id_box.text(),
@@ -108,12 +108,12 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                                 UPDATE inflow_order_only_principal_amount SET
-                                principle_paid_amount = ?, sum_of_money_paid = ?
-                                WHERE contract_id = ? and payment_date = ?
+                                principle_paid_amount = %s, sum_of_money_paid = %s
+                                WHERE contract_id = %s and payment_date = %s
                            """, (
                 self.payment_amount_box.text(),
                 self.payment_amount_box.text(),
@@ -123,12 +123,12 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                                UPDATE inflow_order_both SET
-                               principle_paid_amount = ?
-                               WHERE contract_id = ? and payment_date = ? and percent_paid_amount = ?
+                               principle_paid_amount = %s
+                               WHERE contract_id = %s and payment_date = %s and percent_paid_amount = %s
                            """, (
                 self.payment_amount_box.text(),
                 self.contract_id_box.text(),
@@ -138,10 +138,10 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT principal_paid FROM active_contracts WHERE id = ?
+                SELECT principal_paid FROM active_contracts WHERE id = %s
             """, (self.contract_id_box.text(),))
             row = cursor.fetchone()
             conn.close()
@@ -155,12 +155,12 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             principal_paid_new_amount = principal_paid_before + difference_between_changed_and_before
 
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE active_contracts SET
-                                principal_paid = ?
-                            WHERE id = ?
+                                principal_paid = %s
+                            WHERE id = %s
                         """, (
                 principal_paid_new_amount,
                 self.contract_id_box.text(),

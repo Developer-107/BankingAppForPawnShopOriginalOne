@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 import sys
 import time
 from datetime import datetime, timedelta
@@ -770,13 +770,13 @@ class ActiveContracts(QWidget):
         imei_blk_list = self.model.data(self.model.index(row, self.model.fieldIndex("imei")))
 
         try:
-            conn = sqlite3.connect(resource_path("Databases/black_list.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                     INSERT INTO black_list (
                         name_surname, id_number, tel_number, imei
-                    ) VALUES (?, ?, ?, ?)
+                    ) VALUES (%s, %s, %s, %s)
                 """, (
                 name_surname_to_blk_list,
                 id_number_blk_list,
@@ -812,12 +812,12 @@ class ActiveContracts(QWidget):
 
     # Initializing databases for money control window tables
     def initialize_contracts_database(self):
-        conn = sqlite3.connect(resource_path("Databases/contracts.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS contracts (
-                          unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          unique_id SERIAL PRIMARY KEY,
                           contract_id INTEGER,
                           contract_open_date TEXT,
                           first_percent_payment_date TEXT,
@@ -831,8 +831,8 @@ class ActiveContracts(QWidget):
                           comment TEXT,
                           given_money INTEGER,
                           percent_day_quantity INTEGER,
-                          first_added_percent REAL,
-                          sum_of_principle_and_percent REAL GENERATED ALWAYS AS (given_money + first_added_percent) STORED,
+                          first_added_percent NUMERIC,
+                          sum_of_principle_and_percent NUMERIC GENERATED ALWAYS AS (given_money + first_added_percent) STORED,
                           office_mob_number TEXT
                       )
                   """)
@@ -870,7 +870,7 @@ class ActiveContracts(QWidget):
 
 
     def initialize_closed_contracts_database(self):
-        conn = sqlite3.connect(resource_path("Databases/closed_contracts.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -885,13 +885,13 @@ class ActiveContracts(QWidget):
                           IMEI TEXT,
                           trusted_person TEXT,
                           comment TEXT,
-                          percent REAL,
+                          percent NUMERIC,
                           percent_day_quantity INTEGER,
                           given_money INTEGER,
                           additional_money INTEGER,
-                          paid_principle REAL,
-                          added_percents REAL,
-                          paid_percents REAL,
+                          paid_principle NUMERIC,
+                          added_percents NUMERIC,
+                          paid_percents NUMERIC,
                           status TEXT,
                           date_of_closing TEXT
                       )
@@ -902,12 +902,12 @@ class ActiveContracts(QWidget):
 
 
     def initialize_active_contracts_database(self):
-        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS active_contracts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 date TEXT,
                 days_after_C_O INTEGER NOT NULL DEFAULT 0,
                 name_surname TEXT,
@@ -919,17 +919,17 @@ class ActiveContracts(QWidget):
                 type TEXT,
                 trusted_person TEXT,
                 comment TEXT,
-                given_money REAL NOT NULL DEFAULT 0,
-                percent REAL NOT NULL DEFAULT 0,
+                given_money NUMERIC NOT NULL DEFAULT 0,
+                percent NUMERIC NOT NULL DEFAULT 0,
                 day_quantity INTEGER NOT NULL DEFAULT 0,
-                additional_amounts REAL NOT NULL DEFAULT 0,
-                principal_paid REAL NOT NULL DEFAULT 0,
-                principal_should_be_paid REAL GENERATED ALWAYS AS (
+                additional_amounts NUMERIC NOT NULL DEFAULT 0,
+                principal_paid NUMERIC NOT NULL DEFAULT 0,
+                principal_should_be_paid NUMERIC GENERATED ALWAYS AS (
                     given_money + additional_amounts - principal_paid
                 ) STORED,
-                added_percents REAL NOT NULL DEFAULT 0,
-                paid_percents REAL NOT NULL DEFAULT 0,
-                percent_should_be_paid REAL GENERATED ALWAYS AS (
+                added_percents NUMERIC NOT NULL DEFAULT 0,
+                paid_percents NUMERIC NOT NULL DEFAULT 0,
+                percent_should_be_paid NUMERIC GENERATED ALWAYS AS (
                     added_percents - paid_percents
                 ) STORED,
                 is_visible TEXT DEFAULT 'აქტიური'
@@ -973,9 +973,9 @@ class ActiveContracts(QWidget):
 
     @staticmethod
     def get_already_added_times(contract_id):
-        conn_1 = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
+        conn_1 = get_conn()
         cursor_1 = conn_1.cursor()
-        cursor_1.execute("SELECT COUNT(*) FROM adding_percent_amount WHERE contract_id = ?",
+        cursor_1.execute("SELECT COUNT(*) FROM adding_percent_amount WHERE contract_id = %s",
                          (contract_id,))
         result = cursor_1.fetchone()[0]
         conn_1.close()
@@ -986,7 +986,7 @@ class ActiveContracts(QWidget):
         today = QDate.currentDate()
 
         # Open DB connection (adjust DB path as needed)
-        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM active_contracts_view")  # Adjust table name & columns accordingly
@@ -1038,7 +1038,7 @@ class ActiveContracts(QWidget):
                         new_added_percents = added_percents
                         status_for_added_percent = "დარიცხული პროცენტი"
 
-                        conn2 = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
+                        conn2 = get_conn()
                         cursor2 = conn2.cursor()
 
                         for i in range(additions_needed):
@@ -1048,7 +1048,7 @@ class ActiveContracts(QWidget):
                                     contract_id, date_of_C_O, name_surname, id_number,
                                     tel_number, item_name, model, IMEI,
                                     date_of_percent_addition, percent_amount, status
-                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """, (
                                 contract_id, full_date_str, name_surname, id_number,
                                 tel_number, item_name, model, imei_sn,
@@ -1068,28 +1068,28 @@ class ActiveContracts(QWidget):
 
 
     def update_days_and_percents(self, contract_id, days_after, new_added_percents):
-        conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+        conn = get_conn()
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE active_contracts
-            SET days_after_C_O = ?, added_percents = ?
-            WHERE id = ?
+            SET days_after_C_O = %s, added_percents = %s
+            WHERE id = %s
         """, (days_after, new_added_percents, contract_id))
         conn.commit()
         conn.close()
 
 
     def initialize_given_and_additional_database(self):
-        conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS given_and_additional_database (
-                          unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          unique_id SERIAL PRIMARY KEY,
                           contract_id INTEGER,
                           date_of_outflow TEXT,
                           name_surname TEXT,
-                          amount REAL,
+                          amount NUMERIC,
                           status TEXT
                       )
                   """)
@@ -1099,16 +1099,16 @@ class ActiveContracts(QWidget):
 
 
     def initialize_paid_principle_and_paid_percentage_database(self):
-        conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS paid_principle_and_paid_percentage_database (
-                          unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          unique_id SERIAL PRIMARY KEY,
                           contract_id INTEGER,
                           date_of_inflow TEXT,
                           name_surname TEXT,
-                          amount REAL,
+                          amount NUMERIC,
                           status TEXT
                       )
                   """)
@@ -1117,12 +1117,12 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_paid_principle_registry_database(self):
-        conn = sqlite3.connect(resource_path("Databases/paid_principle_registry.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS paid_principle_registry (
-                          unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          unique_id SERIAL PRIMARY KEY,
                           contract_id INTEGER,
                           date_of_C_O TEXT,
                           name_surname TEXT,
@@ -1133,7 +1133,7 @@ class ActiveContracts(QWidget):
                           IMEI TEXT,
                           given_money INTEGER,
                           date_of_payment TEXT,
-                          payment_amount REAL,
+                          payment_amount NUMERIC,
                           status TEXT
                       )
                   """)
@@ -1143,16 +1143,16 @@ class ActiveContracts(QWidget):
 
 
     def initialize_outflow_order_database(self):
-        conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS outflow_order (
-                          unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          unique_id SERIAL PRIMARY KEY,
                           contract_id INTEGER,
                           name_surname TEXT,
                           tel_number TEXT,
-                          amount REAL,
+                          amount NUMERIC,
                           date TEXT,
                           status TEXT
                       )
@@ -1163,12 +1163,12 @@ class ActiveContracts(QWidget):
 
 
     def initialize_outflow_in_registry_database(self):
-        conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS outflow_in_registry (
-                          unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          unique_id SERIAL PRIMARY KEY,
                           contract_id INTEGER,
                           date_of_C_O TEXT,
                           name_surname TEXT,
@@ -1188,12 +1188,12 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_adding_percent_amount_database(self):
-        conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS adding_percent_amount (
-                                  unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  unique_id SERIAL PRIMARY KEY,
                                   contract_id INTEGER,
                                   date_of_C_O TEXT,
                                   name_surname TEXT,
@@ -1213,12 +1213,12 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_paid_percent_amount_database(self):
-        conn = sqlite3.connect(resource_path("Databases/paid_percent_amount.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS paid_percent_amount (
-                                  unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  unique_id INTEGER SERIAL KEY,
                                   contract_id INTEGER,
                                   date_of_C_O TEXT,
                                   name_surname TEXT,
@@ -1239,17 +1239,17 @@ class ActiveContracts(QWidget):
 
 
     def initialize_inflow_order_only_principal_amount_database(self):
-        conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS inflow_order_only_principal_amount (
-                                  unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  unique_id SERIAL PRIMARY KEY,
                                   contract_id INTEGER,
                                   name_surname TEXT,
-                                  principle_paid_amount REAL,
+                                  principle_paid_amount NUMERIC,
                                   payment_date TEXT,
-                                  sum_of_money_paid REAL
+                                  sum_of_money_paid NUMERIC
                               )
                           """)
 
@@ -1258,18 +1258,18 @@ class ActiveContracts(QWidget):
 
 
     def initialize_inflow_order_only_percent_amount_database(self):
-        conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS inflow_order_only_percent_amount (
-                                  unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  unique_id SERIAL PRIMARY KEY,
                                   contract_id INTEGER,
                                   name_surname TEXT,
                                   payment_date TEXT,
                                   set_date TEXT,
                                   percent_paid_amount INTEGER,
-                                  sum_of_money_paid REAL
+                                  sum_of_money_paid NUMERIC
                               )
                           """)
 
@@ -1278,12 +1278,12 @@ class ActiveContracts(QWidget):
 
 
     def initialize_blk_list_database(self):
-        conn = sqlite3.connect(resource_path("Databases/black_list.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                    CREATE TABLE IF NOT EXISTS black_list (
-                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       id SERIAL PRIMARY KEY,
                        name_surname TEXT,
                        id_number TEXT,
                        tel_number TEXT,
@@ -1295,18 +1295,18 @@ class ActiveContracts(QWidget):
         conn.close()
 
     def initialize_inflow_order_both_database(self):
-        conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
+        conn = get_conn()
         cursor = conn.cursor()
 
         cursor.execute("""
                 CREATE TABLE IF NOT EXISTS inflow_order_both (
-                    unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    unique_id SERIAL PRIMARY KEY,
                     contract_id INTEGER,
                     name_surname TEXT,
                     payment_date TEXT,
-                    principle_paid_amount REAL NOT NULL DEFAULT 0,
-                    percent_paid_amount REAL NOT NULL DEFAULT 0,
-                    sum_of_money_paid REAL GENERATED ALWAYS AS (
+                    principle_paid_amount NUMERIC NOT NULL DEFAULT 0,
+                    percent_paid_amount NUMERIC NOT NULL DEFAULT 0,
+                    sum_of_money_paid NUMERIC GENERATED ALWAYS AS (
                         principle_paid_amount + percent_paid_amount
                     ) STORED
                 )

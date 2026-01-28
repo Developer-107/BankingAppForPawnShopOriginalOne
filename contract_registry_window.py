@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from utils import get_conn
 import tempfile
 from datetime import datetime
 import win32com.client
@@ -1557,32 +1557,32 @@ class ContractRegistry(QWidget):
             model.removeRow(row_index)
 
             # 2. Delete from given_and_additional_database
-            conn_given = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
+            conn_given = get_conn()
             cur_given = conn_given.cursor()
             cur_given.execute("""
                     DELETE FROM given_and_additional_database
-                    WHERE contract_id = ? AND amount = ? AND status = ? AND date_of_outflow = ?
+                    WHERE contract_id = %s AND amount = %s AND status = %s AND date_of_outflow = %s
                 """, (contract_id, amount, status, date_of_addition))
             conn_given.commit()
             conn_given.close()
 
             # 3. Delete from outflow_order
-            conn_outflow = sqlite3.connect(resource_path("Databases/outflow_order.db"))
+            conn_outflow = get_conn()
             cur_outflow = conn_outflow.cursor()
             cur_outflow.execute("""
                     DELETE FROM outflow_order
-                    WHERE contract_id = ? AND amount = ? AND status = ? AND date = ?
+                    WHERE contract_id = %s AND amount = %s AND status = %s AND date = %s
                 """, (contract_id, amount, status, date_of_addition))
             conn_outflow.commit()
             conn_outflow.close()
 
             # 4. Delete amount from active_contracts database
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
             # Fetch old value
             cursor.execute("""
-                            SELECT additional_amounts, given_money, percent FROM active_contracts WHERE id = ?
+                            SELECT additional_amounts, given_money, percent FROM active_contracts WHERE id = %s
                         """, (contract_id,))
             row = cursor.fetchone()
 
@@ -1598,9 +1598,9 @@ class ContractRegistry(QWidget):
 
             cursor.execute("""
                                                                 UPDATE active_contracts SET
-                                                                    additional_amounts = ?,
-                                                                    added_percents = ?
-                                                                WHERE id = ?
+                                                                    additional_amounts = %s,
+                                                                    added_percents = %s
+                                                                WHERE id = %s
                                                             """, (
                 new_additional_amounts,
                 new_added_percent,
@@ -1731,10 +1731,10 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model_page2.removeRow(row_index)
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
-            cursor.execute("SELECT principal_paid FROM active_contracts WHERE id = ?", (contract_id_page2,))
+            cursor.execute("SELECT principal_paid FROM active_contracts WHERE id = %s", (contract_id_page2,))
             row = cursor.fetchone()
             conn.close()
 
@@ -1743,13 +1743,13 @@ class ContractRegistry(QWidget):
 
             new_principles_amount = paid_principles_before - principle_page2
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                               UPDATE active_contracts SET
-                                principal_paid = ?
-                              WHERE id = ?
+                                principal_paid = %s
+                              WHERE id = %s
                           """, (
                 new_principles_amount,
                 contract_id_page2,
@@ -1758,32 +1758,32 @@ class ContractRegistry(QWidget):
             conn.close()
 
             # Deleting from paid_principle_and_paid_percentage_database
-            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                                             DELETE FROM paid_principle_and_paid_percentage_database
-                                            WHERE contract_id = ? AND status = ? AND date_of_inflow = ?
+                                            WHERE contract_id = %s AND status = %s AND date_of_inflow = %s
                                         """, (contract_id_page2, status_of_payment_page2, date_of_payment_page2))
             conn.commit()
             conn.close()
 
             # Deleting from inflow_order_only_principal_amount
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_principal_amount.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                                DELETE FROM inflow_order_only_principal_amount
-                               WHERE contract_id = ? AND payment_date = ?
+                               WHERE contract_id = %s AND payment_date = %s
                               """,
                               (contract_id_page2, date_of_payment_page2))
             conn.commit()
             conn.close()
 
             # Deleting from inflow_order_in_both
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                                            DELETE FROM inflow_order_both
-                                           WHERE contract_id = ? AND payment_date = ? AND percent_paid_amount = ?
+                                           WHERE contract_id = %s AND payment_date = %s AND percent_paid_amount = %s
                                           """,
                               (contract_id_page2, date_of_payment_page2, 0))
             conn.commit()
@@ -1903,10 +1903,10 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model_3_1.removeRow(row_index)
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
-            cursor.execute("SELECT added_percents FROM active_contracts WHERE id = ?", (contract_id_page3,))
+            cursor.execute("SELECT added_percents FROM active_contracts WHERE id = %s", (contract_id_page3,))
             row = cursor.fetchone()
             conn.close()
 
@@ -1918,13 +1918,13 @@ class ContractRegistry(QWidget):
 
             new_percents_amount = added_percents_before - percent_amount_page3
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                                         UPDATE active_contracts SET
-                                            added_percents = ?
-                                        WHERE id = ?
+                                            added_percents = %s
+                                        WHERE id = %s
                                     """, (
                 new_percents_amount,
                 contract_id_page3,
@@ -2067,10 +2067,10 @@ class ContractRegistry(QWidget):
         if reply == QMessageBox.Yes:
             model4.removeRow(row_index)
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
-            cursor.execute("SELECT paid_percents FROM active_contracts WHERE id = ?", (contract_id,))
+            cursor.execute("SELECT paid_percents FROM active_contracts WHERE id = %s", (contract_id,))
             row = cursor.fetchone()
             conn.close()
 
@@ -2079,13 +2079,13 @@ class ContractRegistry(QWidget):
 
             new_percents_amount = paid_percents_before - paid_percent_amount
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                                           UPDATE active_contracts SET
-                                            paid_percents = ?
-                                          WHERE id = ?
+                                            paid_percents = %s
+                                          WHERE id = %s
                                       """, (
                 new_percents_amount,
                 contract_id,
@@ -2093,32 +2093,32 @@ class ContractRegistry(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                                    DELETE FROM paid_principle_and_paid_percentage_database
-                                   WHERE contract_id = ? AND status = ? AND date_of_inflow = ?
+                                   WHERE contract_id = %s AND status = %s AND date_of_inflow = %s
                                """,
                               (contract_id, status, percent_payment_date))
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_only_percent_amount.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                                                DELETE FROM inflow_order_only_percent_amount
-                                               WHERE contract_id = ? AND payment_date = ?
+                                               WHERE contract_id = %s AND payment_date = %s
                                            """,
                               (contract_id, percent_payment_date))
             conn.commit()
             conn.close()
 
             # Deleting from inflow_order_in_both
-            conn = sqlite3.connect(resource_path("Databases/inflow_order_both.db"))
+            conn = get_conn()
             cur_given = conn.cursor()
             cur_given.execute("""
                                   DELETE FROM inflow_order_both
-                                  WHERE contract_id = ? AND payment_date = ? AND principle_paid_amount = ?
+                                  WHERE contract_id = %s AND payment_date = %s AND principle_paid_amount = %s
                               """,
                               (contract_id, percent_payment_date, 0))
             conn.commit()

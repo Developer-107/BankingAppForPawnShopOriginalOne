@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 from PyQt5.QtWidgets import (
     QWidget, QGridLayout, QLabel, QLineEdit, QPushButton,
     QMessageBox, QHBoxLayout
@@ -63,9 +63,9 @@ class EditAddingPercentWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
+        conn = get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM adding_percent_amount WHERE unique_id = ?", (self.record_id,))
+        cursor.execute("SELECT * FROM adding_percent_amount WHERE unique_id = %s", (self.record_id,))
         row = cursor.fetchone()
         conn.close()
 
@@ -83,12 +83,12 @@ class EditAddingPercentWindow(QWidget):
         try:
             new_amount = float(self.percent_amount_box.text())
 
-            conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE adding_percent_amount SET
-                    percent_amount = ?, date_of_percent_addition = ?
-                WHERE contract_id = ? AND date_of_percent_addition = ?
+                    percent_amount = %s, date_of_percent_addition = %s
+                WHERE contract_id = %s AND date_of_percent_addition = %s
             """, (
                 new_amount,
                 self.percent_addition_date_box.text(),
@@ -98,10 +98,10 @@ class EditAddingPercentWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
-            cursor.execute("SELECT added_percents FROM active_contracts WHERE id = ?", (self.contract_id_box.text(),))
+            cursor.execute("SELECT added_percents FROM active_contracts WHERE id = %s", (self.contract_id_box.text(),))
             row = cursor.fetchone()
             conn.close()
 
@@ -113,13 +113,13 @@ class EditAddingPercentWindow(QWidget):
             difference_between_last_and_new_amounts = -self.amount_before_editing + new_amount
             new_percents_amount = added_percents_before + difference_between_last_and_new_amounts
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                             UPDATE active_contracts SET
-                                added_percents = ?
-                            WHERE id = ?
+                                added_percents = %s
+                            WHERE id = %s
                         """, (
                 new_percents_amount,
                 self.contract_id_box.text(),

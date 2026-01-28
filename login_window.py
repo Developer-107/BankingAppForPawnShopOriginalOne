@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMessageBox
-import sqlite3
+from utils import get_conn
 
 from utils import resource_path
 
@@ -37,9 +37,9 @@ class LoginWindow(QWidget):
         username = self.username_input.text()
         password = self.password_input.text()
 
-        conn = sqlite3.connect(resource_path("Credentials/users.db"))
+        conn = get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT role, name_of_user, organisation, id_number_of_user FROM users WHERE username=? AND password=?", (username, password))
+        cursor.execute("SELECT role, name_of_user, organisation, id_number_of_user FROM users WHERE username=%s AND password=%s", (username, password))
         result = cursor.fetchone()
         conn.close()
 

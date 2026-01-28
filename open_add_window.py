@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from utils import get_conn
 from datetime import datetime
 import win32com.client
 from docx import Document
@@ -165,7 +165,7 @@ class AddWindow(QWidget):
 
     def load_name_list_from_db(self):
         try:
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("SELECT DISTINCT name_surname FROM active_contracts")
             names = [row[0] for row in cursor.fetchall()]
@@ -182,11 +182,11 @@ class AddWindow(QWidget):
         if not name:
             return
         try:
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT id_number FROM active_contracts 
-                WHERE name_surname = ? 
+                WHERE name_surname = %s 
                 ORDER BY date DESC LIMIT 1
             """, (name,))
             result = cursor.fetchone()
@@ -201,7 +201,7 @@ class AddWindow(QWidget):
 
     def save_to_sql(self):
         try:
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -210,7 +210,7 @@ class AddWindow(QWidget):
                     item_name, model, imei, type,
                     trusted_person, comment, given_money,
                     percent, day_quantity, added_percents
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 self.take_date_box.text(),
                 self.name_surname_box.text(),
@@ -236,13 +236,13 @@ class AddWindow(QWidget):
 
             status_for_given_principle = "გაცემული ძირი თანხა"
 
-            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                             INSERT INTO given_and_additional_database (
                                 contract_id, date_of_outflow, name_surname, amount, status
-                            ) VALUES (?, ?, ?, ?, ?)
+                            ) VALUES (%s, %s, %s, %s, %s)
                         """, (
                 contract_id,
                 self.take_date_box.text(),
@@ -260,7 +260,7 @@ class AddWindow(QWidget):
                 .toString("yyyy-MM-dd HH:mm:ss")
             office_mob_number = "599 222 918"
 
-            conn = sqlite3.connect(resource_path("Databases/contracts.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
@@ -268,7 +268,7 @@ class AddWindow(QWidget):
                                 contract_id, contract_open_date, first_percent_payment_date, name_surname, id_number, 
                                 tel_number, item_name, model, IMEI, given_money,percent_day_quantity, 
                                 first_added_percent, office_mob_number, comment, trusted_person
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         """, (
                 contract_id,
                 self.take_date_box.text(),
@@ -290,13 +290,13 @@ class AddWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                                        INSERT INTO outflow_order (
                                            contract_id, date, name_surname, tel_number, amount, status
-                                       ) VALUES (?, ?, ?, ?, ?, ?)
+                                       ) VALUES (%s, %s, %s, %s, %s, %s)
                                    """, (
                 contract_id,
                 self.take_date_box.text(),
@@ -311,14 +311,14 @@ class AddWindow(QWidget):
 
             status_for_added_percent = "დარიცხული პროცენტი"
 
-            conn = sqlite3.connect(resource_path("Databases/adding_percent_amount.db"))  # Make sure this matches your DB
+            conn = get_conn()
             cursor = conn.cursor()
 
             cursor.execute("""
                             INSERT INTO adding_percent_amount (
                                     contract_id, date_of_C_O, name_surname, id_number, 
                                     tel_number, item_name, model, IMEI, date_of_percent_addition, percent_amount, status
-                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """, (
                 contract_id,
                 self.take_date_box.text(),

@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 from PyQt5.QtWidgets import (
     QWidget, QGridLayout, QLabel, QLineEdit, QPushButton,
     QMessageBox, QHBoxLayout
@@ -66,9 +66,9 @@ class EditRegistryOutflowWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))
+        conn = get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM outflow_in_registry WHERE unique_id = ?", (self.record_id,))
+        cursor.execute("SELECT * FROM outflow_in_registry WHERE unique_id = %s", (self.record_id,))
         row = cursor.fetchone()
         conn.close()
 
@@ -84,16 +84,16 @@ class EditRegistryOutflowWindow(QWidget):
 
     def update_record(self):
         try:
-            conn = sqlite3.connect(resource_path("Databases/outflow_in_registry.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE outflow_in_registry SET
-                    date_of_addition = ?,
-                    additional_amount = ?,
-                    name_surname = ?,
-                    id_number = ?,
-                    status = ?
-                WHERE unique_id = ?
+                    date_of_addition = %s,
+                    additional_amount = %s,
+                    name_surname = %s,
+                    id_number = %s,
+                    status = %s
+                WHERE unique_id = %s
             """, (
                 self.date_box.text(),
                 self.amount_box.text(),
@@ -105,12 +105,12 @@ class EditRegistryOutflowWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/given_and_additional_database.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                             UPDATE given_and_additional_database SET
-                                amount = ?
-                            WHERE contract_id = ? and status = ? and amount = ? and date_of_outflow = ?
+                                amount = %s
+                            WHERE contract_id = %s and status = %s and amount = %s and date_of_outflow = %s
                         """, (
                 self.amount_box.text(),
                 self.contract_id,
@@ -121,12 +121,12 @@ class EditRegistryOutflowWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/outflow_order.db"))
+            conn = get_conn()
             cursor = conn.cursor()
             cursor.execute("""
                                         UPDATE outflow_order SET
-                                            amount = ?
-                                        WHERE contract_id = ? and amount = ? and status = ? and date = ?
+                                            amount = %s
+                                        WHERE contract_id = %s and amount = %s and status = %s and date = %s
                                     """, (
                 self.amount_box.text(),
                 self.contract_id,
@@ -137,12 +137,12 @@ class EditRegistryOutflowWindow(QWidget):
             conn.commit()
             conn.close()
 
-            conn = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn = get_conn()
             cursor = conn.cursor()
 
             # Fetch old value
             cursor.execute("""
-                SELECT additional_amounts, given_money, percent FROM active_contracts WHERE id = ?
+                SELECT additional_amounts, given_money, percent FROM active_contracts WHERE id = %s
             """, (self.contract_id,))
             row = cursor.fetchone()
 
@@ -159,9 +159,9 @@ class EditRegistryOutflowWindow(QWidget):
 
             cursor.execute("""
                                                     UPDATE active_contracts SET
-                                                        additional_amounts = ?,
-                                                        added_percents = ?
-                                                    WHERE id = ?
+                                                        additional_amounts = %s,
+                                                        added_percents = %s
+                                                    WHERE id = %s
                                                 """, (
                 new_additional_amounts,
                 new_added_percent,

@@ -1,4 +1,4 @@
-import sqlite3
+from utils import get_conn
 import sys
 from datetime import datetime, timedelta
 import win32com.client
@@ -339,19 +339,19 @@ class ClosedContracts(QWidget):
 
         try:
             # 1. Delete from closed_contracts DB
-            conn_closed = sqlite3.connect(resource_path("Databases/closed_contracts.db"))
+            conn_closed = get_conn()
             cursor_closed = conn_closed.cursor()
-            cursor_closed.execute("DELETE FROM closed_contracts WHERE id = ?", (contract_id,))
+            cursor_closed.execute("DELETE FROM closed_contracts WHERE id = %s", (contract_id,))
             conn_closed.commit()
             conn_closed.close()
 
             # 2. Update is_visible = 'აქტიური' in active_contracts DB
-            conn_active = sqlite3.connect(resource_path("Databases/active_contracts.db"))
+            conn_active = get_conn()
             cursor_active = conn_active.cursor()
             cursor_active.execute("""
                 UPDATE active_contracts
                 SET is_visible = 'აქტიური'
-                WHERE id = ?
+                WHERE id = %s
             """, (contract_id,))
             conn_active.commit()
             conn_active.close()
