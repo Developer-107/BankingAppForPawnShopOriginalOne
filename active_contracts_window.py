@@ -1216,9 +1216,8 @@ class ActiveContracts(QWidget):
         conn = get_conn()
         cursor = conn.cursor()
 
-        cursor.execute("""
-                              CREATE TABLE IF NOT EXISTS paid_percent_amount (
-                                  unique_id INTEGER SERIAL KEY,
+        cursor.execute(""" CREATE TABLE IF NOT EXISTS paid_percent_amount (
+                                  unique_id SERIAL PRIMARY KEY,
                                   contract_id INTEGER,
                                   date_of_C_O TEXT,
                                   name_surname TEXT,
