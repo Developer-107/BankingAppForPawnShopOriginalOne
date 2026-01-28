@@ -25,6 +25,12 @@ class LoginWindow(QWidget):
         login_button = QPushButton("შესვლა")
         login_button.clicked.connect(self.check_login)
 
+        login_button.setDefault(True)
+        login_button.setAutoDefault(True)
+
+        self.username_input.returnPressed.connect(self.check_login)
+        self.password_input.returnPressed.connect(self.check_login)
+
         layout = QVBoxLayout()
         layout.addWidget(QLabel("მომხმარებელი"))
         layout.addWidget(self.username_input)
