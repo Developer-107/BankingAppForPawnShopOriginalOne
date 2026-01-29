@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QWidget, QTableView, QGridLayout, QToolButton, QGrou
 
 from edit_blk_list_window import EditBlkListWindow
 from add_blk_list_window import AddBlkListWindow
-from utils import resource_path
+from utils import resource_path, get_qt_db
 
 
 class ClientsInTheBlackList(QWidget):
@@ -27,10 +27,7 @@ class ClientsInTheBlackList(QWidget):
 
         # --------------------------------------------Table-----------------------------------------------------
 
-        self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName(resource_path("Databases/black_list.db"))
-        if not self.db.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
+        self.db = get_qt_db()
 
         self.table = QTableView()
         self.model = QSqlTableModel(self, self.db)

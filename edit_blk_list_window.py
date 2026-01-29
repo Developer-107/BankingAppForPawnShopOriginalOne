@@ -1,6 +1,5 @@
 from utils import get_conn
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QPushButton, QMessageBox
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
 from utils import resource_path

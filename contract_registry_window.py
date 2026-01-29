@@ -1,5 +1,5 @@
 import os
-from utils import get_conn
+from utils import get_conn, get_qt_db
 import tempfile
 from datetime import datetime
 import win32com.client
@@ -189,13 +189,10 @@ class ContractRegistry(QWidget):
 
 
 
-        self.db2 = QSqlDatabase.addDatabase("QSQLITE", "outflow_in_registry")
-        self.db2.setDatabaseName(resource_path("Databases/outflow_in_registry.db"))
-        if not self.db2.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
+        self.db = get_qt_db()
 
         self.table2 = QTableView()
-        self.model2 = QSqlTableModel(self, self.db2)
+        self.model2 = QSqlTableModel(self, self.db)
         self.model2.setTable("outflow_in_registry")
         self.model2.select()
         # Block to rename columns
@@ -366,13 +363,8 @@ class ContractRegistry(QWidget):
         layout2.addWidget(box2_3, 1, 0)
 
         # --- Table Setup ---
-        self.db3 = QSqlDatabase.addDatabase("QSQLITE","paid_principle_registry")
-        self.db3.setDatabaseName(resource_path("Databases/paid_principle_registry.db"))
-        if not self.db3.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table3 = QTableView()
-        self.model3 = QSqlTableModel(self, self.db3)
+        self.model3 = QSqlTableModel(self, self.db)
         self.model3.setTable("paid_principle_registry")  # or another table name
         self.model3.select()
         # Block to rename columns
@@ -537,13 +529,8 @@ class ContractRegistry(QWidget):
         layout3.addWidget(box3_3, 0, 0)
 
         # --- Table Setup ---
-        self.db3_1 = QSqlDatabase.addDatabase("QSQLITE", "adding_percent_amount")
-        self.db3_1.setDatabaseName(resource_path("Databases/adding_percent_amount.db"))
-        if not self.db3_1.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table3_1 = QTableView()
-        self.model3_1 = QSqlTableModel(self, self.db3_1)
+        self.model3_1 = QSqlTableModel(self, self.db)
         self.model3_1.setTable("adding_percent_amount")
         self.model3_1.select()
         # Block to rename columns
@@ -707,13 +694,8 @@ class ContractRegistry(QWidget):
         layout4.addWidget(box4_3, 1, 0)
 
         # --- Table Setup ---
-        self.db4 = QSqlDatabase.addDatabase("QSQLITE", "paid_percent_amount")
-        self.db4.setDatabaseName(resource_path("Databases/paid_percent_amount.db"))
-        if not self.db4.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table4 = QTableView()
-        self.model4 = QSqlTableModel(self, self.db4)
+        self.model4 = QSqlTableModel(self, self.db)
         self.model4.setTable("paid_percent_amount")
         self.model4.select()
         # Block to rename columns
@@ -823,13 +805,8 @@ class ContractRegistry(QWidget):
 
 
         # --- Table Setup ---
-        self.db5 = QSqlDatabase.addDatabase("QSQLITE", "outflow_order")
-        self.db5.setDatabaseName(resource_path("Databases/outflow_order.db"))
-        if not self.db5.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხქერდა")
-
         self.table5 = QTableView()
-        self.model5 = QSqlTableModel(self, self.db5)
+        self.model5 = QSqlTableModel(self, self.db)
         self.model5.setTable("outflow_order")
         self.model5.select()
         # Block to rename columns
@@ -934,13 +911,8 @@ class ContractRegistry(QWidget):
         layout_tab6_1.addWidget(box6_1_2, 0, 0, 1, 1)
 
         # --- Table Setup ---
-        self.db6_1 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_only_percent_amount")
-        self.db6_1.setDatabaseName(resource_path("Databases/inflow_order_only_percent_amount.db"))
-        if not self.db6_1.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table6_1 = QTableView()
-        self.model6_1 = QSqlTableModel(self, self.db6_1)
+        self.model6_1 = QSqlTableModel(self, self.db)
         self.model6_1.setTable("inflow_order_only_percent_amount")
         self.model6_1.select()
 
@@ -1031,13 +1003,8 @@ class ContractRegistry(QWidget):
         layout_tab6_2.addWidget(box6_2_2, 0, 0, 1, 1)
 
         # --- Table Setup ---
-        self.db6_2 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_only_principal_amount")
-        self.db6_2.setDatabaseName(resource_path("Databases/inflow_order_only_principal_amount.db"))
-        if not self.db6_2.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table6_2 = QTableView()
-        self.model6_2 = QSqlTableModel(self, self.db6_2)
+        self.model6_2 = QSqlTableModel(self, self.db)
         self.model6_2.setTable("inflow_order_only_principal_amount")
         self.model6_2.select()
 
@@ -1130,13 +1097,8 @@ class ContractRegistry(QWidget):
         layout_tab6_3.addWidget(box6_3_2, 0, 0, 1, 1)
 
         # --- Table Setup ---
-        self.db6_3 = QSqlDatabase.addDatabase("QSQLITE", "inflow_order_both")
-        self.db6_3.setDatabaseName(resource_path("Databases/inflow_order_both.db"))
-        if not self.db6_3.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table6_3 = QTableView()
-        self.model6_3 = QSqlTableModel(self, self.db6_3)
+        self.model6_3 = QSqlTableModel(self, self.db)
         self.model6_3.setTable("inflow_order_both_view")
         self.model6_3.select()
         # Block to rename columns
@@ -1252,13 +1214,8 @@ class ContractRegistry(QWidget):
         layout7.addWidget(box7_2, 0, 0, 1, 2)
 
         # --- Table Setup ---
-        self.db7 = QSqlDatabase.addDatabase("QSQLITE", "contracts_connection")
-        self.db7.setDatabaseName(resource_path("Databases/contracts.db"))
-        if not self.db7.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
-
         self.table7 = QTableView()
-        self.model7 = QSqlTableModel(self, self.db7)
+        self.model7 = QSqlTableModel(self, self.db)
         self.model7.setTable("contracts_view")
         self.model7.select()
         # Block to rename columns
@@ -1556,35 +1513,29 @@ class ContractRegistry(QWidget):
             # Remove the row from the model
             model.removeRow(row_index)
 
+            conn = get_conn()
+            cur = conn.cursor()
+
             # 2. Delete from given_and_additional_database
-            conn_given = get_conn()
-            cur_given = conn_given.cursor()
-            cur_given.execute("""
+            cur.execute("""
                     DELETE FROM given_and_additional_database
                     WHERE contract_id = %s AND amount = %s AND status = %s AND date_of_outflow = %s
                 """, (contract_id, amount, status, date_of_addition))
-            conn_given.commit()
-            conn_given.close()
+
 
             # 3. Delete from outflow_order
-            conn_outflow = get_conn()
-            cur_outflow = conn_outflow.cursor()
-            cur_outflow.execute("""
+            cur.execute("""
                     DELETE FROM outflow_order
                     WHERE contract_id = %s AND amount = %s AND status = %s AND date = %s
                 """, (contract_id, amount, status, date_of_addition))
-            conn_outflow.commit()
-            conn_outflow.close()
+
 
             # 4. Delete amount from active_contracts database
-            conn = get_conn()
-            cursor = conn.cursor()
-
             # Fetch old value
-            cursor.execute("""
+            cur.execute("""
                             SELECT additional_amounts, given_money, percent FROM active_contracts WHERE id = %s
                         """, (contract_id,))
-            row = cursor.fetchone()
+            row = cur.fetchone()
 
             if row and row[0]:
                 old_amount = float(row[0])
@@ -1596,16 +1547,17 @@ class ContractRegistry(QWidget):
             new_additional_amounts = old_amount - amount
             new_added_percent = (given_money + new_additional_amounts) * percent / 100
 
-            cursor.execute("""
-                                                                UPDATE active_contracts SET
-                                                                    additional_amounts = %s,
-                                                                    added_percents = %s
-                                                                WHERE id = %s
-                                                            """, (
+            cur.execute("""
+                        UPDATE active_contracts SET
+                        additional_amounts = %s,
+                        added_percents = %s
+                        WHERE id = %s
+                        """, (
                 new_additional_amounts,
                 new_added_percent,
                 contract_id
             ))
+
             conn.commit()
             conn.close()
 
@@ -1736,15 +1688,11 @@ class ContractRegistry(QWidget):
 
             cursor.execute("SELECT principal_paid FROM active_contracts WHERE id = %s", (contract_id_page2,))
             row = cursor.fetchone()
-            conn.close()
 
             if row:
                 paid_principles_before = row[0]
 
             new_principles_amount = paid_principles_before - principle_page2
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("""
                               UPDATE active_contracts SET
@@ -1754,43 +1702,29 @@ class ContractRegistry(QWidget):
                 new_principles_amount,
                 contract_id_page2,
             ))
-            conn.commit()
-            conn.close()
 
             # Deleting from paid_principle_and_paid_percentage_database
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
-                                            DELETE FROM paid_principle_and_paid_percentage_database
-                                            WHERE contract_id = %s AND status = %s AND date_of_inflow = %s
-                                        """, (contract_id_page2, status_of_payment_page2, date_of_payment_page2))
-            conn.commit()
-            conn.close()
+            cursor.execute("""
+                                  DELETE FROM paid_principle_and_paid_percentage_database
+                                  WHERE contract_id = %s AND status = %s AND date_of_inflow = %s
+                              """, (contract_id_page2, status_of_payment_page2, date_of_payment_page2))
 
             # Deleting from inflow_order_only_principal_amount
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
+            cursor.execute("""
                                DELETE FROM inflow_order_only_principal_amount
                                WHERE contract_id = %s AND payment_date = %s
                               """,
                               (contract_id_page2, date_of_payment_page2))
-            conn.commit()
-            conn.close()
+
 
             # Deleting from inflow_order_in_both
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
-                                           DELETE FROM inflow_order_both
-                                           WHERE contract_id = %s AND payment_date = %s AND percent_paid_amount = %s
-                                          """,
-                              (contract_id_page2, date_of_payment_page2, 0))
+            cursor.execute("""
+                             DELETE FROM inflow_order_both
+                             WHERE contract_id = %s AND payment_date = %s AND percent_paid_amount = %s
+                             """, (contract_id_page2, date_of_payment_page2, 0))
+
             conn.commit()
             conn.close()
-
-
-
 
             if model_page2.submitAll():
                 QMessageBox.information(self, "წარმატება", "ჩანაწერი წაიშალა")
@@ -1908,7 +1842,6 @@ class ContractRegistry(QWidget):
 
             cursor.execute("SELECT added_percents FROM active_contracts WHERE id = %s", (contract_id_page3,))
             row = cursor.fetchone()
-            conn.close()
 
             if row:
                 added_percents_before = row[0]
@@ -1918,8 +1851,6 @@ class ContractRegistry(QWidget):
 
             new_percents_amount = added_percents_before - percent_amount_page3
 
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("""
                                         UPDATE active_contracts SET
@@ -1929,6 +1860,7 @@ class ContractRegistry(QWidget):
                 new_percents_amount,
                 contract_id_page3,
             ))
+
             conn.commit()
             conn.close()
 
@@ -2072,15 +2004,14 @@ class ContractRegistry(QWidget):
 
             cursor.execute("SELECT paid_percents FROM active_contracts WHERE id = %s", (contract_id,))
             row = cursor.fetchone()
-            conn.close()
+
 
             if row:
                 paid_percents_before = row[0]
 
             new_percents_amount = paid_percents_before - paid_percent_amount
 
-            conn = get_conn()
-            cursor = conn.cursor()
+
 
             cursor.execute("""
                                           UPDATE active_contracts SET
@@ -2090,37 +2021,28 @@ class ContractRegistry(QWidget):
                 new_percents_amount,
                 contract_id,
             ))
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
+            cursor.execute("""
                                    DELETE FROM paid_principle_and_paid_percentage_database
                                    WHERE contract_id = %s AND status = %s AND date_of_inflow = %s
                                """,
-                              (contract_id, status, percent_payment_date))
-            conn.commit()
-            conn.close()
+            (contract_id, status, percent_payment_date))
 
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
-                                               DELETE FROM inflow_order_only_percent_amount
-                                               WHERE contract_id = %s AND payment_date = %s
-                                           """,
+
+
+            cursor.execute("""
+                                   DELETE FROM inflow_order_only_percent_amount
+                                   WHERE contract_id = %s AND payment_date = %s
+                               """,
                               (contract_id, percent_payment_date))
-            conn.commit()
-            conn.close()
+
 
             # Deleting from inflow_order_in_both
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
+            cursor.execute("""
                                   DELETE FROM inflow_order_both
                                   WHERE contract_id = %s AND payment_date = %s AND principle_paid_amount = %s
                               """,
                               (contract_id, percent_payment_date, 0))
+
             conn.commit()
             conn.close()
 

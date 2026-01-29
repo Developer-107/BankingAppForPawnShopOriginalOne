@@ -1,5 +1,4 @@
 import os
-from utils import get_conn
 import tempfile
 
 import pandas as pd
@@ -10,7 +9,7 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QDateEdit, QLabel, 
     QAbstractItemView, QToolButton, QMessageBox
 from openpyxl.chart import layout
 
-from utils import resource_path
+from utils import resource_path, get_qt_db
 
 
 class MoneyControl(QWidget):
@@ -70,13 +69,10 @@ class MoneyControl(QWidget):
         layout.addWidget(export_table1, 1, 0)
         layout.addWidget(name_table1, 1, 1)
 
-        self.db1 = QSqlDatabase.addDatabase("QSQLITE", "paid_principle_and_paid_percentage_database")
-        self.db1.setDatabaseName(resource_path("Databases/paid_principle_and_paid_percentage_database.db"))
-        if not self.db1.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
+        self.db = get_qt_db()
 
         self.table1 = QTableView()
-        self.model1 = QSqlTableModel(self, self.db1)
+        self.model1 = QSqlTableModel(self, self.db)
         self.model1.setTable("paid_principle_and_paid_percentage_database")
         self.model1.select()
         # Block to rename columns
@@ -134,13 +130,9 @@ class MoneyControl(QWidget):
         layout.addWidget(export_table2, 1, 2)
         layout.addWidget(name_table2, 1, 3)
 
-        self.db2 = QSqlDatabase.addDatabase("QSQLITE", "given_and_additional_database")
-        self.db2.setDatabaseName(resource_path("Databases/given_and_additional_database.db"))
-        if not self.db2.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
         self.table2 = QTableView()
-        self.model2 = QSqlTableModel(self, self.db2)
+        self.model2 = QSqlTableModel(self, self.db)
         self.model2.setTable("given_and_additional_database")
         self.model2.select()
 

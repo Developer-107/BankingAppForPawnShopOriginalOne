@@ -90,11 +90,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
                 self.payment_amount_box.text(),
                 self.record_id
             ))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
                                 amount = %s
@@ -105,11 +101,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
                 self.payment_date_box.text(),
                 self.status_box.text()
             ))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                                 UPDATE inflow_order_only_principal_amount SET
                                 principle_paid_amount = %s, sum_of_money_paid = %s
@@ -120,11 +112,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
                 self.contract_id_box.text(),
                 self.payment_date_box.text()
             ))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                                UPDATE inflow_order_both SET
                                principle_paid_amount = %s
@@ -135,28 +123,18 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
                 self.payment_date_box.text(),
                 0
             ))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                 SELECT principal_paid FROM active_contracts WHERE id = %s
             """, (self.contract_id_box.text(),))
             row = cursor.fetchone()
-            conn.close()
 
             if row:
                 principal_paid_before = row[0]
 
-
-
             difference_between_changed_and_before = -float(self.payment_amount_before) + float(self.payment_amount_box.text())
             principal_paid_new_amount = principal_paid_before + difference_between_changed_and_before
 
-
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                             UPDATE active_contracts SET
                                 principal_paid = %s
@@ -167,8 +145,6 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             ))
             conn.commit()
             conn.close()
-
-
 
             QMessageBox.information(self, "წარმატება", "ჩანაწერი განახლებულია")
             self.close()

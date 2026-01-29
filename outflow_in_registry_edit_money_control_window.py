@@ -102,11 +102,7 @@ class EditRegistryOutflowWindow(QWidget):
                 self.status_box.text(),
                 self.record_id
             ))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                             UPDATE given_and_additional_database SET
                                 amount = %s
@@ -118,11 +114,7 @@ class EditRegistryOutflowWindow(QWidget):
                 self.amount_before_editing,
                 self.date_box.text()
             ))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                                         UPDATE outflow_order SET
                                             amount = %s
@@ -134,11 +126,6 @@ class EditRegistryOutflowWindow(QWidget):
                 self.status_box.text(),
                 self.date_box.text()
             ))
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
             # Fetch old value
             cursor.execute("""

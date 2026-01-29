@@ -2,8 +2,7 @@ from utils import get_conn
 
 from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QGridLayout, QMessageBox
-from PyQt5.QtGui import QFont, QPalette, QColor, QIcon
-from pandas.core.dtypes.inference import is_number
+from PyQt5.QtGui import QIcon
 
 from utils import resource_path
 
@@ -97,7 +96,6 @@ class PaymentConfirmWindow(QWidget):
 
             cursor.execute("SELECT * FROM active_contracts WHERE id = %s", (self.contract_id,))
             row = cursor.fetchone()
-            conn.close()
 
             name_surname = str(row[3])
             id_number = str(row[4])
@@ -117,18 +115,11 @@ class PaymentConfirmWindow(QWidget):
             trusted_person = str(row[10])
             date_of_C_O = str(row[1])
 
-            conn = get_conn()
-            cur_given = conn.cursor()
-            cur_given.execute("""
+            cursor.execute("""
                 UPDATE active_contracts
                 SET is_visible = 'დახურული'
                 WHERE id = %s
             """, (self.contract_id,))
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
             # Insert in closed_contracts database
             cursor.execute("""

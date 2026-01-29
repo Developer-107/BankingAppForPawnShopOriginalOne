@@ -59,12 +59,13 @@ class AddMoney(QWidget):
 
         try:
             # Step 1: Get the id_number from the original active_contracts table
-            source_conn = get_conn()
-            source_cursor = source_conn.cursor()
-            source_cursor.execute("""SELECT id_number, additional_amounts, date, item_name, 
+            conn = get_conn()
+            cursor = conn.cursor()
+
+            cursor.execute("""SELECT id_number, additional_amounts, date, item_name, 
                                                  model, imei, given_money, tel_number, percent
                                             FROM active_contracts WHERE id = %s""", (contract_id,))
-            result = source_cursor.fetchone()
+            result = cursor.fetchone()
 
             if not result:
                 QMessageBox.warning(self, "შეცდომა", "მითითებული ID-ით ჩანაწერი ვერ მოიძებნა contracts ბაზაში.")
@@ -82,19 +83,11 @@ class AddMoney(QWidget):
 
             updated_additional_amount = float(additional_amounts) + int(self.added_money_amount.text())
             new_added_percents = (given_money + updated_additional_amount) * percent / 100
-            source_cursor.execute("""
+            cursor.execute("""
                     UPDATE active_contracts
                     SET additional_amounts = %s, added_percents = %s
                     WHERE id = %s
                     """, (updated_additional_amount, new_added_percents,contract_id,))
-
-            source_conn.commit()
-            source_conn.close()
-
-
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
 
             # Insert in given_and_additional_database database
@@ -110,12 +103,6 @@ class AddMoney(QWidget):
                 status_for_added_money
                 ))
 
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cursor = conn.cursor()
-
             # Insert in outflow_order database
             cursor.execute("""
                             INSERT INTO outflow_order (
@@ -130,18 +117,13 @@ class AddMoney(QWidget):
                 status_for_added_money
             ))
 
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cursor = conn.cursor()
-
             # Insert in outflow_in_registry database
             cursor.execute("""
                             INSERT INTO outflow_in_registry (
                                 contract_id, date_of_C_O, name_surname, tel_number, id_number, item_name, model, IMEI,
                                 given_money, date_of_addition, additional_amount, status
                             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            RETURNING unique_id
                         """, (
                 self.contract_id_box.text(),
                 contract_open_date,
@@ -157,7 +139,7 @@ class AddMoney(QWidget):
                 status_for_added_money
             ))
 
-            unique_id = cursor.lastrowid
+            unique_id = cursor.fetchone()[0]
 
             conn.commit()
             conn.close()

@@ -1,24 +1,19 @@
-from utils import get_conn
-import sys
-import time
-from datetime import datetime, timedelta
-from email.policy import default
+from load_data_worker import LoadDataWorker
+from utils import get_conn, get_qt_db
+from datetime import datetime
 
 import win32com.client
 
-from PyQt5.QtCore import Qt, QSize, QDate, QDateTime
-from PyQt5.QtGui import QIcon, QBrush, QColor, QTextDocument
-from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
+from PyQt5.QtCore import Qt, QSize, QDate, QDateTime, QTimer
+from PyQt5.QtGui import QIcon
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
-from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QToolButton, QCheckBox, QLabel, QRadioButton, QButtonGroup, \
-    QLineEdit, QDateEdit, QPushButton, QTableView, QAbstractItemView, QMessageBox, QMenu, QAction, QTableWidgetItem
+from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QToolButton, QLabel, QRadioButton, QButtonGroup, \
+    QLineEdit, QDateEdit, QPushButton, QTableView, QAbstractItemView, QMessageBox, QMenu, QAction
 
 from docx import Document
 import tempfile
 import pandas as pd
 import os
-import subprocess
-from PyQt5.QtWidgets import QMessageBox
 
 from add_money_window import AddMoney
 from contract_color_delegate import ContractColorDelegate
@@ -34,21 +29,8 @@ class ActiveContracts(QWidget):
     def __init__(self, role, name_of_user, organisation, id_number_of_user):
         super().__init__()
         self.setWindowTitle("მოქმედი ხელშეკრულებები")
-        self.initialize_active_contracts_database()
-        self.initialize_contracts_database()
-        self.initialize_closed_contracts_database()
-        self.initialize_given_and_additional_database()
-        self.initialize_paid_principle_and_paid_percentage_database()
-        self.initialize_paid_principle_registry_database()
-        self.initialize_outflow_order_database()
-        self.initialize_outflow_in_registry_database()
-        self.initialize_adding_percent_amount_database()
-        self.initialize_paid_percent_amount_database()
-        self.initialize_inflow_order_only_principal_amount_database()
-        self.initialize_inflow_order_only_percent_amount_database()
-        self.initialize_blk_list_database()
-        self.initialize_inflow_order_both_database()
 
+        self.initialize_all_databases()
 
 
         self.setWindowIcon(QIcon(resource_path("Icons/contract_icon.png")))
@@ -194,10 +176,7 @@ class ActiveContracts(QWidget):
 
 
         # --------------------------------------------Table-----------------------------------------------------
-        self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName(resource_path("Databases/active_contracts.db"))
-        if not self.db.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
+        self.db = get_qt_db()
 
         self.table = QTableView()
         self.model = QSqlTableModel(self, self.db)
@@ -396,7 +375,7 @@ class ActiveContracts(QWidget):
         # --------------------------------------------Layout-----------------------------------------------------
         self.setLayout(layout)
 
-        self.load_data()
+        self.start_load_data()
 
 
 
@@ -495,7 +474,10 @@ class ActiveContracts(QWidget):
 
         # Move next_payment_date forward if already passed
         today = QDate.currentDate()
-        days_on_excess = days_after_c_o % day_quantity
+        if day_quantity > 0:
+            days_on_excess = days_after_c_o % day_quantity
+        else:
+            days_on_excess = 0
         days_to_add = day_quantity - days_on_excess
         while next_payment_date.date() < today and day_quantity > 0:
                 next_payment_date = next_payment_date.addDays(days_to_add)
@@ -807,13 +789,31 @@ class ActiveContracts(QWidget):
     #     record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
     #     pass
 
+    def initialize_all_databases(self):
+        conn = get_conn()
+        cursor = conn.cursor()
 
+        self.initialize_active_contracts_database(cursor)
+        self.initialize_contracts_database(cursor)
+        self.initialize_closed_contracts_database(cursor)
+        self.initialize_given_and_additional_database(cursor)
+        self.initialize_paid_principle_and_paid_percentage_database(cursor)
+        self.initialize_paid_principle_registry_database(cursor)
+        self.initialize_outflow_order_database(cursor)
+        self.initialize_outflow_in_registry_database(cursor)
+        self.initialize_adding_percent_amount_database(cursor)
+        self.initialize_paid_percent_amount_database(cursor)
+        self.initialize_inflow_order_only_principal_amount_database(cursor)
+        self.initialize_inflow_order_only_percent_amount_database(cursor)
+        self.initialize_blk_list_database(cursor)
+        self.initialize_inflow_order_both_database(cursor)
+
+        conn.commit()
+        conn.close()
 
 
     # Initializing databases for money control window tables
-    def initialize_contracts_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_contracts_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS contracts (
@@ -836,8 +836,6 @@ class ActiveContracts(QWidget):
                           office_mob_number TEXT
                       )
                   """)
-
-        conn.commit()
 
         cursor.execute("DROP VIEW IF EXISTS contracts_view")
 
@@ -864,14 +862,9 @@ class ActiveContracts(QWidget):
             FROM contracts
         """)
 
-        conn.commit()
-        conn.close()
 
 
-
-    def initialize_closed_contracts_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_closed_contracts_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS closed_contracts (
@@ -897,13 +890,9 @@ class ActiveContracts(QWidget):
                       )
                   """)
 
-        conn.commit()
-        conn.close()
 
 
-    def initialize_active_contracts_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_active_contracts_database(self, cursor):
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS active_contracts (
@@ -936,8 +925,6 @@ class ActiveContracts(QWidget):
             )
         """)
 
-        conn.commit()
-
         # Create or replace the view that exposes generated columns explicitly
         cursor.execute("DROP VIEW IF EXISTS active_contracts_view")
         cursor.execute("""
@@ -968,120 +955,26 @@ class ActiveContracts(QWidget):
                FROM active_contracts
            """)
 
-        conn.commit()
-        conn.close()
 
-    @staticmethod
-    def get_already_added_times(contract_id):
-        conn_1 = get_conn()
-        cursor_1 = conn_1.cursor()
-        cursor_1.execute("SELECT COUNT(*) FROM adding_percent_amount WHERE contract_id = %s",
-                         (contract_id,))
-        result = cursor_1.fetchone()[0]
-        conn_1.close()
-        return result
+    def start_load_data(self):
+        self.worker = LoadDataWorker()
+        self.worker.error.connect(self.on_load_error)
+        self.worker.row_error.connect(self.on_row_error)
+        self.worker.start()
 
-    def load_data(self):
+    def on_load_error(self, msg):
+        QMessageBox.critical(self, "Error", msg)
 
-        today = QDate.currentDate()
-
-        # Open DB connection (adjust DB path as needed)
-        conn = get_conn()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM active_contracts_view")  # Adjust table name & columns accordingly
-        rows = cursor.fetchall()
-
-        for row_index, row in enumerate(rows):
-            try:
-
-                contract_id = row[0]
-                full_date_str = row[1]
-
-                contract_datetime = QDateTime.fromString(full_date_str, "yyyy-MM-dd HH:mm:ss")
-                if not contract_datetime.isValid():
-                    raise ValueError(f"Invalid datetime format: {full_date_str}")
-                contract_date = contract_datetime.date()
-
-                name_surname = str(row[3])
-                id_number = str(row[4])
-                tel_number = str(row[5])
-                item_name = str(row[6])
-                model = str(row[7])
-                imei_sn = str(row[8])
-
-                # These could crash if values are None or strings
-                day_quantity = int(row[14])
-                percent = int(row[13])
-                principal_should_be_paid = float(row[17])
-                added_percents = float(row[18])
-                paid_percents = float(row[19])
-                percent_should_be_paid = float(row[20])
-
-                days_after = contract_date.daysTo(today)
-                new_added_percents = added_percents
-                first_due_day = contract_date.addDays(day_quantity - 1)
-                start_date = min(contract_date, first_due_day)
-
-                if days_after >= day_quantity > 0 and principal_should_be_paid > 0 and percent > 0:
-                    days_diff = start_date.daysTo(today)
-
-                    periods_passed = days_after // day_quantity
-                    total_expected_adds = periods_passed + 1
+    def on_row_error(self, row_number, message):
+        QMessageBox.warning(
+            self,
+            "Row Error",
+            f"Row {row_number} caused an error:\n{message}"
+        )
 
 
-                    already_added_times = self.get_already_added_times(contract_id)
-                    additions_needed = total_expected_adds - already_added_times
 
-                    if additions_needed > 0:
-                        one_period_amount = (principal_should_be_paid * percent) / 100
-                        new_added_percents = added_percents
-                        status_for_added_percent = "დარიცხული პროცენტი"
-
-                        conn2 = get_conn()
-                        cursor2 = conn2.cursor()
-
-                        for i in range(additions_needed):
-                            new_added_percents += one_period_amount
-                            cursor2.execute("""
-                                INSERT INTO adding_percent_amount (
-                                    contract_id, date_of_C_O, name_surname, id_number,
-                                    tel_number, item_name, model, IMEI,
-                                    date_of_percent_addition, percent_amount, status
-                                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                            """, (
-                                contract_id, full_date_str, name_surname, id_number,
-                                tel_number, item_name, model, imei_sn,
-                                QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss"), one_period_amount,
-                                status_for_added_percent
-                            ))
-
-                        conn2.commit()
-                        conn2.close()
-
-                # Update DB
-                self.update_days_and_percents(contract_id, days_after, new_added_percents)
-
-
-            except Exception as e:
-                QMessageBox.critical(self, "Error Loading Data", f"Row {row_index + 1} caused an error:\n{e}")
-
-
-    def update_days_and_percents(self, contract_id, days_after, new_added_percents):
-        conn = get_conn()
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE active_contracts
-            SET days_after_C_O = %s, added_percents = %s
-            WHERE id = %s
-        """, (days_after, new_added_percents, contract_id))
-        conn.commit()
-        conn.close()
-
-
-    def initialize_given_and_additional_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_given_and_additional_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS given_and_additional_database (
@@ -1094,13 +987,7 @@ class ActiveContracts(QWidget):
                       )
                   """)
 
-        conn.commit()
-        conn.close()
-
-
-    def initialize_paid_principle_and_paid_percentage_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_paid_principle_and_paid_percentage_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS paid_principle_and_paid_percentage_database (
@@ -1113,12 +1000,8 @@ class ActiveContracts(QWidget):
                       )
                   """)
 
-        conn.commit()
-        conn.close()
 
-    def initialize_paid_principle_registry_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_paid_principle_registry_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS paid_principle_registry (
@@ -1138,13 +1021,9 @@ class ActiveContracts(QWidget):
                       )
                   """)
 
-        conn.commit()
-        conn.close()
 
 
-    def initialize_outflow_order_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_outflow_order_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS outflow_order (
@@ -1158,13 +1037,9 @@ class ActiveContracts(QWidget):
                       )
                   """)
 
-        conn.commit()
-        conn.close()
 
 
-    def initialize_outflow_in_registry_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_outflow_in_registry_database(self, cursor):
 
         cursor.execute("""
                       CREATE TABLE IF NOT EXISTS outflow_in_registry (
@@ -1184,12 +1059,8 @@ class ActiveContracts(QWidget):
                       )
                   """)
 
-        conn.commit()
-        conn.close()
 
-    def initialize_adding_percent_amount_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_adding_percent_amount_database(self, cursor):
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS adding_percent_amount (
@@ -1209,12 +1080,7 @@ class ActiveContracts(QWidget):
                           """)
 
 
-        conn.commit()
-        conn.close()
-
-    def initialize_paid_percent_amount_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_paid_percent_amount_database(self, cursor):
 
         cursor.execute(""" CREATE TABLE IF NOT EXISTS paid_percent_amount (
                                   unique_id SERIAL PRIMARY KEY,
@@ -1233,13 +1099,9 @@ class ActiveContracts(QWidget):
                               )
                           """)
 
-        conn.commit()
-        conn.close()
 
 
-    def initialize_inflow_order_only_principal_amount_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_inflow_order_only_principal_amount_database(self, cursor):
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS inflow_order_only_principal_amount (
@@ -1252,13 +1114,9 @@ class ActiveContracts(QWidget):
                               )
                           """)
 
-        conn.commit()
-        conn.close()
 
 
-    def initialize_inflow_order_only_percent_amount_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_inflow_order_only_percent_amount_database(self, cursor):
 
         cursor.execute("""
                               CREATE TABLE IF NOT EXISTS inflow_order_only_percent_amount (
@@ -1272,13 +1130,8 @@ class ActiveContracts(QWidget):
                               )
                           """)
 
-        conn.commit()
-        conn.close()
 
-
-    def initialize_blk_list_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_blk_list_database(self, cursor):
 
         cursor.execute("""
                    CREATE TABLE IF NOT EXISTS black_list (
@@ -1290,12 +1143,7 @@ class ActiveContracts(QWidget):
                    )
                """)
 
-        conn.commit()
-        conn.close()
-
-    def initialize_inflow_order_both_database(self):
-        conn = get_conn()
-        cursor = conn.cursor()
+    def initialize_inflow_order_both_database(self, cursor):
 
         cursor.execute("""
                 CREATE TABLE IF NOT EXISTS inflow_order_both (
@@ -1310,8 +1158,6 @@ class ActiveContracts(QWidget):
                     ) STORED
                 )
             """)
-
-        conn.commit()
 
         # Create a view for the table
         cursor.execute("DROP VIEW IF EXISTS inflow_order_both_view")
@@ -1329,8 +1175,6 @@ class ActiveContracts(QWidget):
                 FROM inflow_order_both
             """)
 
-        conn.commit()
-        conn.close()
 
     def open_detail_window(self, index):
         row = index.row()

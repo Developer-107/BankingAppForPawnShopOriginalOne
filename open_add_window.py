@@ -1,9 +1,9 @@
 import os
-from utils import get_conn
+from utils import get_conn, office_mob_number
 from datetime import datetime
 import win32com.client
 from docx import Document
-from PyQt5.QtCore import QDate, QSize, Qt, QDateTime
+from PyQt5.QtCore import QSize, Qt, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox, QComboBox, \
     QCompleter
@@ -211,6 +211,7 @@ class AddWindow(QWidget):
                     trusted_person, comment, given_money,
                     percent, day_quantity, added_percents
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
             """, (
                 self.take_date_box.text(),
                 self.name_surname_box.text(),
@@ -228,16 +229,10 @@ class AddWindow(QWidget):
                 float(int(self.given_money_box.text()) * float(self.percent_box.currentText()) / 100)
             ))
 
-            contract_id = cursor.lastrowid
-
-            conn.commit()
-            conn.close()
+            contract_id = cursor.fetchone()[0]
 
 
             status_for_given_principle = "გაცემული ძირი თანხა"
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("""
                             INSERT INTO given_and_additional_database (
@@ -251,17 +246,9 @@ class AddWindow(QWidget):
                 status_for_given_principle
             ))
 
-
-            conn.commit()
-            conn.close()
-
             new_datetime_str = QDateTime.fromString(self.take_date_box.text(), "yyyy-MM-dd HH:mm:ss") \
                 .addDays(int(self.day_quantity_box.currentText()) - 1) \
                 .toString("yyyy-MM-dd HH:mm:ss")
-            office_mob_number = "599 222 918"
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("""
                             INSERT INTO contracts (
@@ -287,12 +274,6 @@ class AddWindow(QWidget):
                 self.trusted_person_box.text()
             ))
 
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cursor = conn.cursor()
-
             cursor.execute("""
                                        INSERT INTO outflow_order (
                                            contract_id, date, name_surname, tel_number, amount, status
@@ -306,13 +287,8 @@ class AddWindow(QWidget):
                 status_for_given_principle
             ))
 
-            conn.commit()
-            conn.close()
-
             status_for_added_percent = "დარიცხული პროცენტი"
 
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("""
                             INSERT INTO adding_percent_amount (

@@ -1,5 +1,4 @@
 import os
-from utils import get_conn
 import tempfile
 
 import pandas as pd
@@ -10,7 +9,7 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QDateEdit, QLabel, 
     QAbstractItemView, QToolButton, QMessageBox
 from openpyxl.chart import layout
 
-from utils import resource_path
+from utils import resource_path, get_qt_db
 
 
 class DetailWindow(QWidget):
@@ -92,13 +91,10 @@ class DetailWindow(QWidget):
 
         layout.addWidget(name_table1, 1, 0)
 
-        self.db1 = QSqlDatabase.addDatabase("QSQLITE", "adding_percent_amount")
-        self.db1.setDatabaseName(resource_path("Databases/adding_percent_amount.db"))
-        if not self.db1.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
+        self.db = get_qt_db()
 
         self.table1 = QTableView()
-        self.model1 = QSqlTableModel(self, self.db1)
+        self.model1 = QSqlTableModel(self, self.db)
         self.model1.setTable("adding_percent_amount")
         self.model1.select()
         self.table1.setModel(self.model1)
@@ -179,13 +175,9 @@ class DetailWindow(QWidget):
 
         layout.addWidget(name_table2, 1, 2)
 
-        self.db2 = QSqlDatabase.addDatabase("QSQLITE", "paid_percent_amount")
-        self.db2.setDatabaseName(resource_path("Databases/paid_percent_amount.db"))
-        if not self.db2.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
 
         self.table2 = QTableView()
-        self.model2 = QSqlTableModel(self, self.db2)
+        self.model2 = QSqlTableModel(self, self.db)
         self.model2.setTable("paid_percent_amount")
         self.model2.select()
         self.table2.setModel(self.model2)

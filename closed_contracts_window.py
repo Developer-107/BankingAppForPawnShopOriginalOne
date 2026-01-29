@@ -1,4 +1,4 @@
-from utils import get_conn
+from utils import get_conn, get_qt_db
 import sys
 from datetime import datetime, timedelta
 import win32com.client
@@ -150,10 +150,7 @@ class ClosedContracts(QWidget):
 
 
         # --------------------------------------------Table-----------------------------------------------------
-        self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName(resource_path("Databases/closed_contracts.db"))
-        if not self.db.open():
-            raise Exception("ბაზასთან კავშირი ვერ მოხერხდა")
+        self.db = get_qt_db()
 
         self.table = QTableView()
         self.model = QSqlTableModel(self, self.db)
@@ -338,23 +335,22 @@ class ClosedContracts(QWidget):
         contract_id = self.model.data(self.model.index(row_index, self.model.fieldIndex("id")))
 
         try:
+
+            conn = get_conn()
+            cursor = conn.cursor()
+
             # 1. Delete from closed_contracts DB
-            conn_closed = get_conn()
-            cursor_closed = conn_closed.cursor()
-            cursor_closed.execute("DELETE FROM closed_contracts WHERE id = %s", (contract_id,))
-            conn_closed.commit()
-            conn_closed.close()
+            cursor.execute("DELETE FROM closed_contracts WHERE id = %s", (contract_id,))
 
             # 2. Update is_visible = 'აქტიური' in active_contracts DB
-            conn_active = get_conn()
-            cursor_active = conn_active.cursor()
-            cursor_active.execute("""
+            cursor.execute("""
                 UPDATE active_contracts
                 SET is_visible = 'აქტიური'
                 WHERE id = %s
             """, (contract_id,))
-            conn_active.commit()
-            conn_active.close()
+
+            conn.commit()
+            conn.close()
 
             QMessageBox.information(self, "წარმატება", "ხელშეკრულება დაბრუნდა აქტიურებში")
 

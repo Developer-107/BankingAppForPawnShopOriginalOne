@@ -3,7 +3,7 @@ from utils import get_conn
 from datetime import datetime
 import win32com.client
 from docx import Document
-from PyQt5.QtCore import QDate, QDateTime
+from PyQt5.QtCore import QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox, \
     QDateTimeEdit
@@ -61,18 +61,14 @@ class PaymentWindow(QWidget):
         set_date = self.set_date.dateTime().toString("yyyy-MM-dd HH:mm:ss")
         contract_id = self.contract_id_box.text()
 
-
-
-
         try:
             # Step 1: Get the id_number from the original active_contracts table
-            source_conn = get_conn()
-            source_cursor = source_conn.cursor()
-            source_cursor.execute("""SELECT id_number, name_surname, principal_paid, date, item_name, imei, 
+            conn = get_conn()
+            cursor = conn.cursor()
+            cursor.execute("""SELECT id_number, name_surname, principal_paid, date, item_name, imei, 
                                         tel_number, model, given_money, paid_percents 
                                         FROM active_contracts WHERE id = %s""", (contract_id,))
-            result = source_cursor.fetchone()
-            source_conn.close()
+            result = cursor.fetchone()
 
             if not result:
                 QMessageBox.warning(self, "შეცდომა", "მითითებული ID-ით ჩანაწერი ვერ მოიძებნა active_contracts ბაზაში.")
@@ -91,8 +87,6 @@ class PaymentWindow(QWidget):
 
 
             if self.payed_percent_amount.text().strip():
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 new_percent_amount = old_percent_paid + int(self.payed_percent_amount.text())
 
@@ -101,12 +95,6 @@ class PaymentWindow(QWidget):
                                     SET paid_percents = %s
                                     WHERE id = %s
                                 """, (new_percent_amount, contract_id))
-
-                conn.commit()
-                conn.close()
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                                INSERT INTO paid_percent_amount (
@@ -127,11 +115,6 @@ class PaymentWindow(QWidget):
                     status_for_payed_percent_money,
                     set_date
                 ))
-                conn.commit()
-                conn.close()
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                     INSERT INTO paid_principle_and_paid_percentage_database (
@@ -144,17 +127,13 @@ class PaymentWindow(QWidget):
                     int(self.payed_percent_amount.text()),
                     status_for_payed_percent_money
                 ))
-                conn.commit()
-                conn.close()
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                       INSERT INTO inflow_order_only_percent_amount (
                                       contract_id, payment_date, name_surname, percent_paid_amount, sum_of_money_paid, 
                                       set_date
                                       ) VALUES (%s, %s, %s, %s, %s, %s)
+                                      RETURNING unique_id
                                """, (
                     contract_id,
                     payment_date,
@@ -164,15 +143,10 @@ class PaymentWindow(QWidget):
                     set_date
                 ))
 
-                self.unique_id = cursor.lastrowid
-
-                conn.commit()
-                conn.close()
+                self.unique_id = cursor.fetchone()[0]
 
 
             if self.amount_input.text().strip():
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 new_principal_amount = old_principal_paid + int(self.amount_input.text())
 
@@ -181,12 +155,6 @@ class PaymentWindow(QWidget):
                     SET principal_paid = %s
                     WHERE id = %s
                 """, (new_principal_amount, contract_id))
-
-                conn.commit()
-                conn.close()
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                 INSERT INTO paid_principle_registry (
@@ -207,11 +175,6 @@ class PaymentWindow(QWidget):
                     int(self.amount_input.text()),
                     status_for_payed_ground_money
                 ))
-                conn.commit()
-                conn.close()
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                                INSERT INTO paid_principle_and_paid_percentage_database (
@@ -224,16 +187,12 @@ class PaymentWindow(QWidget):
                     int(self.amount_input.text()),
                     status_for_payed_ground_money
                 ))
-                conn.commit()
-                conn.close()
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                 INSERT INTO inflow_order_only_principal_amount (
                                 contract_id, payment_date, name_surname, principle_paid_amount, sum_of_money_paid
                                 ) VALUES (%s, %s, %s, %s, %s)
+                                RETURNING unique_id
                     """, (
                     contract_id,
                     payment_date,
@@ -242,21 +201,16 @@ class PaymentWindow(QWidget):
                     int(self.amount_input.text())
                 ))
 
-                self.unique_id = cursor.lastrowid
-
-                conn.commit()
-                conn.close()
+                self.unique_id = cursor.fetchone()[0]
 
             if self.payed_percent_amount.text().strip() and self.amount_input.text().strip():
-
-                conn = get_conn()
-                cursor = conn.cursor()
 
                 cursor.execute("""
                                                        INSERT INTO inflow_order_both (
                                                        contract_id, payment_date, name_surname, principle_paid_amount,
                                                        percent_paid_amount
                                                        ) VALUES (%s, %s, %s, %s, %s)
+                                                       RETURNING unique_id
                                                """, (
                     contract_id,
                     payment_date,
@@ -265,15 +219,14 @@ class PaymentWindow(QWidget):
                     int(self.payed_percent_amount.text())
                 ))
 
-                self.unique_id = cursor.lastrowid
-
-                conn.commit()
-                conn.close()
+                self.unique_id = cursor.fetchone()[0]
 
             if not self.payed_percent_amount.text().strip() and not self.amount_input.text().strip():
                 QMessageBox.warning(self, "შეცდომა", "გთხოვთ მიუთითოთ მაინც ერთი გადახდის თანხა.")
                 return
 
+            conn.commit()
+            conn.close()
 
             QMessageBox.information(self, "წარმატება", "მონაცემები შენახულია")
             self.close()

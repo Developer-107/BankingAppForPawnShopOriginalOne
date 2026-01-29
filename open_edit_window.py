@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import (
     QMessageBox, QHBoxLayout, QComboBox
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, Qt, QDateTime
+from PyQt5.QtCore import QSize
 
-from utils import resource_path
+from utils import resource_path, office_mob_number
 
 
 class EditWindow(QWidget):
@@ -122,9 +122,10 @@ class EditWindow(QWidget):
 
     def update_record(self):
         try:
-            # 1. Update active_contracts.db
             conn = get_conn()
             cursor = conn.cursor()
+
+            # 1. Update active_contracts.db
             cursor.execute("""
                 UPDATE active_contracts SET
                     name_surname = %s,
@@ -157,14 +158,10 @@ class EditWindow(QWidget):
                 float((int(self.given_money_box.text()) + self.additional_amounts) * (float(self.percent_box.currentText()) / 100)),
                 self.record_id
             ))
-            conn.commit()
-            conn.close()
 
             status = 'გაცემული ძირი თანხა'
 
             # 2. Update given_and_additional_database.db
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                 UPDATE given_and_additional_database SET
                     name_surname = %s,
@@ -177,14 +174,7 @@ class EditWindow(QWidget):
                 status,
                 self.date_of_outflow
             ))
-            conn.commit()
-            conn.close()
 
-
-            office_mob_number = "599 222 918"
-
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                 UPDATE contracts SET
                     name_surname = %s,
@@ -211,12 +201,8 @@ class EditWindow(QWidget):
                 office_mob_number,
                 self.record_id
             ))
-            conn.commit()
-            conn.close()
 
             # 4. Update outflow_order.db
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                 UPDATE outflow_order SET
                     name_surname = %s,
@@ -232,13 +218,8 @@ class EditWindow(QWidget):
                 status,
                 self.date_of_outflow
             ))
-            conn.commit()
-            conn.close()
-
 
             # 5. Update adding_percent_amount.db
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                            UPDATE adding_percent_amount SET
                                percent_amount = %s
@@ -248,6 +229,8 @@ class EditWindow(QWidget):
                 self.record_id,
                 self.date_of_outflow
             ))
+
+
             conn.commit()
             conn.close()
 

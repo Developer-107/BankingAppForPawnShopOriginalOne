@@ -85,6 +85,7 @@ class EditAddingPercentWindow(QWidget):
 
             conn = get_conn()
             cursor = conn.cursor()
+
             cursor.execute("""
                 UPDATE adding_percent_amount SET
                     percent_amount = %s, date_of_percent_addition = %s
@@ -95,15 +96,9 @@ class EditAddingPercentWindow(QWidget):
                 self.contract_id_box.text(),
                 self.percent_addition_date_before
             ))
-            conn.commit()
-            conn.close()
-
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("SELECT added_percents FROM active_contracts WHERE id = %s", (self.contract_id_box.text(),))
             row = cursor.fetchone()
-            conn.close()
 
             if row:
                 added_percents_before = row[0]
@@ -113,8 +108,6 @@ class EditAddingPercentWindow(QWidget):
             difference_between_last_and_new_amounts = -self.amount_before_editing + new_amount
             new_percents_amount = added_percents_before + difference_between_last_and_new_amounts
 
-            conn = get_conn()
-            cursor = conn.cursor()
 
             cursor.execute("""
                             UPDATE active_contracts SET
@@ -124,6 +117,7 @@ class EditAddingPercentWindow(QWidget):
                 new_percents_amount,
                 self.contract_id_box.text(),
             ))
+
             conn.commit()
             conn.close()
 

@@ -64,7 +64,7 @@ class EditPaidPercentWindow(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        conn = get_conn
+        conn = get_conn()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM paid_percent_amount WHERE unique_id = %s", (self.record_id,))
         row = cursor.fetchone()
@@ -93,31 +93,19 @@ class EditPaidPercentWindow(QWidget):
                     paid_amount = %s%s
                 WHERE unique_id = %s%s
             """, (new_amount, self.record_id))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn
-            cursor = conn.cursor()
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
                                 amount = %s%s
                             WHERE contract_id = %s%s AND status = %s%s AND date_of_inflow = %s
                         """, (new_amount, contract_id, status, payment_date))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                                         UPDATE inflow_order_only_percent_amount SET
                                             percent_paid_amount = %s, sum_of_money_paid= %s
                                         WHERE contract_id = %s AND payment_date = %s
                                     """, (new_amount, new_amount, contract_id, payment_date))
-            conn.commit()
-            conn.close()
 
-            conn = get_conn()
-            cursor = conn.cursor()
             cursor.execute("""
                                 UPDATE inflow_order_both SET
                                     percent_paid_amount = %s
