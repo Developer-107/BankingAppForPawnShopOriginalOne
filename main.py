@@ -1,4 +1,6 @@
 import os
+
+from database_Initialiser import initialize_all_databases
 from utils import get_conn
 import sys
 
@@ -207,8 +209,6 @@ class MainWindow(QMainWindow):
 
 
 def init_user_db():
-    base_folder = os.path.dirname(sys.argv[0])
-    db_path = os.path.join(base_folder, "Credentials", "users.db")
 
     conn = get_conn()
     cursor = conn.cursor()
@@ -236,7 +236,8 @@ def launch_main(username, role, name_of_user, organisation, id_number_of_user):
 
 
 if __name__ == "__main__":
-    init_user_db()  # <- move DB setup here so PyInstaller unpacking finishes first
+    init_user_db()
+    initialize_all_databases()
     app = QApplication(sys.argv)
     login = LoginWindow(app_callback=launch_main)
     login.show()
