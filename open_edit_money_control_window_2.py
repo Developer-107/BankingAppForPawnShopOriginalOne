@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import (
     QMessageBox, QHBoxLayout
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, pyqtSignal
 
 from utils import resource_path
 
 
 class EditInPrincipalInflowsInRegistryWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
@@ -121,7 +124,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
                 self.payment_amount_box.text(),
                 self.contract_id_box.text(),
                 self.payment_date_box.text(),
-                0
+                self.payment_amount_before
             ))
 
             cursor.execute("""
@@ -130,7 +133,7 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             row = cursor.fetchone()
 
             if row:
-                principal_paid_before = row[0]
+                principal_paid_before = float(row[0])
 
             difference_between_changed_and_before = -float(self.payment_amount_before) + float(self.payment_amount_box.text())
             principal_paid_new_amount = principal_paid_before + difference_between_changed_and_before
@@ -150,5 +153,9 @@ class EditInPrincipalInflowsInRegistryWindow(QWidget):
             self.close()
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"შეცდომა განახლებაში:\n{e}")
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()
 
 

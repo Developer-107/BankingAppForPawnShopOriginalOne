@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import (
     QMessageBox, QHBoxLayout
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, pyqtSignal
 
 from utils import resource_path
 
 
 class EditRegistryOutflowWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
@@ -163,3 +166,7 @@ class EditRegistryOutflowWindow(QWidget):
             QMessageBox.critical(self, "შეცდომა", f"შეცდომა განახლებაში:\n{e}")
         finally:
             conn.close()
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

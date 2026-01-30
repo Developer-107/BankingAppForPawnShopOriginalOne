@@ -3,7 +3,7 @@ from utils import get_conn
 from datetime import datetime
 import win32com.client
 from docx import Document
-from PyQt5.QtCore import QDateTime
+from PyQt5.QtCore import QDateTime, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox, \
     QDateTimeEdit
@@ -11,6 +11,9 @@ from utils import resource_path
 
 
 class PaymentWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, contract_id, organisation):
         super().__init__()
         self.contract_id = contract_id
@@ -320,3 +323,7 @@ class PaymentWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"ვერ შევინახე მონაცემები:\n{e}")
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

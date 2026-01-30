@@ -27,7 +27,7 @@ class ClientsInTheBlackList(QWidget):
 
         # --------------------------------------------Table-----------------------------------------------------
 
-        self.db = get_qt_db()
+        self.db = get_qt_db("Blk_list")
 
         self.table = QTableView()
         self.model = QSqlTableModel(self, self.db)
@@ -172,8 +172,13 @@ class ClientsInTheBlackList(QWidget):
 
         self.setLayout(layout)
 
+    def refresh_table(self):
+        self.model.setFilter("")
+        self.model.select()
+
     def open_add_blk_list_window(self):
         self.open_add_blk_list_window = AddBlkListWindow()
+        self.open_add_blk_list_window.closing_signal.connect(self.refresh_table)
         self.open_add_blk_list_window.show()
 
 
@@ -221,6 +226,8 @@ class ClientsInTheBlackList(QWidget):
             else:
                 QMessageBox.critical(self, "შეცდომა", "ჩანაწერის ამოშლა ვერ მოხერხდა")
 
+        self.refresh_table()
+
     def open_edit_blk_list_window(self):
         selected = self.table.selectionModel().selectedRows()
         if not selected:
@@ -230,6 +237,7 @@ class ClientsInTheBlackList(QWidget):
         row = selected[0].row()
         record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
         self.edit_window = EditBlkListWindow(record_id)
+        self.edit_window.closing_signal.connect(self.refresh_table)
         self.edit_window.show()
         self.edit_window.destroyed.connect(lambda: self.model.select())  # Refresh after edit
 

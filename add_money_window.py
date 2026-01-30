@@ -4,7 +4,7 @@ from datetime import datetime
 
 import win32com.client
 from docx import Document
-from PyQt5.QtCore import QDate, QDateTime
+from PyQt5.QtCore import QDate, QDateTime, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox
 
@@ -12,6 +12,9 @@ from utils import resource_path
 
 
 class AddMoney(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, contract_id, name_surname, organisation):
         super().__init__()
         self.contract_id = contract_id
@@ -77,9 +80,9 @@ class AddMoney(QWidget):
             item_name = result[3]
             model = result[4]
             imei = result[5]
-            given_money = result[6]
+            given_money = float(result[6])
             tel_number = result[7]
-            percent = result[8]
+            percent = int(result[8])
 
             updated_additional_amount = float(additional_amounts) + int(self.added_money_amount.text())
             new_added_percents = (given_money + updated_additional_amount) * percent / 100
@@ -220,3 +223,8 @@ class AddMoney(QWidget):
                 QMessageBox.critical(self, "შეცდომა", f"ამობეჭდვა ვერ მოოხერხდა:\n{e}")
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"ვერ შევინახე მონაცემები:\n{e}")
+
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

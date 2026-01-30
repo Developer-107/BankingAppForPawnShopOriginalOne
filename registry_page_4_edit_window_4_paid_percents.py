@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import (
     QMessageBox, QHBoxLayout
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, pyqtSignal
 
 from utils import resource_path
 
 
 class EditPaidPercentWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
@@ -90,14 +93,14 @@ class EditPaidPercentWindow(QWidget):
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE paid_percent_amount SET
-                    paid_amount = %s%s
-                WHERE unique_id = %s%s
+                    paid_amount = %s
+                WHERE unique_id = %s
             """, (new_amount, self.record_id))
 
             cursor.execute("""
                             UPDATE paid_principle_and_paid_percentage_database SET
-                                amount = %s%s
-                            WHERE contract_id = %s%s AND status = %s%s AND date_of_inflow = %s
+                                amount = %s
+                            WHERE contract_id = %s AND status = %s AND date_of_inflow = %s
                         """, (new_amount, contract_id, status, payment_date))
 
             cursor.execute("""
@@ -123,3 +126,7 @@ class EditPaidPercentWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"შეცდომა განახლებაში:\n{e}")
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

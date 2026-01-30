@@ -4,12 +4,16 @@ from PyQt5.QtWidgets import (
     QMessageBox, QHBoxLayout, QComboBox
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, pyqtSignal
 
 from utils import resource_path, office_mob_number
 
 
 class EditWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
+
     def __init__(self, record_id, role):
         super().__init__()
         self.record_id = record_id
@@ -115,8 +119,8 @@ class EditWindow(QWidget):
             self.given_money_box.setText(str(int(row[12])))
             self.percent_box.setCurrentText(str(row[13]))  # ✅
             self.day_quantity_box.setCurrentText(str(row[14]))  # ✅
-            self.additional_amounts = row[15]
-            self.given_money_before = row[11]
+            self.additional_amounts = float(row[15])
+            self.given_money_before = row[12]
             self.date_of_outflow = row[1]
 
 
@@ -214,7 +218,7 @@ class EditWindow(QWidget):
                 self.tel_number_box.text(),
                 self.given_money_box.text(),
                 self.record_id,
-                self.given_money_before,
+                float(self.given_money_before),
                 status,
                 self.date_of_outflow
             ))
@@ -248,3 +252,8 @@ class EditWindow(QWidget):
                 conn.close()
             except:
                 pass
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()
+

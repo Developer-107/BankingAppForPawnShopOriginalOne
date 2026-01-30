@@ -1,6 +1,6 @@
 from utils import get_conn
 
-from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtCore import Qt, QDateTime, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QGridLayout, QMessageBox
 from PyQt5.QtGui import QIcon
 
@@ -8,6 +8,9 @@ from utils import resource_path
 
 
 class PaymentConfirmWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, contract_id, name_surname, principal_paid, percent_paid, given_money, principal_should_be_paid):
         super().__init__()
         self.setWindowTitle("გადახდის დადასტურება")
@@ -158,3 +161,7 @@ class PaymentConfirmWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", str(e))
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

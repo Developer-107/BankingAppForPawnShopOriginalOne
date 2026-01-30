@@ -1,6 +1,6 @@
 from utils import get_conn
 
-from PyQt5.QtCore import QDate, QSize, Qt
+from PyQt5.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox
 
@@ -8,6 +8,10 @@ from utils import resource_path
 
 
 class AddBlkListWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("დამატება")
@@ -102,6 +106,11 @@ class AddBlkListWindow(QWidget):
             QMessageBox.critical(self, "შეცდომა", f"ვერ შევინახე მონაცემები:\n{e}")
         finally:
             conn.close()
+
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()
 
 
 

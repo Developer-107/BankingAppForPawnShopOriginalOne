@@ -150,7 +150,7 @@ class ClosedContracts(QWidget):
 
 
         # --------------------------------------------Table-----------------------------------------------------
-        self.db = get_qt_db()
+        self.db = get_qt_db("Closed_contracts")
 
         self.table = QTableView()
         self.model = QSqlTableModel(self, self.db)
@@ -171,6 +171,7 @@ class ClosedContracts(QWidget):
             "model": "მოდელი",
             "trusted_person": "მინდობილი პირი",
             "comment": "კომენტარი",
+            "imei": "IMEI",
             "given_money": "გაცემული ძირი თანხა",
             "percent": "პროცენტი",
             "percent_day_quantity": "დღეების რაოდენობა",
@@ -359,6 +360,8 @@ class ClosedContracts(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"მოცემულობის დამუშავებისას მოხდა შეცდომა:\n{e}")
+
+        self.refresh_table()
 
 
     def refresh_table(self):

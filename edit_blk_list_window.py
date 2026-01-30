@@ -1,3 +1,5 @@
+from PyQt5.QtCore import pyqtSignal
+
 from utils import get_conn
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtGui import QIcon
@@ -6,6 +8,9 @@ from utils import resource_path
 
 
 class EditBlkListWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, record_id, parent=None):
         super().__init__(parent)
         self.record_id = record_id
@@ -76,3 +81,9 @@ class EditBlkListWindow(QWidget):
             QMessageBox.critical(self, "შეცდომა", f"შეცდომა:\n{e}")
         finally:
             conn.close()
+
+
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

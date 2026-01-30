@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import (
     QMessageBox, QHBoxLayout
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, pyqtSignal
 
 from utils import resource_path
 
 
 class EditAddingPercentWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, record_id):
         super().__init__()
         self.record_id = record_id
@@ -101,7 +104,7 @@ class EditAddingPercentWindow(QWidget):
             row = cursor.fetchone()
 
             if row:
-                added_percents_before = row[0]
+                added_percents_before = float(row[0])
             else:
                 print("No record found")
 
@@ -127,3 +130,8 @@ class EditAddingPercentWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "შეცდომა", f"შეცდომა განახლებაში:\n{e}")
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()
+

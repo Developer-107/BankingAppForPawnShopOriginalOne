@@ -2,17 +2,19 @@ import os
 import tempfile
 
 import pandas as pd
-from PyQt5.QtCore import QDate, QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
-from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QDateEdit, QLabel, QPushButton, QTableView, \
+from PyQt5.QtSql import QSqlTableModel
+from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QLabel, QTableView, \
     QAbstractItemView, QToolButton, QMessageBox
-from openpyxl.chart import layout
 
 from utils import resource_path, get_qt_db
 
 
 class DetailWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, contract_id, name_surname, item_name):
         super().__init__()
         self.setWindowTitle("დარიცხული და გადახდილი პროცენტები")
@@ -91,7 +93,7 @@ class DetailWindow(QWidget):
 
         layout.addWidget(name_table1, 1, 0)
 
-        self.db = get_qt_db()
+        self.db = get_qt_db("detail_window_connection")
 
         self.table1 = QTableView()
         self.model1 = QSqlTableModel(self, self.db)
@@ -292,3 +294,7 @@ class DetailWindow(QWidget):
                     pass
 
         footer_label.setText(f"სულ: {total:.2f} ₾")
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

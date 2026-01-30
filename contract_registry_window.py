@@ -189,7 +189,7 @@ class ContractRegistry(QWidget):
 
 
 
-        self.db = get_qt_db()
+        self.db = get_qt_db("Registry_window")
 
         self.table2 = QTableView()
         self.model2 = QSqlTableModel(self, self.db)
@@ -202,12 +202,13 @@ class ContractRegistry(QWidget):
         column_labels = {
             "unique_id": "უნიკალური ნომერი N",
             "contract_id": "ხელშეკრულების N",
-            "date_of_C_O": "გაფორმების თარიღი",
+            "date_of_c_o": "გაფორმების თარიღი",
             "name_surname": "სახელი და გვარი",
             "id_number": "პირადი ნომერი",
             "tel_number": "ტელეფონის ნომერი",
             "item_name": "ნივთის დასახელება",
             "model": "მოდელი",
+            "imei" : "IMEI",
             "given_money": "გაცემული ძირი თანხა",
             "date_of_addition": "დამატების თარიღი",
             "additional_amount": "დამატებული თანხები",
@@ -374,11 +375,12 @@ class ContractRegistry(QWidget):
         column_labels = {
             "unique_id": "უნიკალური ნომერი N",
             "contract_id": "ხელშეკრულების N",
-            "date_of_C_O": "გაფორმების თარიღი",
+            "date_of_c_o": "გაფორმების თარიღი",
             "name_surname": "სახელი და გვარი",
             "id_number": "პირადი ნომერი",
             "tel_number": "ტელეფონის ნომერი",
             "item_name": "ნივთის დასახელება",
+            "imei": "IMEI",
             "model": "მოდელი",
             "given_money": "გაცემული ძირი თანხა",
             "date_of_payment": "გადახდის თარიღი",
@@ -540,10 +542,11 @@ class ContractRegistry(QWidget):
         column_labels = {
             "unique_id": "უნიკალური ნომერი N",
             "contract_id": "ხელშეკრულების N",
-            "date_of_C_O": "გაფორმების თარიღი",
+            "date_of_c_o": "გაფორმების თარიღი",
             "name_surname": "სახელი და გვარი",
             "id_number": "პირადი ნომერი",
             "tel_number": "ტელეფონის ნომერი",
+            "imei": "IMEI",
             "item_name": "ნივთის დასახელება",
             "model": "მოდელი",
             "date_of_percent_addition": "პროცენტის დარიცხვის თარიღი",
@@ -705,11 +708,12 @@ class ContractRegistry(QWidget):
         column_labels = {
             "unique_id": "უნიკალური ნომერი N",
             "contract_id": "ხელშეკრულების N",
-            "date_of_C_O": "გაფორმების თარიღი",
+            "date_of_c_o": "გაფორმების თარიღი",
             "name_surname": "სახელი და გვარი",
             "id_number": "პირადი ნომერი",
             "tel_number": "ტელეფონის ნომერი",
             "item_name": "ნივთის დასახელება",
+            "imei": "IMEI",
             "model": "მოდელი",
             "set_date": "პროცენტის მითითებული თარიღი",
             "date_of_percent_addition": "გადახდის თარიღი",
@@ -1474,6 +1478,7 @@ class ContractRegistry(QWidget):
             record_id = model.data(model.index(row_index, model.fieldIndex("unique_id")))
 
             self.open_outflow_in_registry_edit_money_control_window = EditRegistryOutflowWindow(record_id)
+            self.open_outflow_in_registry_edit_money_control_window.closing_signal.connect(self.refresh_table)
             self.open_outflow_in_registry_edit_money_control_window.show()
 
         else:
@@ -1568,6 +1573,8 @@ class ContractRegistry(QWidget):
             else:
                 QMessageBox.critical(self, "შეცდომა", "ჩანაწერის წაშლა ვერ მოხერხდა")
 
+        self.refresh_table()
+
 
     # --------------------------------------------page2functions-----------------------------------------------------
 
@@ -1642,6 +1649,7 @@ class ContractRegistry(QWidget):
             model = self.table3.model()
             record_id = model.data(model.index(row_index, model.fieldIndex("unique_id")))
             self.open_edit_money_control_window_2 = EditInPrincipalInflowsInRegistryWindow(record_id)
+            self.open_edit_money_control_window_2.closing_signal.connect(self.refresh_table_2)
             self.open_edit_money_control_window_2.show()
         else:
             QMessageBox.warning(self, "შეცდომა", "გთხოვთ აირჩიოთ შესაცვლელი ჩანაწერი")
@@ -1689,10 +1697,12 @@ class ContractRegistry(QWidget):
             cursor.execute("SELECT principal_paid FROM active_contracts WHERE id = %s", (contract_id_page2,))
             row = cursor.fetchone()
 
+
             if row:
                 paid_principles_before = row[0]
+            else: print("No record found")
 
-            new_principles_amount = paid_principles_before - principle_page2
+            new_principles_amount = float(paid_principles_before) - principle_page2
 
             cursor.execute("""
                               UPDATE active_contracts SET
@@ -1730,6 +1740,8 @@ class ContractRegistry(QWidget):
                 QMessageBox.information(self, "წარმატება", "ჩანაწერი წაიშალა")
             else:
                 QMessageBox.critical(self, "შეცდომა", "ჩანაწერის წაშლა ვერ მოხერხდა")
+
+        self.refresh_table_2()
 
 
 
@@ -1804,6 +1816,7 @@ class ContractRegistry(QWidget):
             model = self.table3_1.model()
             record_id = model.data(model.index(row_index, model.fieldIndex("unique_id")))
             self.edit_window_3 = EditAddingPercentWindow(record_id)
+            self.edit_window_3.closing_signal.connect(self.refresh_table_3)
             self.edit_window_3.show()
 
         else:
@@ -1869,6 +1882,8 @@ class ContractRegistry(QWidget):
                 QMessageBox.information(self, "წარმატება", "ჩანაწერი წაიშალა")
             else:
                 QMessageBox.critical(self, "შეცდომა", "წაშლა ვერ მოხერხდა")
+
+        self.refresh_table_3()
 
 
     # --------------------------------------------page4functions-----------------------------------------------------
@@ -1963,6 +1978,7 @@ class ContractRegistry(QWidget):
             model = self.table4.model()
             record_id = model.data(model.index(row_index, model.fieldIndex("unique_id")))
             self.edit_window_4 = EditPaidPercentWindow(record_id)
+            self.edit_window_4.closing_signal.connect(self.refresh_table_4)
             self.edit_window_4.show()
         else:
             QMessageBox.warning(self, "შეცდომა", "გთხოვთ აირჩიოთ შესაცვლელი ჩანაწერი")
@@ -2006,6 +2022,7 @@ class ContractRegistry(QWidget):
             row = cursor.fetchone()
 
 
+            paid_percents_before = 0
             if row:
                 paid_percents_before = row[0]
 
@@ -2051,6 +2068,8 @@ class ContractRegistry(QWidget):
                 QMessageBox.information(self, "წარმატება", "ჩანაწერი წაიშალა")
             else:
                 QMessageBox.critical(self, "შეცდომა", "წაშლა ვერ მოხერხდა")
+
+        self.refresh_table_4()
 
     # --------------------------------------------page5functions-----------------------------------------------------
     def update_summary_footer5(self):

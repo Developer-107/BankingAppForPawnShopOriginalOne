@@ -3,7 +3,7 @@ from utils import get_conn, office_mob_number
 from datetime import datetime
 import win32com.client
 from docx import Document
-from PyQt5.QtCore import QSize, Qt, QDateTime
+from PyQt5.QtCore import QSize, Qt, QDateTime, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QToolButton, QHBoxLayout, QMessageBox, QComboBox, \
     QCompleter
@@ -12,6 +12,9 @@ from utils import resource_path
 
 
 class AddWindow(QWidget):
+
+    closing_signal = pyqtSignal()
+
     def __init__(self, organisation, name_of_user):
         super().__init__()
         self.setWindowTitle("დამატება")
@@ -395,3 +398,7 @@ class AddWindow(QWidget):
             QMessageBox.critical(self, "შეცდომა", f"ვერ შევინახე მონაცემები:\n{e}")
         finally:
             conn.close()
+
+    def closeEvent(self, event):
+        self.closing_signal.emit()
+        event.accept()

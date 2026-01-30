@@ -6,7 +6,7 @@ import win32com.client
 
 from PyQt5.QtCore import Qt, QSize, QDate, QDateTime, QTimer
 from PyQt5.QtGui import QIcon
-from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
+from PyQt5.QtSql import QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QToolButton, QLabel, QRadioButton, QButtonGroup, \
     QLineEdit, QDateEdit, QPushButton, QTableView, QAbstractItemView, QMessageBox, QMenu, QAction
 
@@ -191,7 +191,7 @@ class ActiveContracts(QWidget):
         column_labels = {
             "id": "ხელშეკრულების N",
             "date": "გაფორმების თარიღი",
-            "days_after_C_O":"დღის რაოდენობა",
+            "days_after_c_o":"დღის რაოდენობა",
             "name_surname": "სახელი და გვარი",
             "id_number": "პირადი ნომერი",
             "tel_number": "ტელეფონის ნომერი",
@@ -383,6 +383,7 @@ class ActiveContracts(QWidget):
         # --------------------------------------------Functions-----------------------------------------------------
     def open_add_window(self):
         self.open_add_window = AddWindow(self.organisation, self.name_of_user)
+        self.open_add_window.closing_signal.connect(self.refresh_table)
         self.open_add_window.show()
 
     def open_edit_window(self):
@@ -392,6 +393,7 @@ class ActiveContracts(QWidget):
             model = self.table.model()
             record_id = model.data(model.index(row_index, model.fieldIndex("id")))
             self.open_edit_window = EditWindow(record_id, self.role)
+            self.open_edit_window.closing_signal.connect(self.refresh_table)
             self.open_edit_window.show()
         else:
             QMessageBox.warning(self, "შეცდომა", "გთხოვთ აირჩიოთ შესაცვლელი ჩანაწერი")
@@ -693,6 +695,7 @@ class ActiveContracts(QWidget):
 
     def open_add_money_window(self, contract_id, name_surname):
         self.add_money_window = AddMoney(contract_id, name_surname, self.organisation)
+        self.add_money_window.closing_signal.connect(self.refresh_table)
         self.add_money_window.show()
 
 
@@ -709,6 +712,7 @@ class ActiveContracts(QWidget):
 
     def open_payment_window(self, contract_id):
         self.payment_window = PaymentWindow(contract_id, self.organisation)
+        self.payment_window.closing_signal.connect(self.refresh_table)
         self.payment_window.show()
 
 
@@ -731,6 +735,7 @@ class ActiveContracts(QWidget):
 
         self.confirm_window = PaymentConfirmWindow(contract_id, name_surname, principal_paid, percent_paid,
                                                    given_money, principal_should_be_paid)
+        self.confirm_window.closing_signal.connect(self.refresh_table)
         self.confirm_window.show()
 
 
@@ -1184,6 +1189,7 @@ class ActiveContracts(QWidget):
 
         # Example: open a custom window and pass the contract ID
         self.detail_window = DetailWindow(contract_id, name_surname, item_name)
+        self.detail_window.closing_signal.connect(self.refresh_table)
         self.detail_window.show()
 
     def update_summary_footer(self):
