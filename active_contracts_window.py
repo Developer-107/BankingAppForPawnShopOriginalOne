@@ -373,10 +373,6 @@ class ActiveContracts(QWidget):
         # --------------------------------------------Layout-----------------------------------------------------
         self.setLayout(layout)
 
-        self.start_load_data()
-
-
-
 
         # --------------------------------------------Functions-----------------------------------------------------
     def open_add_window(self):
@@ -791,26 +787,6 @@ class ActiveContracts(QWidget):
     #     row = self.table.currentIndex().row()
     #     record_id = self.model.data(self.model.index(row, self.model.fieldIndex("id")))
     #     pass
-
-
-
-
-
-    def start_load_data(self):
-        self.worker = LoadDataWorker()
-        self.worker.error.connect(self.on_load_error)
-        self.worker.row_error.connect(self.on_row_error)
-        self.worker.start()
-
-    def on_load_error(self, msg):
-        QMessageBox.critical(self, "Error", msg)
-
-    def on_row_error(self, row_number, message):
-        QMessageBox.warning(
-            self,
-            "Row Error",
-            f"Row {row_number} caused an error:\n{message}"
-        )
 
 
     def open_detail_window(self, index):

@@ -1,5 +1,6 @@
 import os
 
+from application_percent_logic import schedule_daily_load, start_load_data
 from database_Initialiser import initialize_all_databases
 from utils import get_conn
 import sys
@@ -28,6 +29,11 @@ class MainWindow(QMainWindow):
         self.name_of_user = name_of_user
         self.organisation = organisation
         self.id_number_of_user = id_number_of_user
+
+
+        start_load_data(self)  # run immediately
+        schedule_daily_load(self) # schedules for 00:00 daily
+
 
         self.money_control_window = None
         self.clients_in_the_black_list_window = None
